@@ -1,0 +1,37 @@
+extends layout 
+
+block content 
+    h2.glowny= title 
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Nazwa:
+            input#name.form-control(type='text', placeholder='np. Czajnik' name='name', required= 'true', value=(undefined===result ? '' : result.device.name))
+            
+            label(for='freeText') Dodatkowy opis:
+            input#freeText.form-control(type='text', name='freeText',  value=(undefined===result ? '' : result.device.description))
+
+            label(for='ip') Adres IP urzadzenia:
+            input#ip.form-control(type='text', name='ip',  value=(undefined===result ? '' : result.device.ip))
+
+            div 
+                p Wybierz do której linii należy urządzenie
+                select(name='prodLineId')
+                    each data in result.prodLine 
+                        option(value!= data._id selected=(data.name===result.device.prodLine.name?true:false))  #{data.name}
+
+            div 
+                p Wybierz typ urządzenia
+                select(name='deviceTypeId')
+                    each data in result.deviceType
+                        option(value!= data._id selected=(data.name===result.device.deviceType.name?true:false))  #{data.name}
+
+        button.btn.btn-primary(type='submit') Zapisz
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+
+    script.
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"

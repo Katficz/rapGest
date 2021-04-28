@@ -1,0 +1,23 @@
+extends layout 
+
+block content
+    h1= title 
+
+    p Nazwa Urządzenie: #{result.name} 
+    p Adres IP urządzenia: #{result.ip}
+    p Nazwa Linii produkcyjnej: #{result.prodLine.name}
+    p Typ urządzenia: #{result.deviceType.name}
+    p Opis #{result.description}
+    div 
+        a(href=result.url+'/edytuj') EDYTUJ
+    div 
+        a(href=result.url+'/usun') USUN
+    
+
+    if err
+        ul
+            for error in err
+                li!= error.msg
+    script.
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"

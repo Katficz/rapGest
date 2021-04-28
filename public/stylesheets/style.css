@@ -1,0 +1,32 @@
+/* CSS FOR BOOTSTRAP STARTS HERE */
+.raportTableTitle {
+  background-color: #01426a;
+  color: white;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 19px;
+}
+
+.gestamp-bg-color {
+  background-color: #01426a;
+}
+.nice-border {
+  border: 3px solid #01426a;
+  border-radius: 15px;
+  padding: 10px;
+}
+.nice-shifts-border {
+  border: 2px solid #01426a;
+  border-radius: 15px;
+  padding: 15px;
+  height: 200px;
+}
+.no-ul-style {
+  height: 300px;
+  list-style-type: none;
+}
+.no-ul-style li input {
+  margin-right: 4px;
+}
+
+/* CSS AFTER BOOTSTRAP ENDS HERE */

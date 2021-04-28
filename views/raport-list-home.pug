@@ -1,0 +1,116 @@
+extends layout 
+
+block content 
+    div.container
+        div.row
+            div.col-10.offset-1.col-xs-12
+                h1.h1.m-3.text-center= title
+                table.table.table-bordered
+                    thead 
+                        tr
+                            th.text-center(scope="col" style="width: 12%") Zmiana
+                            th.text-center(scope="col" style="width: 22%") #{dates[3]}
+                            th.text-center(scope="col" style="width: 22%") #{dates[2]}
+                            th.text-center(scope="col" style="width: 22%") #{dates[1]}
+                            th.text-center(scope="col" style="width: 22%") #{dates[0]}
+                    tbody 
+                        tr#shiftAUrl(data-shiftA=shiftA)
+                            th.align-middle.text-center(scope="row") 1
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+
+                        tr#shiftBUrl(data-shiftB=shiftB)
+                            th.align-middle.text-center(scope="row") 2
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+
+                        tr#shiftCUrl(data-shiftC=shiftC)
+                            th.align-middle.text-center(scope="row") 3
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+                            td
+                                button.btn.lg.btn-block(style="height:70px")
+                                    a(style="color:white" href="#")
+
+
+
+
+    script.
+        const activateSubMenu = document.querySelector('#mainHistory')
+        activateSubMenu.className+=" active"
+
+        firstTr = document.querySelector('#shiftAUrl')
+        secondTr = document.querySelector('#shiftBUrl')
+        thirdTr = document.querySelector('#shiftCUrl')
+        parsedFirst = JSON.parse(firstTr.dataset.shifta)
+        parsedSecond = JSON.parse(secondTr.dataset.shiftb)
+        parsedThird = JSON.parse(thirdTr.dataset.shiftc)
+        for(var i = 1;i<firstTr.childNodes.length;i++) {
+            if(parsedFirst[i-1] != 0) {
+                firstTr.childNodes[i].firstChild.firstChild.href = parsedFirst[i-1] + '/edytuj'
+                firstTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
+                firstTr.childNodes[i].firstChild.classList.add('btn-success')
+            }
+            else {
+                firstTr.childNodes[i].firstChild.classList.add('btn-warning')
+                firstTr.childNodes[i].firstChild.disabled = true
+                firstTr.childNodes[i].firstChild.firstChild.text = 'Brak raportu'
+            }
+        }
+        for(var i = 1;i<secondTr.childNodes.length;i++) {
+            if(parsedSecond[i-1] != 0) {
+                secondTr.childNodes[i].firstChild.firstChild.href = parsedSecond[i-1] + '/edytuj'
+                secondTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
+                secondTr.childNodes[i].firstChild.classList.add('btn-success')
+            }
+            else {
+                secondTr.childNodes[i].firstChild.classList.add('btn-warning')
+                secondTr.childNodes[i].firstChild.disabled = true
+                secondTr.childNodes[i].firstChild.firstChild.text = 'Brak raportu'
+            }
+        }
+        for(var i = 1;i<thirdTr.childNodes.length;i++) {
+            if(parsedThird[i-1] != 0) {
+                thirdTr.childNodes[i].firstChild.firstChild.href = parsedThird[i-1] + '/edytuj'
+                thirdTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
+                thirdTr.childNodes[i].firstChild.classList.add('btn-success')
+            }
+            else {
+                thirdTr.childNodes[i].firstChild.classList.add('btn-warning')
+                thirdTr.childNodes[i].firstChild.disabled = true
+                thirdTr.childNodes[i].firstChild.firstChild.text = 'Brak raportu'
+            }
+        }
+
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg

@@ -1,0 +1,40 @@
+extends layout 
+
+block content 
+    h2.glowny= title 
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Nazwa:
+            input#name.form-control(type='text', placeholder='np. Czajnik' name='name', required= 'true')
+            
+            label(for='freeText') Dodatkowy opis:
+            input#freeText.form-control(type='text', name='freeText')
+
+            label(for='ip') Adres IP urzadzenia:
+            input#ip.form-control(type='text', name='ip')
+
+            div 
+                p Wybierz do której linii należy urządzenie
+                select(name='prodLineId')
+                    each prodLine in result.prodLines
+                        option(value!= prodLine._id)  #{prodLine.name}
+
+            div 
+                p Wybierz typ urządzenia
+                select(name='deviceTypeId')
+                    each deviceType in result.deviceTypes
+                        option(value!= deviceType._id)  #{deviceType.name}
+
+        button.btn.btn-primary(type='submit') Zapisz
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+    script.
+        const activateLink = document.querySelector('#deviceAddActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"
+
+//- sends object {name: 'data', freeText: 'data', prodLineId: 'data'} in req.body

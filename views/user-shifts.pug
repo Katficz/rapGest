@@ -1,0 +1,234 @@
+extends layout 
+
+block content 
+    div.container
+        div.row
+            h1.col-12.text-center= title 
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.firstShiftSaved.text-primary.text-center.font-weight-bold 
+                h2.h2.font-weight-bold.mb-2 Zmiana I
+                ul.sh1.font-weight-normal.nice-shifts-border
+                    each employee in shift1
+                        li(data-id=employee._id) #{employee.name} #{employee.surname} #{employee.position}
+
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.secondShiftSaved.text-primary.text-center.font-weight-bold
+                h2.font-weight-bold Zmiana II
+                ul.sh2.font-weight-normal.nice-shifts-border
+                    each employee in shift2
+                        li(data-id=employee._id) #{employee.name} #{employee.surname} #{employee.position}
+
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.thirdShiftSaved.text-primary.text-center.font-weight-bold
+                h2.font-weight-bold Zmiana III
+                ul.sh3.font-weight-normal.nice-shifts-border
+                    each employee in shift3
+                        li(data-id=employee._id) #{employee.name} #{employee.surname} #{employee.position}
+            
+            
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.firstShift 
+                form#firstForm() 
+                    ul.nice-shifts-border.list-unstyled
+                        each employee in shift0 
+                            div.toShift1(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
+                                li
+                                    input.mr-1(type='checkbox' name='shift1' value=employee._id onclick="clickShift1(this)" checked=(employee.shift===1 ? true : false))
+                                    label(for='shift1') #{employee.name} #{employee.surname} #{employee.position}
+                    button(type='button') Zapisz zmianę 1
+            
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.secondShift 
+                form#secondForm() 
+                    ul.nice-shifts-border.list-unstyled
+                        each employee in shift0 
+                            div.toShift2(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
+                                li
+                                    input.mr-1(type='checkbox' name='shift2' value=employee._id onclick="clickShift2(this)" checked=(employee.shift===2 ? true : false))
+                                    label(for='shift2') #{employee.name} #{employee.surname} #{employee.position}
+                    button(type='button') Zapisz zmianę 2
+            
+            div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.thirdShift
+                form#thirdForm() 
+                    ul.nice-shifts-border.list-unstyled
+                        each employee in shift0 
+                            div.toShift3(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
+                                li
+                                    input.mr-1(type='checkbox' name='shift3' value=employee._id onclick="clickShift3(this)" checked=(employee.shift===3 ? true : false))
+                                    label(for='shift3') #{employee.name} #{employee.surname} #{employee.position}
+                    button(type='button') Zapisz zmianę 3
+    script.
+        const activateLink = document.querySelector('#userShiftsActive')
+        const activateSubMenu = document.querySelector('#userSubMenu')
+        activateSubMenu.className+=" active"
+        activateLink.className+=" active"
+        
+        const shiftList1 = document.querySelectorAll('.sh1')[0]
+
+        const shiftButtons1 = document.querySelectorAll('.toShift1')
+        const shiftButtons2 = document.querySelectorAll('.toShift2')
+        const shiftButtons3 = document.querySelectorAll('.toShift3')
+        
+        const firstShiftSaved = document.querySelector('.sh1')
+        const secondShiftSaved = document.querySelector('.sh2')
+        const thirdShiftSaved = document.querySelector('.sh3')
+
+        const firstForm = document.querySelector('#firstForm')
+        const secondForm = document.querySelector('#secondForm')
+        const thirdForm = document.querySelector('#thirdForm')
+        startUpHide();
+
+        firstForm.lastChild.onclick = function() {
+            var toSaveIds = {shift: 1}
+            for(let i=0;i<firstForm.length-1;i++) {
+                if(firstForm[i].checked == true) {
+                    toSaveIds['employee' + i] = firstForm[i].value
+                }
+            }
+            //fetching here
+            fetch('/api/zmiany', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(toSaveIds)
+            })
+            .then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                alert(json.body + toSaveIds.shift)
+            })
+            .catch((err) => {
+                console.error('error: ', err)
+            })
+        }
+
+        secondForm.lastChild.onclick = function() {
+            var toSaveIds = {shift: 2}
+            for(let i=0;i<secondForm.length-1;i++) {
+                if(secondForm[i].checked == true) {
+                    console.log(secondForm[i])
+                    toSaveIds['employee' + i] = secondForm[i].value
+                }
+            }
+            //fetching here
+            fetch('/api/zmiany', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(toSaveIds)
+            })
+            .then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                alert(json.body + toSaveIds.shift)
+            })
+            .catch((err) => {
+                console.error('error: ', err)
+            })
+        }
+
+        thirdForm.lastChild.onclick = function() {
+            var toSaveIds = {shift: 3}
+            for(let i=0;i<thirdForm.length-1;i++) {
+                if(thirdForm[i].checked == true) {
+                    toSaveIds['employee' + i] = thirdForm[i].value
+                }
+            }
+            //fetching here
+            fetch('/api/zmiany', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(toSaveIds)
+            })
+            .then(function(response) {
+                return response.json();
+            }).then(function(json) {
+                alert(json.body + toSaveIds.shift)
+            })
+            .catch((err) => {
+                alert('error: ', err)
+            })
+        }
+
+        //startup for firstShift
+        function clickShift1(object) {
+            if(object.checked == true) {
+                findMatchingCheckBox(object.value, shiftButtons2, shiftButtons3, 'none')
+                var newEmployeeShift1 = document.createElement('li')
+                newEmployeeShift1.textContent = object.parentNode.parentNode.dataset.name + ' ' + object.parentNode.parentNode.dataset.surname + ' ' + object.parentNode.parentNode.dataset.position
+                newEmployeeShift1.dataset.id = object.value
+                firstShiftSaved.appendChild(newEmployeeShift1)
+            }
+            if(object.checked == false) {
+                findMatchingCheckBox(object.value, shiftButtons2, shiftButtons3, 'initial')
+                for(var i=0; i<firstShiftSaved.childNodes.length; i++){ 
+                    if(firstShiftSaved.childNodes[i].dataset.id == object.value)
+                    firstShiftSaved.removeChild(firstShiftSaved.childNodes[i])
+                }
+            }
+        }
+        function clickShift2(object) {
+            if(object.checked == true) {
+                findMatchingCheckBox(object.value, shiftButtons1, shiftButtons3, 'none')
+                var newEmployeeShift2 = document.createElement('li')
+                newEmployeeShift2.textContent = object.parentNode.parentNode.dataset.name + ' ' + object.parentNode.parentNode.dataset.surname + ' ' + object.parentNode.parentNode.dataset.position
+                newEmployeeShift2.dataset.id = object.value
+                secondShiftSaved.appendChild(newEmployeeShift2)
+                }
+            if(object.checked == false) {
+                findMatchingCheckBox(object.value, shiftButtons1, shiftButtons3, 'initial')
+                for(var i=0; i<secondShiftSaved.childNodes.length; i++){ 
+                    if(secondShiftSaved.childNodes[i].dataset.id == object.value)
+                    secondShiftSaved.removeChild(secondShiftSaved.childNodes[i])
+                }
+                }   
+        }
+        function clickShift3(object) {
+            if(object.checked == true) {
+                findMatchingCheckBox(object.value, shiftButtons1, shiftButtons2, 'none')
+                var newEmployeeShift3 = document.createElement('li')
+                newEmployeeShift3.textContent = object.parentNode.parentNode.dataset.name + ' ' + object.parentNode.parentNode.dataset.surname + ' ' + object.parentNode.parentNode.dataset.position
+                newEmployeeShift3.dataset.id = object.value
+                thirdShiftSaved.appendChild(newEmployeeShift3)
+            }
+            if(object.checked == false) {
+                findMatchingCheckBox(object.value, shiftButtons1, shiftButtons2, 'initial')
+                for(var i=0; i<thirdShiftSaved.childNodes.length; i++){ 
+                    if(thirdShiftSaved.childNodes[i].dataset.id == object.value)
+                    thirdShiftSaved.removeChild(thirdShiftSaved.childNodes[i])
+                }
+            }
+        }
+        //iterates through nodelists A and B, finds matching id and sets style.display value to 'value'
+        function findMatchingCheckBox(masterId, nodeListA, nodeListB, value) {
+            for (let i = 0; i < nodeListA.length; i++) {
+                if(masterId === nodeListA[i].dataset.id) {
+                    nodeListA[i].style.display = value
+                }
+                if(masterId === nodeListB[i].dataset.id) {
+                    nodeListB[i].style.display = value
+                }
+            }
+        }
+        //hiding checkboxes as the program page is loaded
+        function startUpHide(){
+            for(let i = 0; i<shiftButtons1.length;i++) {
+                if(shiftButtons1[i].firstChild.firstChild.checked == true){
+                    findMatchingCheckBox(shiftButtons1[i].dataset.id, shiftButtons2, shiftButtons3, 'none')
+                }
+            }
+            for(let i = 0; i<shiftButtons2.length;i++) {
+                if(shiftButtons2[i].firstChild.firstChild.checked == true){
+                    findMatchingCheckBox(shiftButtons2[i].dataset.id, shiftButtons1, shiftButtons3, 'none')
+                }
+            }
+            for(let i = 0; i<shiftButtons3.length;i++) {
+                if(shiftButtons3[i].firstChild.firstChild.checked == true){
+                    findMatchingCheckBox(shiftButtons3[i].dataset.id, shiftButtons1, shiftButtons2, 'none')
+                }
+            }
+        }
+
+    if errors
+        ul
+            for error in errors
+                li #{error.msg}

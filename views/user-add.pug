@@ -1,0 +1,47 @@
+extends layout 
+
+block content 
+    h2.glowny= title 
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Imię:
+            input#name.form-control(type='text' name='name', required= 'true')
+            
+            label(for='surname') Nazwisko:
+            input#freeText.form-control(type='text', name='surname', required= 'true')
+
+            label(for='email') Adres email:
+            input#ip.form-control(type='email', name='email')
+
+            div 
+                p Wybierz stopień dostępu
+                select(name='permission', selected='technik')
+                    each result in permission
+                        option(value!= result)  #{result}
+
+            div 
+                p Wybierz stanowisko
+                select(name='position')
+                    each result in position 
+                        option(value!= result)  #{result}
+
+
+
+
+
+        button.btn.btn-primary(type='submit') Zapisz
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+
+    script.
+        const activateSubMenu = document.querySelector('#userSubMenu')
+        activateSubMenu.className+=" active"
+        const activateLink = document.querySelector('#userAddActive')
+        activateLink.className+=" active"
+                
+
+                
+//- sends object {name: 'data', freeText: 'data', prodLineId: 'data'} in req.body

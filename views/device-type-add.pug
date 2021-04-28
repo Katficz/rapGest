@@ -1,0 +1,25 @@
+extends layout 
+
+block content 
+    h2.glowny= title 
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Nazwa:
+            input#name.form-control(type='text', placeholder='np. Urzadzenie do czyszczenia' name='name', required= 'true')
+            
+            label(for='freeText') Dodatkowy opis:
+            input#freeText.form-control(type='text', name='freeText')
+
+        button.btn.btn-primary(type='submit') Zapisz
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+    script.
+        const activateLink = document.querySelector('#deviceTypeAddActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"
+                
+//- sends object {name: 'data', freeText: 'data'} in req.body

@@ -1,0 +1,22 @@
+extends layout 
+
+block content 
+    h2.glowny= title 
+
+    ul 
+        for result in list
+            li
+                p
+                    a(href=result.url) #{result.name} 
+        else 
+            li Nie znaleziono żadnych urządzeń
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+    script.
+        const activateLink = document.querySelector('#deviceListActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"

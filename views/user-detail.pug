@@ -1,0 +1,32 @@
+extends layout 
+
+block content
+    h1= title 
+
+    p Imie #{result.name} 
+    p Nazwisko  #{result.surname}
+    p adres email #{result.email}
+    p Stanowisko #{result.position}
+    p Dostęp do systemu: #{result.permission}
+
+    div
+        input#scales(type='checkbox' name='isAvaible' disabled='disabled' checked=result.isAvaible)
+        label(for='isAvaible') Dostępność pracownika
+
+    div
+        input#scales(type='checkbox' name='isEmployed' disabled='disabled' checked=result.isEmployed)
+        label(for='isEmployed') Status zatrudnienia pracownika 
+
+
+    div 
+        a(href=result.url+'/edytuj') EDYTUJ
+
+
+    if err
+        ul
+            for error in err
+                li!= error.msg
+
+    script.
+        const activateSubMenu = document.querySelector('#userSubMenu')
+        activateSubMenu.className+=" active"
