@@ -2,7 +2,7 @@
 
 Raport system for Gestamp Polska
 
-NIUE MOW TAK DO MNIE
+NIUE ŚMIECIU
 
 DELETED ON MACHINE
 git
