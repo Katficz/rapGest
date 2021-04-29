@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  div(class="col mx-md-5 my-5")
+    h1.pb-3 Usuń Operację: #{operation.name}
+
+    if operation_devices.length
+
+      p.h4.pt-3 Usuń poniższe urządzenia przed usunięciem operacji:
+
+      div(style='margin-left:20px;margin-top:20px')
+
+        h4 Urządzenia:
+
+        dl
+        each device in operation_devices
+          dt
+            a(href=device.url) #{device.name}
+          dd #{device.desc}
+
+    else
+      p.py-3 Czy na pewno chcesz usunąć tą Operację?
+
+      form(method='POST' action='')
+        div.form-group
+          input#operationid.form-control(type='hidden',name='operationid', required='true', value=operation._id )
+
+        button.btn.btn-danger(type='submit') Usuń

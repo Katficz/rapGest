@@ -30,3 +30,118 @@
 }
 
 /* CSS AFTER BOOTSTRAP ENDS HERE */
+
+/* UMFY */
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.bg-gestampblue {
+  background-color: #01426a;
+}
+
+.table caption {
+  caption-side: top;
+  text-align: center;
+}
+
+.table-umfy td {
+  padding: 0.2rem;
+}
+.table-umfy th {
+  padding: 0.4rem;
+}
+
+.umfy-ghost-table {
+  margin: 0px;
+}
+.umfy-table-separator {
+  border-bottom: 2px solid rgb(200, 200, 200) !important;
+}
+
+.umfy-td-border {
+  border: 1px solid #dee2e6;
+}
+
+.umfy-btn {
+  width: 85px;
+}
+
+input[type='time'] {
+  width: 100px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+}
+.umfy-card-body {
+  padding: 0px;
+}
+
+.umfy-clock {
+  margin-top: 14px;
+  margin-bottom: 145px;
+}
+
+.page {
+  position: relative;
+  overflow: hidden;
+  padding: 0.3in;
+  padding-right: 0.8in;
+  padding-left: 0.8in;
+  break-inside: avoid;
+}
+
+.padding0 {
+  padding: 0 !important;
+}
+.padding0 a {
+  display: block;
+  padding: 10px;
+}
+
+.dark-header-hover > thead > tr:hover {
+  background-color: #343a40; /* Assuming you want the hover color to be white */
+}
+
+a.white-link {
+  color: white;
+  text-decoration: none;
+}
+a.black-link {
+  color: black;
+  text-decoration: none;
+}
+a.red-link {
+  color: #dc3545;
+  text-decoration: none;
+}
+a.green-link {
+  color: #28a745;
+  text-decoration: none;
+}
+
+.clock {
+  height: 6rem;
+  width: 30rem;
+  line-height: 100px;
+  margin: 50px auto 0;
+  padding: 0 50px;
+  background: #343a40;
+  color: #eee;
+  text-align: center;
+  border-radius: 10px;
+}
+
+@media (max-width: 575px) {
+  .clock {
+    height: 12rem;
+    width: 18rem;
+    line-height: 100px;
+    margin: 50px auto 0;
+    padding: 0 50px;
+    background: #343a40;
+    color: #eee;
+    text-align: center;
+    border-radius: 10px;
+  }
+}

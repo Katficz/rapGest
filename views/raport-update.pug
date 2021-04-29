@@ -128,7 +128,7 @@ block content
                                         
                                         form(data-rapId=data.raport._id data-failureId=failure._id)
                                             
-                                            div.form-row#startUpOption(value!=failure data-prodLine=failure.prodLine data-deviceType=failure.deviceType data-device=failure.device)
+                                            div.form-row#startUpOption(value!=failure)
                                                 
                                                 div.form-group.col-4
                                                     label(for="prodLineOption") Linia produkcyjna
@@ -374,7 +374,7 @@ block content
         function saveTeam() {
             var teamPresent = []
             var teamAbsent = []
-
+            // Access users' chcekboxes in some ugly way that only smart boys can understand
             for(var i = 1; i<teamForm.childNodes[0].childNodes[1].childNodes.length;i++) {
                 if(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].checked == true) {
                     teamPresent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)

@@ -1,0 +1,15 @@
+extends layout
+
+block content
+   div(class="col mx-md-5 my-5")
+      h1 Operacja
+
+      p #[strong Nazwa:] #{operation.name}
+      p #[strong Linia:] #{operation.line.name}
+
+     
+      a.btn.btn-primary.my-5.mr-2(href=operation.url + '/delete') Usuń 
+      a.btn.btn-primary.my-5.mr-2(href=operation.url + '/update') Zmodyfikuj 
+
+  
+
