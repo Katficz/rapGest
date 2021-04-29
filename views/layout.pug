@@ -41,6 +41,9 @@ body
               a.dropdown-item#deviceTypeListActive(href='/api/typy-urzadzen') Lista typów urządzeń
               a.dropdown-item#deviceTypeAddActive(href='/api/typy-urzadzen/dodaj') Dodaj typ urzadzenia
 
+              div.dropdown-divider(aria-labelledby="deviceSubMenu")
+              a.dropdown-item#deviceTypeListActive(href='/api/operation') Lista operacji
+
           il.nav-item.dropdown
             a.nav-link.dropdown-toggle#userSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Zarządzaj zespołem
 
@@ -61,20 +64,13 @@ body
           il.nav-item.dropdown
             a.nav-link.dropdown(href="#") Panel Administratora
 
-  div.container-fluid.pt-5
+  div.container-fluid.pt-5.my-5
     div.row 
+      block content 
         //- div.col-xl-2.col-lg-4.col-md-12.col-sm-12.my-2
         //-   p.nice-border TUTAJ BĘDĄ PRACE PLANOWANE ... ALBO COŚ INNEGO JESZCZE NIE WIEM 
  
-        div.col.my-2
-          main
-            block content 
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
-
-
-    footer
-      p Created by student with deams
-
 

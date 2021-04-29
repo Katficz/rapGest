@@ -1,0 +1,23 @@
+extends layout
+
+block content
+   div(class="col mx-md-5 my-5")
+      h1 #{title}
+
+      form(method='POST' action='')
+         div.form-group
+            label(for='line') Lina:
+            select#line.form-control(type='select', placeholder='Linia' name='line' )
+               for line in lines
+                  if operation
+                     option(value=line._id selected=(line._id.toString()===operation.line._id.toString() ? 'selected' : false) ) #{line.name}
+                  else
+                  option(value=line._id) #{line.name}
+            label(for='name') Nazwa operacji:
+            input#name.form-control(type='text', placehoder='ASS1, ASS2 etc.' name='name', value=(undefined===operation ? '' : operation.name))
+         button.btn.btn-primary(type='submit') Zapisz
+
+      if errors
+         ul
+            for error in errors
+               li!=error.msg

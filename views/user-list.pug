@@ -1,25 +1,33 @@
 extends layout 
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5")
+        h1.text-center.mb-5= title
 
-    ul 
-        for result in list
-            li
-                p
-                    a(href=result.url) #{result.name} 
-        else 
-            li Nie znaleziono żadnych użytkowników
 
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
+        a.btn.btn-primary.my-2(href="/api/uzytkownicy/dodaj") Dodaj Pracownika
+        table.table.table-bordered.table-striped.table-hover.dark-header-hover
+            thead.table-dark
+                tr
+                    th Imię
+                    th Nazwisko
+                    th Specjalizacja
+            tbody 
+                each user in user_list
+                    tr
+                        td.padding0
+                            a.black-link(href=user.url) #{user.name}
+                        td.padding0
+                            a.black-link(href=user.url) #{user.surname}
+                        td.padding0
+                            a.black-link(href=user.url) #{user.position}
+                else
+                    li Nie znaleziono żadnych użytkowników.
+
 
     script.
         const activateSubMenu = document.querySelector('#userSubMenu')
         activateSubMenu.className+=" active"
         const activateLink = document.querySelector('#userListActive')
         activateLink.className+=" active"
-                
-               
+

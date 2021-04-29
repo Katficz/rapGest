@@ -1,31 +1,39 @@
-extends layout 
+extends layout
 
 block content
-    h1= title 
-    p Login: #{result.login}
-    p Imie: #{result.name} 
-    p Nazwisko:  #{result.surname}
-    p adres email: #{result.email}
-    p Stanowisko: #{result.position}
-    p Dostęp do systemu: #{result.permission}
+    div(class="col mx-md-5")
+        div(class='row')
+           div(class="col")
+                h1= title 
+                p #[strong Login:] #{user.login}
 
-    div
-        input#scales(type='checkbox' name='isAvaible' disabled='disabled' checked=result.isAvaible)
-        label(for='isAvaible') Dostępność pracownika
-
-    div
-        input#scales(type='checkbox' name='isEmployed' disabled='disabled' checked=result.isEmployed)
-        label(for='isEmployed') Status zatrudnienia pracownika 
+                h4 #{user.fullname}
+                p #[strong Email:] #{user.email}
+                p #[strong Stanowisko:] #{user.position}
+                p #[strong Przywileje:] #{user.permission}
 
 
-    div 
-        a(href=result.url+'/edytuj') EDYTUJ
 
 
-    if err
-        ul
-            for error in err
-                li!= error.msg
+        div(class='row')
+            div(class="col")
+                input#isAvaible(type='checkbox' name='isAvaible' disabled='disabled' checked=user.isAvaible)
+                label(for='isAvaible') Dostępność pracownika
+        div(class='row')
+           div(class="col")
+                input#isEmployed(type='checkbox' name='isEmployed' disabled='disabled' checked=user.isEmployed)
+                label(for='isEmployed') Status zatrudnienia pracownika 
+
+        if err
+            ul
+                for error in err
+                    li!= error.msg
+
+        div(class='row')
+            div(class="col")
+                a.btn.btn-primary.my-5.mr-2(href=user.url + '/usun') Usuń 
+
+                a.btn.btn-primary.my-5.mr-2(href=user.url + '/edytuj') Zmodyfikuj 
 
     script.
         const activateSubMenu = document.querySelector('#userSubMenu')
