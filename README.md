@@ -4,4 +4,4 @@ Raport system for Gestamp Polska
 
 jsut some readme
 
-DELETED ON MACHINE
+added just a sec ago
