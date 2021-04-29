@@ -3,8 +3,12 @@ extends layout
 block content 
     h2.glowny= title 
 
+
     form(method='POST' action='')
         div.form-group
+            label(for='login') Login:
+            input#login.form-control(type='text' name='login', required= 'true')
+            
             label(for='name') Imię:
             input#name.form-control(type='text' name='name', required= 'true')
             
@@ -12,7 +16,10 @@ block content
             input#freeText.form-control(type='text', name='surname', required= 'true')
 
             label(for='email') Adres email:
-            input#ip.form-control(type='email', name='email')
+            input#email.form-control(type='email', name='email')
+
+            label(for='password') Hasło użytkownika:
+            input#password.form-control(type='text', name='password', required: true)
 
             div 
                 p Wybierz stopień dostępu
@@ -25,9 +32,6 @@ block content
                 select(name='position')
                     each result in position 
                         option(value!= result)  #{result}
-
-
-
 
 
         button.btn.btn-primary(type='submit') Zapisz

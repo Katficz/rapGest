@@ -1,4 +1,9 @@
 /* CSS FOR BOOTSTRAP STARTS HERE */
+.logInBox {
+  border: 3px solid #01426a;
+  border-radius: 10px;
+  background-color: #dbf5ff;
+}
 .raportTableTitle {
   background-color: #01426a;
   color: white;

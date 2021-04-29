@@ -9,6 +9,10 @@ const raportController = require('../controllers/raportController');
 
 const userController = require('../controllers/userController')
 
+// LOGING // 1st Page layout
+router.post('/zaloguj', userController.user_POST_login);
+router.get('/zaloguj', userController.user_GET_login);
+
 /// DEVICES ///
 
 //GET all devices

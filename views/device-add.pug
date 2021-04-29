@@ -27,14 +27,14 @@ block content
                         option(value!= deviceType._id)  #{deviceType.name}
 
         button.btn.btn-primary(type='submit') Zapisz
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
     script.
         const activateLink = document.querySelector('#deviceAddActive')
         activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"
 
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
 //- sends object {name: 'data', freeText: 'data', prodLineId: 'data'} in req.body

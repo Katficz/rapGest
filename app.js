@@ -3,11 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 
+dotenv.config();
+
 //connecting to DB
-mongoose.connect("mongodb://localhost/playground", {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
+mongoose.connect(process.env.DB_CONNECT, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(() => console.log('connected'))
     .catch(err => console.log(err))
 

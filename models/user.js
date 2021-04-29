@@ -3,6 +3,11 @@ require('mongoose-type-email');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+    login: {
+        type: String,
+        require: true,
+        maxlength: 50,
+    },
     name: {
         type: String,
         require: true,
@@ -42,6 +47,12 @@ const userSchema = new Schema({
         type: Number,
         required: true,
         default: 0,
+    },
+    password: {
+        type: String,
+        required: true,
+        man: 1024,
+        min: 6,
     }
 })
 
