@@ -35,6 +35,10 @@ router.get('/operation', operation_controller.operation_list)
 // GET request for one device item
 router.get('/operation/:id', operation_controller.operation_detail)
 
+// LOGING // 1st Page layout
+router.post('/zaloguj', userController.user_POST_login);
+router.get('/zaloguj', userController.user_GET_login);
+
 /// DEVICES ///
 
 //GET all devices

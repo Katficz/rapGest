@@ -32,6 +32,7 @@ block content
                                 else
                                     option(value=item)  #{item}
 
+
                         if user
                             p
                             input.form-check-input.isAvaible(type='checkbox' name='isAvaible' checked=user.isAvaible)
@@ -48,6 +49,7 @@ block content
                     ul
                         for error in errors
                             li!=error.msg
+
 
 
 
