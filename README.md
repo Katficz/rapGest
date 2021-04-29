@@ -2,7 +2,7 @@
 
 Raport system for Gestamp Polska
 
-NIUE MOW TAK DO MNIE
+NIUE MOW DO MNIE NIE Pało
 
 DELETED ON MACHINE
 git
