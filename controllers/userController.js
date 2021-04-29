@@ -88,7 +88,6 @@ exports.user_POST_add = [
         res.redirect('/api/uzytkownicy')
       })
     }
-    res.redirect('/api/uzytkownicy')
   },
 ]
 
@@ -242,11 +241,7 @@ exports.user_POST_shift = function (req, res) {
 
 /// LOGIN MANAGMENT
 exports.user_GET_login = function(req, res) {
-  console.log(req.cookies)
-  res
-  .clearCookie('token')
-  .clearCookie('test')
-  console.log(req.cookies)
+  res.clearCookie('token')
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
 exports.user_POST_login = async function(req, res) {
@@ -269,9 +264,10 @@ exports.user_POST_login = async function(req, res) {
         //creating token with users ID and permission and storing it as a cookie
         const token = jwt.sign({_id: result._id, permission: result.permission}, process.env.TOKEN_SECRET)
 
-        res.status(200).cookie('token', token, {
+        res.status(200)
+        .cookie('token', token, {
           secure: true,
         })
-        .send('test')
+        .redirect('/api/raporty')
     })
 }

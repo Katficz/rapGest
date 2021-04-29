@@ -11,7 +11,6 @@ const failure = require('../models/failure')
 //HOME PAGE
 
 exports.raport_GET_list = function (req, res) {
-  console.log(req.cookies)
   startDate = new Date()
   startDate.setTime(
     startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000
@@ -72,12 +71,6 @@ exports.raport_GET_list = function (req, res) {
         var match = false
         for (var j = 0; j < result.shiftC.length; j++) {
           if (result.shiftC[j].date.getDate() == startDate.getDate() + i) {
-            console.log(
-              'porownuje: ',
-              result.shiftC[j].date.getDate(),
-              ' z ',
-              startDate.getDate() + i
-            )
             shiftC.push(result.shiftC[j].url)
             match = true
           }
@@ -175,7 +168,6 @@ exports.raport_GET_update = function (req, res, next) {
 }
 
 exports.raport_POST_saveAdditionalInfo = function (req, res, next) {
-  console.log(req.body)
   Raport.findByIdAndUpdate(req.params.id, {
     additionalInfo: req.body.roundAround,
   }).exec(function (err) {
