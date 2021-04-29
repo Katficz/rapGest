@@ -11,6 +11,7 @@ const failure = require('../models/failure')
 //HOME PAGE
 
 exports.raport_GET_list = function (req, res) {
+  console.log(req.cookies)
   startDate = new Date()
   startDate.setTime(
     startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000
@@ -281,8 +282,10 @@ exports.raport_GET_myRaport = function (req, res, next) {
   //if if raport for this shift doesnt exist
   //create new one and redirect for the raport of this shift
   //redirecting, so the id is in the url
-  const shiftLoggedIn = 3
+  const shiftLoggedIn = 2
   var nowDate = new Date()
+
+  res.clearCookie('test', {path:'/'})
 
   saveDate = new Date()
   saveDate.setHours(10)

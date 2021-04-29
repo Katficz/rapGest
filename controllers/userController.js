@@ -1,7 +1,11 @@
 const User = require('../models/user')
-const { body, validationResult } = require('express-validator')
+const { body, validationResult, cookie } = require('express-validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
 
+dotenv.config();
 exports.user_GET_all = function (req, res) {
   User.find()
     .sort([['surname', 'ascending']])
@@ -86,7 +90,6 @@ exports.user_POST_add = [
                 res.redirect('/api/uzytkownicy')
             })
         }
-        res.redirect('/api/uzytkownicy')
       }
 ]
 
@@ -226,10 +229,15 @@ exports.user_POST_shift = function(req, res) {
 
 /// LOGIN MANAGMENT
 exports.user_GET_login = function(req, res) {
-    res.render('login', {title: 'System Raportowania UR Spawalnia'})
+  console.log(req.cookies)
+  res
+  .clearCookie('token')
+  .clearCookie('test')
+  console.log(req.cookies)
+  res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
 exports.user_POST_login = async function(req, res) {
-    console.log(req.body.password)
+    
     User.findOne({login: req.body.login})
     .exec(async function(err, result) {
         if(err) {
@@ -244,6 +252,13 @@ exports.user_POST_login = async function(req, res) {
             console.log('złe hasło')
             res.status(400).render('login',{errs:'Złe hasło!'})
         }
-        res.status(200).render()
+
+        //creating token with users ID and permission and storing it as a cookie
+        const token = jwt.sign({_id: result._id, permission: result.permission}, process.env.TOKEN_SECRET)
+
+        res.status(200).cookie('token', token, {
+          secure: true,
+        })
+        .send('test')
     })
 }

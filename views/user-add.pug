@@ -8,10 +8,18 @@ block content
 
                 form(method='POST' action='')
                     div.form-group
+                        label(for='login') Login:
+                        input#login.form-control(type='text', placehoder='SamKozak123' name='login')
+ 
+                        label(for='hasło') Dodaj hasło:
+                        input#password.form-control(type='text', name='password', value=(undefined===user ? '' : user.name))
+ 
                         label(for='name') Imię:
                         input#name.form-control(type='text', placehoder='Sam' name='name', value=(undefined===user ? '' : user.name))
+                        
                         label(for='surname') Nazwisko:
                         input#surname.form-control(type='text', placehoder='Sepiol' name='surname', value=(undefined===user ? '' : user.surname))
+                        
                         label(for='email') Email:
                         input#email.form-control(type='text', placehoder='samsepiol@mail.com' name='email', value=(undefined===user ? '' : user.email))
                         
