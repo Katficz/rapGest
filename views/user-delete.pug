@@ -1,0 +1,14 @@
+extends layout
+
+block content
+   div(class="col mx-md-5")
+      h1 #{title}: 
+       h1 #[strong #{user.fullname}]
+
+      p.mt-5.h4 Czy na pewno chcesz usunąć tego użytkownika?
+
+      form(method='POST' action='')
+         div.form-group
+            input#userid.form-control(type='hidden',name='userid', required='true', value=user._id )
+
+         button.btn.btn-danger(type='submit') Delete

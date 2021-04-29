@@ -1,23 +1,28 @@
-extends layout 
+extends layout
 
 block content
-    h1= title 
+    div(class="col mx-md-5")
+        h1 #{title}
 
-    p Nazwa Urządzenie: #{result.name} 
-    p Adres IP urządzenia: #{result.ip}
-    p Nazwa Linii produkcyjnej: #{result.prodLine.name}
-    p Typ urządzenia: #{result.deviceType.name}
-    p Opis #{result.description}
-    div 
-        a(href=result.url+'/edytuj') EDYTUJ
-    div 
-        a(href=result.url+'/usun') USUN
-    
+        p #[strong Nazwa:] #{device.name}
+        p #[strong Ip:] #{device.ip}
+        p #[strong Linia:] #{device.prodLine.name}
+        p #[strong Operacja:] #{device.operation.name}
+        p #[strong Typ urządzenia:] #{device.deviceType.name}
+        p #[strong Opis:] #{device.description}
+
+        a.btn.btn-primary.my-5.mr-2(href=device.url + '/usun') Usuń 
+        a.btn.btn-primary.my-5.mr-2(href=device.url + '/edytuj') Zmodyfikuj 
+
+
+
 
     if err
         ul
             for error in err
                 li!= error.msg
     script.
+        const activateLink = document.querySelector('#deviceListActive')
+        activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"

@@ -17,6 +17,7 @@ block content
                 li!= error.msg
 
     script.
+        const activateLink = document.querySelector('#productionLineListActive')
+        activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"
-//- sends object {name: 'data', freeText: 'data'} in req.body

@@ -1,25 +1,25 @@
-extends layout 
+extends layout
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5 my-5")
+        h1 #{title}
 
-    form(method='POST' action='')
-        div.form-group
-            label(for='name') Nazwa:
-            input#name.form-control(type='text', placeholder='np. Linia 1' name='name', required= 'true')
-            
-            label(for='freeText') Dodatkowy opis:
-            input#freeText.form-control(type='text', name='freeText')
+        form(method='POST' action='')
+            div.form-group
+                label(for='name') Nazwa linii:
+                input#name.form-control(type='text', placehoder='ASS1, ASS2 etc.' name='name' value=(undefined===line ? '' : line.name))
+                label(for='freeText') Dodatkowy opis:
+                input#freeText.form-control(type='text', name='freeText' value=(undefined===line ? '' : line.description))
+            button.btn.btn-primary(type='submit') Zapisz
 
-        button.btn.btn-primary(type='submit') Zapisz
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
+        if errors
+            ul
+                for error in errors
+                    li!=error.msg
+
+
     script.
-        const activateLink = document.querySelector('#productionLineAddActive')
+        const activateLink = document.querySelector('#productionLineListActive')
         activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"
-                
-//- sends object {name: 'data', freeText: 'data'} in req.body

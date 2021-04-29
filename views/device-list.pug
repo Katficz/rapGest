@@ -1,20 +1,32 @@
-extends layout 
+extends layout
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5")
+        h1.text-center.mb-5= title
 
-    ul 
-        for result in list
-            li
-                p
-                    a(href=result.url) #{result.name} 
-        else 
-            li Nie znaleziono żadnych urządzeń
+        a.btn.btn-primary.my-2(href="/api/urzadzenia/dodaj") Dodaj Urządzenie
+        each line in line_list
+            table.table.table-bordered.table-striped.table-hover.dark-header-hover
+                thead.table-dark
+                    tr
+                        th.text-center(scope='col' colspan='3') #{line.name}
+                tbody
+                    each device in device_list
+                        if device.prodLine == line._id.toString()
+                            tr
+                                td.padding0(width="33%") 
+                                    a.black-link(href=device.url) #{device.operation.name} 
+                                td.padding0(width="33%") 
+                                    a.black-link(href=device.url) #{device.deviceType.name} 
+                                td.padding0(width="33%") 
+                                    a.black-link(href=device.url) #{device.name}
 
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
+
+        if errors
+            ul
+                for error in errors
+                    li!= error.msg
+
     script.
         const activateLink = document.querySelector('#deviceListActive')
         activateLink.className+=" active"

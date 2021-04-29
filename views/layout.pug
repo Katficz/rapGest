@@ -32,24 +32,24 @@ body
 
             div.dropdown-menu(aria-labelledby="deviceSubMenu")
               a.dropdown-item#deviceListActive(href='/api/urzadzenia') Lista urządzeń
-              a.dropdown-item#deviceAddActive(href='/api/urzadzenia/dodaj') Dodaj urządzenie
+              //a.dropdown-item#deviceAddActive(href='/api/urzadzenia/dodaj') Dodaj urządzenie
 
-              div.dropdown-divider(aria-labelledby="deviceSubMenu")
-              a.dropdown-item#productionLineListActive(href='/api/linie-produkcyjne') Lista linii produkcyjnych
-              a.dropdown-item#productionLineAddActive(href='/api/linie-produkcyjne/dodaj') Dodaj linię produkcyjną
-
-              div.dropdown-divider(aria-labelledby="deviceSubMenu")
+              //div.dropdown-divider(aria-labelledby="deviceSubMenu")
               a.dropdown-item#deviceTypeListActive(href='/api/typy-urzadzen') Lista typów urządzeń
-              a.dropdown-item#deviceTypeAddActive(href='/api/typy-urzadzen/dodaj') Dodaj typ urzadzenia
+              //a.dropdown-item#deviceTypeAddActive(href='/api/typy-urzadzen/dodaj') Dodaj typ urzadzenia
 
               div.dropdown-divider(aria-labelledby="deviceSubMenu")
-              a.dropdown-item#deviceTypeListActive(href='/api/operation') Lista operacji
+              //div.dropdown-divider(aria-labelledby="deviceSubMenu")
+              a.dropdown-item#operationListActive(href='/api/operation') Lista operacji
+
+              a.dropdown-item#productionLineListActive(href='/api/linie-produkcyjne') Lista linii produkcyjnych
+              //a.dropdown-item#productionLineAddActive(href='/api/linie-produkcyjne/dodaj') Dodaj linię produkcyjną
 
           il.nav-item.dropdown
             a.nav-link.dropdown-toggle#userSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Zarządzaj zespołem
 
             div.dropdown-menu(arialabelledby="userSubMenu")
-              a.dropdown-item#userAddActive(href='/api/uzytkownicy/dodaj') Dodaj użytkownika
+              //a.dropdown-item#userAddActive(href='/api/uzytkownicy/dodaj') Dodaj użytkownika
               a.dropdown-item#userListActive(href='/api/uzytkownicy') Lista Użytkowników
               div.dropdown-divider(aria-labelledby="userSubMenu")
               a.dropdown-item#userShiftsActive(href='/api/zmiany') Zarządzanie zmianami

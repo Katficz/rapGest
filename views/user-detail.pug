@@ -29,6 +29,7 @@ block content
                 for error in err
                     li!= error.msg
 
+                
         div(class='row')
             div(class="col")
                 a.btn.btn-primary.my-5.mr-2(href=user.url + '/usun') Usuń 
@@ -38,3 +39,5 @@ block content
     script.
         const activateSubMenu = document.querySelector('#userSubMenu')
         activateSubMenu.className+=" active"
+        const activateLink = document.querySelector('#userListActive')
+        activateLink.className+=" active"

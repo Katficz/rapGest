@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 const deviceSchema = new Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 50,
   },
   ip: {
@@ -15,12 +15,16 @@ const deviceSchema = new Schema({
   deviceType: {
     type: Schema.Types.ObjectId,
     ref: 'DeviceType',
-    require: true,
+    required: true,
+  },
+  operation: {
+    type: Schema.Types.ObjectId,
+    ref: 'Operation',
   },
   prodLine: {
     type: Schema.Types.ObjectId,
     ref: 'ProdLine',
-    require: true,
+    required: true,
   },
   description: {
     type: String,

@@ -36,8 +36,8 @@ router.get('/operation', operation_controller.operation_list)
 router.get('/operation/:id', operation_controller.operation_detail)
 
 // LOGING // 1st Page layout
-router.post('/zaloguj', userController.user_POST_login);
-router.get('/zaloguj', userController.user_GET_login);
+router.post('/zaloguj', userController.user_POST_login)
+router.get('/zaloguj', userController.user_GET_login)
 
 /// DEVICES ///
 
@@ -58,6 +58,8 @@ router.post('/urzadzenia/:id/edytuj', deviceController.device_POST_update)
 
 //DELETE for deleting device
 router.get('/urzadzenia/:id/usun', deviceController.device_GET_delete)
+//DELETE post for deleting device
+router.post('/urzadzenia/:id/usun', deviceController.device_POST_delete)
 
 //GET specific device
 router.get('/urzadzenia/:id', deviceController.device_GET_one)
@@ -88,7 +90,15 @@ router.post(
 )
 
 //DELETE for deleting device type
-router.delete('/typy-urzadzen/:id', deviceTypeController.deviceType_GET_DELETE)
+router.get(
+  '/typy-urzadzen/:id/usun',
+  deviceTypeController.deviceType_GET_delete
+)
+//DELETE for deleting device type
+router.post(
+  '/typy-urzadzen/:id/usun',
+  deviceTypeController.deviceType_POST_delete
+)
 
 //GET specific device type
 router.get('/typy-urzadzen/:id', deviceTypeController.deviceType_GET_one)
@@ -120,6 +130,10 @@ router.post(
 router.get(
   '/linie-produkcyjne/:id/usun',
   prodLineController.prodLine_GET_delete
+)
+router.post(
+  '/linie-produkcyjne/:id/usun',
+  prodLineController.prodLine_POST_delete
 )
 
 //GET specific prod-line
@@ -181,6 +195,9 @@ router.post('/uzytkownicy/:id/edytuj', userController.user_POST_update)
 
 //GET delete user
 router.get('/uzytkownicy/:id/usun', userController.user_GET_delete)
+
+//POST delete user
+router.post('/uzytkownicy/:id/usun', userController.user_POST_delete)
 
 //GET specific user
 router.get('/uzytkownicy/:id', userController.user_GET_one)

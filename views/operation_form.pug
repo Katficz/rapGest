@@ -21,3 +21,9 @@ block content
          ul
             for error in errors
                li!=error.msg
+
+   script.
+      const activateLink = document.querySelector('#operationListActive')
+      activateLink.className+=" active"
+      const activateSubMenu = document.querySelector('#deviceSubMenu')
+      activateSubMenu.className+=" active"
