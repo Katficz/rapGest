@@ -1,16 +1,22 @@
-const mongoose = require('mongoose');
-require('mongoose-type-email');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+require('mongoose-type-email')
+const Schema = mongoose.Schema
 
 const userSchema = new Schema({
+
+    login: {
+        type: String,
+        required: true,
+        maxlength: 50,
+    },
     name: {
         type: String,
-        require: true,
+        required: true,
         maxlength: 50
     },
     surname: {
         type: String,
-        require: true,
+        required: true,
         maxlength: 50
     },
     email: {
@@ -20,12 +26,12 @@ const userSchema = new Schema({
     },
     isAvaible: {
         type: Boolean,
-        require: true,
+        required: true,
         default: true,
     },
     isEmployed: {
         type: Boolean,
-        require: true,
+        required: true,
         default: true,
     },
     position: {
@@ -42,11 +48,22 @@ const userSchema = new Schema({
         type: Number,
         required: true,
         default: 0,
+    },
+    password: {
+        type: String,
+        required: true,
+        man: 1024,
+        min: 6,
     }
 })
 
 userSchema.virtual('url').get(function () {
-    return '/api/uzytkownicy/' + this._id
- })
+  return '/api/uzytkownicy/' + this._id
+})
+
+// Virtual for user's full name
+userSchema.virtual('fullname').get(function () {
+  return this.surname + ', ' + this.name
+})
 
 module.exports = mongoose.model('User', userSchema)

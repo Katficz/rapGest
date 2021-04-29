@@ -1,55 +1,83 @@
 const User = require('../models/user')
-const{body, validationResult} = require('express-validator')
+const { body, validationResult } = require('express-validator')
+const bcrypt = require('bcryptjs')
 
-
-exports.user_GET_all = function(req, res) {
-    User.find()
-    .sort({ name: 1 })
-    .exec(function(err, result) {
-        if(err) {
-            return next(err)
-        }
-        res.render('user-list', {title: 'Lista Użytkowników', list: result})
+exports.user_GET_all = function (req, res) {
+  User.find()
+    .sort([['surname', 'ascending']])
+    .exec(function (err, result) {
+      if (err) {
+        return next(err)
+      }
+      res.render('user-list', {
+        title: 'Lista Użytkowników',
+        user_list: result,
+      })
     })
 }
 
-exports.user_GET_add = function(req, res) {
-    res.render('user-add', {title: 'Dodaj użytkownika', 
+exports.user_GET_add = function (req, res) {
+  res.render('user-add', {
+    title: 'Dodaj użytkownika',
     permission: ['technik', 'specjalista', 'admin'],
-    position: ['specjalista', 'mechanik', 'robotyk', 'automatyk', 'kierownik'] })
+    position: ['specjalista', 'mechanik', 'robotyk', 'automatyk', 'kierownik'],
+  })
 }
 
 exports.user_POST_add = [
-    body('name')
+  body('name')
     .trim()
-    .isLength({min: 1, max: 100})
-    .escape().withMessage('Podaj imię'),
+    .isLength({ min: 1, max: 100 })
+    .escape()
+    .withMessage('Podaj imię'),
 
-    body('surname')
+  body('surname')
     .trim()
-    .isLength({min: 1, max: 100})
-    .escape().withMessage('Podaj Nazwisko'),
+    .isLength({ min: 1, max: 100 })
+    .escape()
+    .withMessage('Podaj Nazwisko'),
 
-    body('email')
-    .normalizeEmail().isEmail(),
+  body('email').optional({ checkFalsy: true }).isEmail().normalizeEmail(),
 
-    (req, res, next) => {
+
+    body('login').custom((value) => {
+        return User.findOne({ login: value }).then((line) => {
+           if (line) {
+              return Promise.reject('Login: ' + value + ' jest już w użyciu')
+           }
+        })
+     }),
+    async function(req, res, next) {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-            res.render('user-add', {title: 'Dodaj użytkownika', errors: errors.array()})
-            return
+          res.render('user-add', {
+            title: 'Dodaj użytkownika',
+            errors: errors.array(),
+            permission: ['technik', 'specjalista', 'admin'],
+            position: [
+              'specjalista',
+              'mechanik',
+              'robotyk',
+              'automatyk',
+              'kierownik',
+            ],
+          })
+          return
         }
-
         else {
+            const salt = await bcrypt.genSalt(10);
+            const hashPassword = await bcrypt.hash(req.body.password, salt)
             const user = new User({
+                login: req.body.login,
                 name: req.body.name,
                 surname: req.body.surname,
                 email: req.body.email,
                 isAvaible: true,
                 isEmployed: true,
                 permission: req.body.permission,
-                position: req.body.position
+                position: req.body.position,
+                password: hashPassword
             })
             user.save(function(err) {
                 if(err) {
@@ -58,43 +86,56 @@ exports.user_POST_add = [
                 res.redirect('/api/uzytkownicy')
             })
         }
-    }
+        res.redirect('/api/uzytkownicy')
+      }
 ]
 
-exports.user_GET_update = function(req, res) {
-    User.findById(req.params.id).exec(function(err, result) {
-        if(err) {
-            return next(err)
-        }
-        res.render('user-update', { 
-        title: 'Edytuj Użytkownika', 
-        result: result,
-        permission: ['technik', 'specjalista', 'admin'],
-        position: ['specjalista', 'mechanik', 'robotyk', 'automatyk', 'kierownik']})
+exports.user_GET_update = function (req, res) {
+  User.findById(req.params.id).exec(function (err, result) {
+    if (err) {
+      return next(err)
+    }
+    res.render('user-add', {
+      title: 'Edytuj Użytkownika',
+      user: result,
+      permission: ['technik', 'specjalista', 'admin'],
+      position: [
+        'specjalista',
+        'mechanik',
+        'robotyk',
+        'automatyk',
+        'kierownik',
+      ],
     })
+  })
 }
 
 exports.user_POST_update = [
-    body('name')
+  body('name')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .escape()
+    .withMessage('Podaj imię'),
+
+  body('surname')
     .trim()
     .isLength({min: 1, max: 100})
-    .escape().withMessage('Podaj imię'),
+    .escape()
+    .withMessage('Podaj Nazwisko'),
 
-    body('surname')
-    .trim()
-    .isLength({min: 1, max: 100})
-    .escape().withMessage('Podaj Nazwisko'),
+  body('email')
+    .normalizeEmail()
+    .isEmail(),
 
-    body('email')
-    .normalizeEmail().isEmail(),
-
-    (req, res, next) => {
+    async function(req, res, next) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.render('user-list', {title: 'Użytkownik', errors: errors.array()})
             return
         }
         else {
+            const salt = await bcrypt.genSalt(10);
+            const hashPassword = await bcrypt.hash(req.body.password, salt)
             User.findByIdAndUpdate(req.params.id, {
                 name: req.body.name,
                 surname: req.body.surname,
@@ -102,7 +143,8 @@ exports.user_POST_update = [
                 isAvaible: !!req.body.isAvaible,
                 isEmployed: !!req.body.isEmployed,
                 permission: req.body.permission,
-                position: req.body.position
+                position: req.body.position,
+                password: hashPassword
             })
             .exec(function(err, result) {
                 if(err) {
@@ -114,44 +156,45 @@ exports.user_POST_update = [
 
     }];
 
-exports.user_GET_delete = function(req, res) {
-    User.findByIdAndRemove(req.params.id).exec(function (err, result) {
-        if(err) {
-            return next(err)
-        }
-        res.redirect('/api/uzytkownicy/')
-    })    
+exports.user_GET_delete = function (req, res) {
+  User.findByIdAndRemove(req.params.id).exec(function (err, result) {
+    if (err) {
+      return next(err)
+    }
+    res.redirect('/api/uzytkownicy/')
+  })
 }
 
-exports.user_GET_one = function(req, res, next) {
-    User.findById(req.params.id).exec(function(err, result) {
-        if(err) {
-            return next(err)
-        }
-        res.render('user-detail', {title: 'Użytkownik', result: result})
-    })
+exports.user_GET_one = function (req, res, next) {
+  User.findById(req.params.id)
+    .exec(function (err, result) {
+    if (err) {
+      return next(err)
+    }
+    res.render('user-detail', { title: 'Użytkownik', user: result })
+  })
 }
 
 /// SHIFT MANAGMENT ///
 
-exports.user_GET_shift = function(req, res, next) {
-    User.find({'isEmployed': true, 'isAvaible': true})
-    .select({_id: 1, name: 1, surname: 1, shift: 1, position: 1})
-    .exec(function(err, result) {
-        if(err) {
-            console.log(err)
-            return next(err)
-        }
-        const shift1 = result.filter(object => object.shift == 1)
-        const shift2 = result.filter(object => object.shift == 2)
-        const shift3 = result.filter(object => object.shift == 3)
-        res.render('user-shifts', {
-            title: 'Zarządzanie zmianami', 
-            shift0: result,
-            shift1: shift1,
-            shift2: shift2,
-            shift3: shift3
-        })
+exports.user_GET_shift = function (req, res, next) {
+  User.find({ isEmployed: true, isAvaible: true })
+    .select({ _id: 1, name: 1, surname: 1, shift: 1, position: 1 })
+    .exec(function (err, result) {
+      if (err) {
+        console.log(err)
+        return next(err)
+      }
+      const shift1 = result.filter((object) => object.shift == 1)
+      const shift2 = result.filter((object) => object.shift == 2)
+      const shift3 = result.filter((object) => object.shift == 3)
+      res.render('user-shifts', {
+        title: 'Zarządzanie zmianami',
+        shift0: result,
+        shift1: shift1,
+        shift2: shift2,
+        shift3: shift3,
+      })
     })
 }
 
@@ -176,8 +219,31 @@ exports.user_POST_shift = function(req, res) {
                     res.status(500).json({error: err})
                 }
             })
-
-        }
+            }
         }
         res.status(200).json({body: 'Zapisano pomyślnie zmianę '})
-} 
+}
+
+/// LOGIN MANAGMENT
+exports.user_GET_login = function(req, res) {
+    res.render('login', {title: 'System Raportowania UR Spawalnia'})
+}
+exports.user_POST_login = async function(req, res) {
+    console.log(req.body.password)
+    User.findOne({login: req.body.login})
+    .exec(async function(err, result) {
+        if(err) {
+            return next(err)
+        }
+        if(!result) {
+            console.log('brak loginu')
+            res.status(400).render('login', {errs:'Podany login nie widnieje w bazie danych'})
+        }
+        const validPass = await bcrypt.compare(req.body.password, result.password)
+        if(!validPass) {
+            console.log('złe hasło')
+            res.status(400).render('login',{errs:'Złe hasło!'})
+        }
+        res.status(200).render()
+    })
+}

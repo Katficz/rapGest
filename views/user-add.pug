@@ -1,47 +1,75 @@
-extends layout 
+extends layout
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5")
+        div(class='row')
+            div(class="col")
+                h1 #{title}
 
-    form(method='POST' action='')
-        div.form-group
-            label(for='name') Imię:
-            input#name.form-control(type='text' name='name', required= 'true')
-            
-            label(for='surname') Nazwisko:
-            input#freeText.form-control(type='text', name='surname', required= 'true')
+                form(method='POST' action='')
+                    div.form-group
+                        label(for='name') Imię:
+                        input#name.form-control(type='text', placehoder='Sam' name='name', value=(undefined===user ? '' : user.name))
+                        label(for='surname') Nazwisko:
+                        input#surname.form-control(type='text', placehoder='Sepiol' name='surname', value=(undefined===user ? '' : user.surname))
+                        label(for='email') Email:
+                        input#email.form-control(type='text', placehoder='samsepiol@mail.com' name='email', value=(undefined===user ? '' : user.email))
+                        
+                        label(for='permission') Wybierz stopień dostępu
+                        select.form-control#permission(name='permission')
+                            each item in permission
+                                if user
+                                    option(value=item selected=(item === user.permission ? 'selected' : false)) #{item}
+                                else
+                                    option(value=item)  #{item}
 
-            label(for='email') Adres email:
-            input#ip.form-control(type='email', name='email')
-
-            div 
-                p Wybierz stopień dostępu
-                select(name='permission', selected='technik')
-                    each result in permission
-                        option(value!= result)  #{result}
-
-            div 
-                p Wybierz stanowisko
-                select(name='position')
-                    each result in position 
-                        option(value!= result)  #{result}
+                        
+                        label(for='position') Wybierz stanowisko
+                        select.form-control#position(name='position')
+                            each item in position 
+                                if user
+                                    option(value=item selected=(item === user.position ? 'selected' : false)) #{item}
+                                else
+                                    option(value=item)  #{item}
 
 
+                        if user
+                            p
+                            input.form-check-input.isAvaible(type='checkbox' name='isAvaible' checked=user.isAvaible)
+                            label.form-check-label(for='isAvaible') Dostępność pracownika
+
+                            p
+                            input.form-check-input.isEmployed(type='checkbox' name='isEmployed' checked=user.isEmployed)
+                            label.form-check-label(for='isEmployed') Status zatrudnienia pracownika 
+
+
+                    button.btn.btn-primary(type='submit') Zapisz
+
+                if errors
+                    ul
+                        for error in errors
+                            li!=error.msg
 
 
 
-        button.btn.btn-primary(type='submit') Zapisz
-    if errors
-        ul
-            for error in errors
-                li!= error.msg
 
     script.
         const activateSubMenu = document.querySelector('#userSubMenu')
         activateSubMenu.className+=" active"
         const activateLink = document.querySelector('#userAddActive')
         activateLink.className+=" active"
-                
 
-                
-//- sends object {name: 'data', freeText: 'data', prodLineId: 'data'} in req.body
+    script.
+        const isEmployed = document.querySelector('.isEmployed')
+        const isAvaible = document.querySelector('.isAvaible')
+        
+
+        isEmployed.onclick = function() {
+            if(isEmployed.checked == true) {
+                isAvaible.disabled = false;
+            }
+            if(isEmployed.checked == false) {
+                isAvaible.checked = false;
+                isAvaible.disabled = true;
+        }
+        }
