@@ -110,15 +110,11 @@ exports.prodLine_GET_delete = function(req, res) {
 exports.prodLine_GET_one = function(req, res) {
     ProdLine.findById(req.params.id).exec(function (err, result) {
         if(err) {
-            console.log('jestem w if err')
             return next(err)
         }
         if (result == null) {
-            let err = new Error('Nie znaleziono takiej linii')
-            err.status(404)
             return next(err)
          }
-        console.log(result + 'resultfasdf2')
         res.render('prod-line-detail', {title: 'Linia', result: result})
     })
 };

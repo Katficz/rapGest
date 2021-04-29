@@ -9,7 +9,7 @@ dotenv.config();
 
 //connecting to DB
 
-mongoose.connect(process.env.DB_CONNECT, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
+mongoose.connect(process.env.DB_ATLAS, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(() => console.log('connected'))
     .catch(err => console.log(err))
 
