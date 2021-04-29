@@ -2,7 +2,7 @@
 
 Raport system for Gestamp Polska
 
-Do roboty śmieciu
+NIUE MOW TAK DO MNIE
 
 DELETED ON MACHINE
 git
