@@ -5,17 +5,17 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     login: {
         type: String,
-        require: true,
+        required: true,
         maxlength: 50,
     },
     name: {
         type: String,
-        require: true,
+        required: true,
         maxlength: 50
     },
     surname: {
         type: String,
-        require: true,
+        required: true,
         maxlength: 50
     },
     email: {
@@ -25,12 +25,12 @@ const userSchema = new Schema({
     },
     isAvaible: {
         type: Boolean,
-        require: true,
+        required: true,
         default: true,
     },
     isEmployed: {
         type: Boolean,
-        require: true,
+        required: true,
         default: true,
     },
     position: {

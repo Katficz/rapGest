@@ -94,7 +94,8 @@ exports.user_POST_update = [
     body('surname')
     .trim()
     .isLength({min: 1, max: 100})
-    .escape().withMessage('Podaj Nazwisko'),
+    .escape()
+    .withMessage('Podaj Nazwisko'),
 
     body('email')
     .normalizeEmail().isEmail(),
@@ -191,11 +192,10 @@ exports.user_POST_shift = function(req, res) {
                     res.status(500).json({error: err})
                 }
             })
-
-        }
+            }
         }
         res.status(200).json({body: 'Zapisano pomyślnie zmianę '})
-} 
+}
 
 /// LOGIN MANAGMENT
 exports.user_GET_login = function(req, res) {
