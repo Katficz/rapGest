@@ -2,6 +2,6 @@
 
 Raport system for Gestamp Polska
 
-jsut some readme
+Do roboty śmieciu
 
 DELETED ON MACHINE
