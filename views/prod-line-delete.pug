@@ -1,0 +1,22 @@
+extends layout
+
+block content
+   div(class="col mx-md-5 my-5")
+      h1 #{title}: 
+      h1 #[strong  #{line.name} ]
+      p #{line.description}
+
+
+      p.py-3 Czy na pewno chcesz usunąć tą Linię?
+
+      form(method='POST' action='')
+         div.form-group
+            input#lineid.form-control(type='hidden',name='lineid', required='true', value=line._id )
+
+         button.btn.btn-danger(type='submit') Usuń
+
+   script.
+      const activateLink = document.querySelector('#productionLineListActive')
+      activateLink.className+=" active"
+      const activateSubMenu = document.querySelector('#deviceSubMenu')
+      activateSubMenu.className+=" active"

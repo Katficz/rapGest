@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  div(class="col mx-md-5")
+    h1 #{title}:
+    h1 #[strong #{devicetype.name}]
+    p #{devicetype.description}
+
+
+      p.mt-5.h4 Czy na pewno chcesz usunąć to urządzenie?
+
+      form(method='POST' action='')
+        div.form-group
+          input#devicetypeid.form-control(type='hidden',name='devicetypeid', required='true', value=devicetype._id )
+
+        button.btn.btn-danger(type='submit') Usuń
+
+  script.
+    const activateLink = document.querySelector('#deviceTypeListActive')
+    activateLink.className+=" active"
+    const activateSubMenu = document.querySelector('#deviceSubMenu')
+    activateSubMenu.className+=" active"

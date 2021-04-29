@@ -1,22 +1,32 @@
-extends layout 
+extends layout
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5 my-5")
+        h1.text-center.mb-5= title
 
-    ul 
-        for result in list
-            li
-                p.prodLines
-                    a(href=result.url) #{result.name} 
-        else 
-            li Nie znaleziono żadnych typów urządzeń           
+        a.btn.btn-primary.my-2(href="/api/typy-urzadzen/dodaj") Utwórz Typ Urządzenia
+        table.table.table-bordered.table-striped.table-hover.dark-header-hover
+            thead.table-dark
+                tr
+                    th.text-center Lista
+            tbody
+                each devicetype in list
+                    tr
+                        td.padding0
+                            a.black-link(href=devicetype.url) #{devicetype.name}
+                else
+                    li Nie znaleziono żadnych typów urządzeń.
+
+
+
+
+        if errors
+            ul
+                for error in errors
+                    li!= error.msg
+
     script.
         const activateLink = document.querySelector('#deviceTypeListActive')
         activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"
-
-    if errors
-        ul
-            for error in errors
-                li!= error.msg

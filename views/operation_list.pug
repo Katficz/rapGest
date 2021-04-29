@@ -10,13 +10,21 @@ block content
          thead.table-dark
             tr
                th.text-center(scope='col' colspan='2') Lista
-               
-               
+
+
          tbody
             each operation in operation_list
-                  tr
-                     td.padding0(width="50%") 
-                        a.black-link(href=operation.url) #{operation.line.name} 
-                     td.padding0
-                        a.black-link(href=operation.url) #{operation.name}
+               tr
+                  td.padding0(width="50%") 
+                     a.black-link(href=operation.url) #{operation.line.name} 
+                  td.padding0
+                     a.black-link(href=operation.url) #{operation.name}
+
+
+   script.
+      const activateLink = document.querySelector('#operationListActive')
+      activateLink.className+=" active"
+      const activateSubMenu = document.querySelector('#deviceSubMenu')
+      activateSubMenu.className+=" active"
+
 

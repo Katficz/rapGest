@@ -1,20 +1,23 @@
-extends layout 
+extends layout
 
 block content
-    h1= title 
+    div(class="col mx-md-5")
+        h1 #{title}
+        p.h4.pt-3 Nazwa: #{line.name}
+        p.h4.pt-3 Opis: #{line.description}
 
-    p!= result.name 
-    p!= result.description
-    div 
-        a(href=result.url+'/edytuj') EDYTUJ
-    div 
-        a(href=result.url+'/usun') USUN
-    
+        a.btn.btn-primary.my-5.mr-2(href=line.url + '/usun') Usuń 
+        a.btn.btn-primary.my-5(href=line.url+'/edytuj') Zmodyfikuj 
+
 
     if err
         ul
             for error in err
                 li!= error.msg
+
+
     script.
+        const activateLink = document.querySelector('#productionLineListActive')
+        activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#deviceSubMenu')
         activateSubMenu.className+=" active"

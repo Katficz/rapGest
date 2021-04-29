@@ -1,40 +1,53 @@
-extends layout 
+extends layout
 
-block content 
-    h2.glowny= title 
+block content
+    div(class="col mx-md-5")
+        h1= title
 
-    form(method='POST' action='')
-        div.form-group
-            label(for='name') Nazwa:
-            input#name.form-control(type='text', placeholder='np. Czajnik' name='name', required= 'true')
-            
-            label(for='freeText') Dodatkowy opis:
-            input#freeText.form-control(type='text', name='freeText')
-
-            label(for='ip') Adres IP urzadzenia:
-            input#ip.form-control(type='text', name='ip')
-
-            div 
-                p Wybierz do której linii należy urządzenie
-                select(name='prodLineId')
-                    each prodLine in result.prodLines
-                        option(value!= prodLine._id)  #{prodLine.name}
-
-            div 
-                p Wybierz typ urządzenia
-                select(name='deviceTypeId')
-                    each deviceType in result.deviceTypes
-                        option(value!= deviceType._id)  #{deviceType.name}
-
-        button.btn.btn-primary(type='submit') Zapisz
-    script.
-        const activateLink = document.querySelector('#deviceAddActive')
-        activateLink.className+=" active"
-        const activateSubMenu = document.querySelector('#deviceSubMenu')
-        activateSubMenu.className+=" active"
+        form(method='POST' action='')
+            div.form-group
+                label(for='name') Nazwa:
+                input#name.form-control(type='text', placeholder='Nazwa urządzenia' name='name' value=(undefined===device ? '' : device.name) )
+                label(for='ip') IP:
+                input#ip.form-control(type='text', placeholder='172.168.0.1' name='ip' value=(undefined===device ? '' : device.ip) )
+            div.form-group
+                label(for='prodLineId') Lina:
+                select#prodLineId.form-control(type='select', placeholder='Linia' name='prodLineId' )
+                    for line in lines
+                        if device
+                            option(value=line._id selected=(line._id.toString()===device.prodLine._id.toString() ? 'selected' : false) ) #{line.name}
+                        else
+                            option(value=line._id) #{line.name}
+            div.form-group
+                label(for='deviceTypeId') Typ urządzenia:
+                select#deviceTypeId.form-control(type='select', placeholder='Typ urządzenia' name='deviceTypeId' )
+                    for devicetype in devicetypes
+                        if device
+                            option(value=devicetype._id selected=(devicetype._id.toString()===device.deviceType._id.toString() ? 'selected' : false) ) #{devicetype.name}
+                        else
+                            option(value=devicetype._id) #{devicetype.name}
+            div.form-group
+                label(for='operation') Operacja:
+                select#operation.form-control(type='select', placeholder='Typ urządzenia' name='operation' )
+                    for operation in operations
+                        if device
+                            option(value=operation._id selected=(operation._id.toString()===device.operation._id.toString() ? 'selected' : false) ) #{operation.name}
+                        else
+                            option(value=operation._id) #{operation.name}
+            div.form-group
+                label(for='freeText') Opis:
+                textarea#freeText.form-control(type='textarea', placeholder='Opis' name='freeText') #{undefined===device ? '' : device.desc}
+            button.btn.btn-primary(type='submit') Zapisz
 
     if errors
         ul
             for error in errors
                 li!= error.msg
-//- sends object {name: 'data', freeText: 'data', prodLineId: 'data'} in req.body
+
+
+    script.
+        const activateLink = document.querySelector('#deviceListActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#deviceSubMenu')
+        activateSubMenu.className+=" active"
+
