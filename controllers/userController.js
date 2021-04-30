@@ -193,7 +193,7 @@ exports.user_GET_one = function (req, res, next) {
 
 exports.user_GET_shift = function (req, res, next) {
   User.find({ isEmployed: true, isAvaible: true })
-    .select({ _id: 1, name: 1, surname: 1, shift: 1, position: 1 })
+    .select({ _id: 1, name: 1, surname: 1, shift: 1, position: 1, permission: 1 })
     .exec(function (err, result) {
       if (err) {
         console.log(err)
@@ -202,9 +202,10 @@ exports.user_GET_shift = function (req, res, next) {
       const shift1 = result.filter((object) => object.shift == 1)
       const shift2 = result.filter((object) => object.shift == 2)
       const shift3 = result.filter((object) => object.shift == 3)
+      const shift0 = result.filter((object) => object.permission == 'technik')
       res.render('user-shifts', {
         title: 'Zarządzanie zmianami',
-        shift0: result,
+        shift0: shift0,
         shift1: shift1,
         shift2: shift2,
         shift3: shift3,
@@ -263,11 +264,145 @@ exports.user_POST_login = async function(req, res) {
 
         //creating token with users ID and permission and storing it as a cookie
         const token = jwt.sign({_id: result._id, permission: result.permission}, process.env.TOKEN_SECRET)
-
+        if(result.shift!=0) {
+        raportCreator(req, res, next, result.shift)
+        }
         res.status(200)
         .cookie('token', token, {
           secure: true,
         })
         .redirect('/api/raporty')
     })
+}
+
+//checks if raport exists for today fot the logged if shift
+//if it does not - creates a new one
+function raportCreator(req, res, next, shift) {
+  //if raport for this shift exists - this login
+  //redirect to this raport
+  //if if raport for this shift doesnt exist
+  //create new one and redirect for the raport of this shift
+  //redirecting, so the id is in the url
+  const shiftLoggedIn = shift
+  var nowDate = new Date()
+  var returnabe = []
+
+  saveDate = new Date()
+  saveDate.setHours(10)
+
+  startDate = new Date()
+  endDate = new Date()
+  if (
+    shiftLoggedIn != 3 ||
+    (nowDate.getHours() > 6 && nowDate.getHours() < 24)
+  ) {
+    startDate.setHours(8, 00)
+    endDate.setHours(24)
+    Raport.findOne({
+      shift: shiftLoggedIn,
+      date: {
+        // searching for the same day between 0 - 24
+        $gte: startDate,
+        $lte: endDate,
+      },
+    })
+    .populate('teamPresent')
+    .populate('teamAbsent')
+    .populate({
+      path: 'failure',
+      populate: {
+        path: 'prodLine',
+        model: 'ProdLine',
+      },
+    })
+    .populate({
+      path: 'failure',
+      populate: 'deviceType',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'device',
+    }).exec(function (err, result) {
+      console.log(result)
+      if (err) {
+        return next(err)
+      }
+      if (result == null) {
+        User.find({
+          shift: shiftLoggedIn,
+          isAvaible: true,
+        }).exec(function (err, team) {
+          if (err) {
+            res.status(500).json(err)
+            return next(err)
+          }
+          raport = new Raport({
+            date: saveDate,
+            shift: shiftLoggedIn,
+            teamAbsent: team,
+            teamPresent: [],
+          })
+          raport.save()
+        })
+      } 
+    })
+  }
+  // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
+  if (shiftLoggedIn == 3 && 6 > nowDate.getHours() && 0 < nowDate.getHours()) {
+    startDate.setHours(8, 00)
+    endDate.setHours(24)
+
+    startDate.setDate(startDate.getDate() - 1)
+    endDate.setDate(startDate.getDate() - 1)
+
+    Raport.findOne({
+      shift: shiftLoggedIn,
+      date: {
+        // searching for the previous date 6 - 24
+        $gte: startDate,
+        $lte: nowDate,
+      },
+    })
+    .populate('teamPresent')
+    .populate('teamAbsent')
+    .populate({
+      path: 'failure',
+      populate: {
+        path: 'prodLine',
+        model: 'ProdLine',
+      },
+    })
+    .populate({
+      path: 'failure',
+      populate: 'deviceType',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'device',
+    })
+    .exec(function (err, result) {
+      if (err) {
+        return next(err)
+      }
+      if (result == null) {
+        User.find({
+          shift: shiftLoggedIn,
+          isAvaible: true,
+        }).exec(function (err, team) {
+          if (err) {
+            res.status(500).json(err)
+            return next(err)
+          }
+
+          raport = new Raport({
+            date: saveDate,
+            shift: shiftLoggedIn,
+            teamAbsent: team,
+            teamPresent: [],
+          })
+          raport.save()
+        })
+      } 
+    })
+  }
 }

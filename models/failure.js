@@ -3,7 +3,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const failureSchema = new Schema({
-    
+    author: {
+        type: Schema.Types.ObjectId, ref: 'User',
+        required: true,
+    },
+    collaborators: [{
+        type: Schema.Types.ObjectId, ref: 'User'
+    }],
     startTime: {//..
         type: String, require: true,
     },
@@ -16,15 +22,15 @@ const failureSchema = new Schema({
     },
     prodLine: {//..
         type: Schema.Types.ObjectId, ref: 'ProdLine',
-        require: true,
+        required: true,
     },
     deviceType: {//..
         type: Schema.Types.ObjectId, ref: 'DeviceType',
-        require: true,
+        required: true,
     },
     device: {//..
         type: Schema.Types.ObjectId, ref: 'Device',
-        require: true,
+        required: true,
     },
     cause: {//
         type: String,

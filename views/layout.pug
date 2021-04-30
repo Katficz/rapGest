@@ -21,8 +21,17 @@ body
     
       div.collapse.navbar-collapse(id="topNavBar") 
         ul.navbar-nav
-          il.nav-item
-            a.nav-link#myRaport(href="/api/raporty/moj-raport") Mój Raport 
+          il.nav-item.dropdown
+            a.nav-link.dropdown-toggle#myRaportSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Mój Raport 
+           
+            div.dropdown-menu(aria-labelledby="myRaportSubMenu")
+              a.dropdown-item#firstSectionActive(href='/api/raporty/moj-raport/zestawienie') Zestawienie
+
+              a.dropdown-item#seconSectionActive(href='/api/raporty/moj-raport/awarie') Awarie
+
+              div.dropdown-divider(aria-labelledby="myRaportSubMenu")
+              a.dropdown-item#raportSummaryActive(href='/api/raporty/moj-raport') Podsumowanie
+
 
           il.nav-item
             a.nav-link#mainHistory(href="/api/raporty") Historia
@@ -58,12 +67,6 @@ body
 
           il.nav-item.dropdown
             a.nav-link.dropdown(href="#") Znajdź raport/awarię
-
-          il.nav-item.dropdown
-            a.nav-link.dropdown(href="#") Panel Specjalisty
-
-          il.nav-item.dropdown
-            a.nav-link.dropdown(href="#") Panel Administratora
 
           il.nav-item.dropdown
             a.nav-link.dropdown(href="/api/zaloguj") Wyloguj

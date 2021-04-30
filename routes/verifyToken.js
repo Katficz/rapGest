@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken')
+// adds verifiedId with logged in user ID and verifiedPerm with logged users permision in req
+
+
 
 exports.authTech = function(req, res, next) {
     const token = req.cookies.token
@@ -7,6 +10,8 @@ exports.authTech = function(req, res, next) {
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         req.verifiedId = verified._id
+        req.verifiedPerm = verified.permission
+        req.verifiedShift = verified.shift
         return next()
     } 
     catch (error) {
@@ -22,6 +27,7 @@ exports.authSpec = function(req, res, next) {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         if(verified.permission == 'specjalista' || verified.permission == 'admin') {
             req.verifiedId = verified._id
+            req.verifiedPerm = verified.permission
             return next()
         }
         else {
@@ -41,6 +47,7 @@ exports.authAdmin = function(req, res, next) {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         if(verified.permission == 'admin') {
             req.verifiedId = verified._id
+            req.verifiedPerm = verified.permission
             return next()
         }
         else {

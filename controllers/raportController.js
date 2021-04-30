@@ -269,107 +269,19 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  //if raport for this shift exists - this login
-  //redirect to this raport
-  //if if raport for this shift doesnt exist
-  //create new one and redirect for the raport of this shift
-  //redirecting, so the id is in the url
-  const shiftLoggedIn = 2
-  var nowDate = new Date()
-
-  res.clearCookie('test', {path:'/'})
-
-  saveDate = new Date()
-  saveDate.setHours(10)
-
-  startDate = new Date()
-  endDate = new Date()
-  if (
-    shiftLoggedIn != 3 ||
-    (nowDate.getHours() > 6 && nowDate.getHours() < 24)
-  ) {
-    startDate.setHours(8, 00)
-    endDate.setHours(24)
-
-    Raport.findOne({
-      shift: shiftLoggedIn,
-      date: {
-        // searching for the same day between 0 - 24
-        $gte: startDate,
-        $lte: endDate,
-      },
-    }).exec(function (err, result) {
-      if (err) {
-        return next(err)
-      }
-      if (result == null) {
-        User.find({
-          shift: shiftLoggedIn,
-          isAvaible: true,
-        }).exec(function (err, team) {
-          if (err) {
-            res.status(500).json(err)
-            return next(err)
-          }
-          raport = new Raport({
-            date: saveDate,
-            shift: shiftLoggedIn,
-            teamAbsent: team,
-            teamPresent: [],
-          })
-          raport.save()
-          res.redirect(raport.url + '/edytuj')
-        })
-      } else {
-        res.redirect(result.url + '/edytuj')
-      }
-    })
-  }
-  // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
-  if (shiftLoggedIn == 3 && 6 > nowDate.getHours() && 0 < nowDate.getHours()) {
-    startDate.setHours(8, 00)
-    endDate.setHours(24)
-
-    startDate.setDate(startDate.getDate() - 1)
-    endDate.setDate(startDate.getDate() - 1)
-
-    Raport.findOne({
-      shift: shiftLoggedIn,
-      date: {
-        // searching for the previous date 6 - 24
-        $gte: startDate,
-        $lte: nowDate,
-      },
-    }).exec(function (err, result) {
-      if (err) {
-        return next(err)
-      }
-      if (result == null) {
-        User.find({
-          shift: shiftLoggedIn,
-          isAvaible: true,
-        }).exec(function (err, team) {
-          if (err) {
-            res.status(500).json(err)
-            return next(err)
-          }
-
-          raport = new Raport({
-            date: saveDate,
-            shift: shiftLoggedIn,
-            teamAbsent: team,
-            teamPresent: [],
-          })
-          raport.save()
-          res.redirect(raport.url + '/edytuj')
-        })
-      } else {
-        res.redirect(result.url + '/edytuj')
-      }
-    })
-  }
+  //raportCreator(req, res, next, true, 1)
 }
 
 exports.raport_GET_one = function (req, res) {
   res.send('get specific raport GET NI')
 }
+
+exports.raport_GET_failures = function(req, res, next) { 
+  res.send('get failure')
+}
+exports.raport_GET_firstSection = function(req, res, next) {
+  res.send('get failure ni')
+}
+
+
+
