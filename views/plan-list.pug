@@ -1,0 +1,23 @@
+extends layout
+
+block content
+   
+   div(class="col mx-md-5 text-body")
+      h1.text-center.my-5 Lista prac planowanych
+
+      a.btn.btn-primary.my-2(href="/api/masterplan/create") Utwórz nową pracę planowaną
+      table.table.table-bordered.table-striped.table-hover.dark-header-hover
+         thead.table-dark
+            tr
+               th(scope='col') Tytuł
+               th(scope='col') Data utworzenia
+               th(scope='col') Wielkość
+         tbody
+            each masterplan in masterplan_list
+               tr
+                  td.padding0
+                     a.black-link(href=masterplan.url) #{masterplan.name}
+                  td.padding0
+                     a.black-link(href=masterplan.url) #{masterplan.date}
+                  td.padding0 
+                     a.black-link(href=masterplan.url) 10 k
