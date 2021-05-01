@@ -13,7 +13,7 @@ const masterplan_controller = require('../controllers/masterplanController')
 
 //to authenticate specific routes, add auth.authTech/authSpec/authAdmin to middleware
 const auth = require('./verifyToken')
-
+// adds verifiedId with logged in user ID and verifiedPerm with logged users permision in req
 // LOGING // 1st Page layout
 router.post('/zaloguj', userController.user_POST_login)
 router.get('/zaloguj', userController.user_GET_login)
@@ -269,14 +269,28 @@ router.get('/linie-produkcyjne/:id', prodLineController.prodLine_GET_one)
 
 /// RAPORT ///
 
-//GET raports list /// HOME PAGE ///
+//GET raports list /// HOME PAGE AFTER LOGIN///
 router.get('/raporty', auth.authTech, raportController.raport_GET_list)
 
-//GET for creating raport
+//GET for this shifts raport summary /// only technicians will use this --
 router.get(
   '/raporty/moj-raport',
   auth.authTech,
   raportController.raport_GET_myRaport
+)
+
+//GET for this shifts raports first section // kurwa nie wiem jak nazwać to gówno po and i po polsku
+router.get(
+  '/raporty/moj-raport/zestawienie',
+  auth.authTech,
+  raportController.raport_GET_firstSection
+)
+
+//GET for this users + shifts failures
+router.get(
+  '/raporty/moj-raport/awarie',
+  auth.authTech,
+  raportController.raport_GET_failures
 )
 
 //GET for updating raport

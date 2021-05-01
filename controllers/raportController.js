@@ -8,6 +8,8 @@ const Device = require('../models/device')
 
 const async = require('async')
 const failure = require('../models/failure')
+
+const { DateTime } = require('luxon')
 //HOME PAGE
 
 exports.raport_GET_list = function (req, res) {
@@ -57,52 +59,49 @@ exports.raport_GET_list = function (req, res) {
       var shiftB = []
       var shiftC = []
       var dates = []
+      var pushDate = startDate
       for (var i = 4; i > 0; i--) {
-        dates.push(
-          startDate.getDate() +
-            i +
-            '-' +
-            (startDate.getMonth() + 1) +
-            '-' +
-            (startDate.getYear() + 1900)
-        )
+        pushDate.setDate(pushDate.getDate()+1)
+        dates.push(DateTime.fromJSDate(pushDate).toFormat('dd.LL.yyyy'))
       }
-      for (var i = 1; i < 5; i++) {
+      console.log(dates)
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftC.length; j++) {
-          if (result.shiftC[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftC.length; j++) {
+          if(result.shiftC[j].virtual_date==dates[i]) {
             shiftC.push(result.shiftC[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftC.push(0)
         }
       }
-      for (var i = 1; i < 5; i++) {
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftB.length; j++) {
-          if (result.shiftB[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftB.length; j++) {
+          if(result.shiftB[j].virtual_date==dates[i]) {
             shiftB.push(result.shiftB[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftB.push(0)
         }
       }
-      for (var i = 1; i < 5; i++) {
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftA.length; j++) {
-          if (result.shiftA[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftA.length; j++) {
+          if(result.shiftA[j].virtual_date==dates[i]) {
             shiftA.push(result.shiftA[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftA.push(0)
         }
       }
+
       res.render('raport-list-home', {
         title: 'Witaj! Wybierz raport',
         shiftA: shiftA,
@@ -269,107 +268,20 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  //if raport for this shift exists - this login
-  //redirect to this raport
-  //if if raport for this shift doesnt exist
-  //create new one and redirect for the raport of this shift
-  //redirecting, so the id is in the url
-  const shiftLoggedIn = 2
-  var nowDate = new Date()
-
-  res.clearCookie('test', {path:'/'})
-
-  saveDate = new Date()
-  saveDate.setHours(10)
-
-  startDate = new Date()
-  endDate = new Date()
-  if (
-    shiftLoggedIn != 3 ||
-    (nowDate.getHours() > 6 && nowDate.getHours() < 24)
-  ) {
-    startDate.setHours(8, 00)
-    endDate.setHours(24)
-
-    Raport.findOne({
-      shift: shiftLoggedIn,
-      date: {
-        // searching for the same day between 0 - 24
-        $gte: startDate,
-        $lte: endDate,
-      },
-    }).exec(function (err, result) {
-      if (err) {
-        return next(err)
-      }
-      if (result == null) {
-        User.find({
-          shift: shiftLoggedIn,
-          isAvaible: true,
-        }).exec(function (err, team) {
-          if (err) {
-            res.status(500).json(err)
-            return next(err)
-          }
-          raport = new Raport({
-            date: saveDate,
-            shift: shiftLoggedIn,
-            teamAbsent: team,
-            teamPresent: [],
-          })
-          raport.save()
-          res.redirect(raport.url + '/edytuj')
-        })
-      } else {
-        res.redirect(result.url + '/edytuj')
-      }
-    })
-  }
-  // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
-  if (shiftLoggedIn == 3 && 6 > nowDate.getHours() && 0 < nowDate.getHours()) {
-    startDate.setHours(8, 00)
-    endDate.setHours(24)
-
-    startDate.setDate(startDate.getDate() - 1)
-    endDate.setDate(startDate.getDate() - 1)
-
-    Raport.findOne({
-      shift: shiftLoggedIn,
-      date: {
-        // searching for the previous date 6 - 24
-        $gte: startDate,
-        $lte: nowDate,
-      },
-    }).exec(function (err, result) {
-      if (err) {
-        return next(err)
-      }
-      if (result == null) {
-        User.find({
-          shift: shiftLoggedIn,
-          isAvaible: true,
-        }).exec(function (err, team) {
-          if (err) {
-            res.status(500).json(err)
-            return next(err)
-          }
-
-          raport = new Raport({
-            date: saveDate,
-            shift: shiftLoggedIn,
-            teamAbsent: team,
-            teamPresent: [],
-          })
-          raport.save()
-          res.redirect(raport.url + '/edytuj')
-        })
-      } else {
-        res.redirect(result.url + '/edytuj')
-      }
-    })
-  }
+  res.send('zmiana tutaj bedzie!')
 }
 
 exports.raport_GET_one = function (req, res) {
   res.send('get specific raport GET NI')
 }
+
+exports.raport_GET_failures = function(req, res, next) { 
+  res.send('get failure')
+}
+exports.raport_GET_firstSection = function(req, res, next) {
+  
+  res.send('get first section ni')
+}
+
+
+

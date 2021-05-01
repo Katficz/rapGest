@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
+const Raport = require('../models/raport')
 
 dotenv.config();
 exports.user_GET_all = function (req, res) {
@@ -193,18 +194,18 @@ exports.user_GET_one = function (req, res, next) {
 
 exports.user_GET_shift = function (req, res, next) {
   User.find({ isEmployed: true, isAvaible: true })
-    .select({ _id: 1, name: 1, surname: 1, shift: 1, position: 1 })
+    .select({ _id: 1, name: 1, surname: 1, shift: 1, position: 1, permission: 1 })
     .exec(function (err, result) {
       if (err) {
-        console.log(err)
         return next(err)
       }
       const shift1 = result.filter((object) => object.shift == 1)
       const shift2 = result.filter((object) => object.shift == 2)
       const shift3 = result.filter((object) => object.shift == 3)
+      const shift0 = result.filter((object) => object.permission == 'technik')
       res.render('user-shifts', {
         title: 'Zarządzanie zmianami',
-        shift0: result,
+        shift0: shift0,
         shift1: shift1,
         shift2: shift2,
         shift3: shift3,
@@ -215,28 +216,28 @@ exports.user_GET_shift = function (req, res, next) {
 exports.user_POST_shift = function (req, res) {
   var changeList = req.body
   var shift = req.body.shift
-
-  User.updateMany({ shift: shift }, { shift: 0 }).exec(function (err, result) {
+  User.updateMany({shift: shift}, {shift: 0})
+  .exec(function (err, result) {
     if (err) {
       res.status(500).json({ error: err })
     }
+    for (const [key, value] of Object.entries(changeList)) {
+      if (value != shift) {
+        User.updateOne(
+          { _id: value },
+          {
+            $set: { shift: shift },
+          }
+        ).exec(function (err, result) {
+          if (err) {
+            res.status(500).json({ error: err })
+          }
+        })
+      }
+    }
+    res.status(200).json({ body: 'Zapisano pomyślnie zmianę ' })
   })
 
-  for (const [key, value] of Object.entries(changeList)) {
-    if (value != shift) {
-      User.updateOne(
-        { _id: value },
-        {
-          $set: { shift: shift },
-        }
-      ).exec(function (err, result) {
-        if (err) {
-          res.status(500).json({ error: err })
-        }
-      })
-    }
-  }
-  res.status(200).json({ body: 'Zapisano pomyślnie zmianę ' })
 }
 
 /// LOGIN MANAGMENT
@@ -244,30 +245,149 @@ exports.user_GET_login = function(req, res) {
   res.clearCookie('token')
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
-exports.user_POST_login = async function(req, res) {
+exports.user_POST_login = async function(req, res, next) {
     
     User.findOne({login: req.body.login})
-    .exec(async function(err, result) {
+    .exec(async function(err, loggedInResult) {
         if(err) {
             return next(err)
         }
-        if(!result) {
-            console.log('brak loginu')
+        if(!loggedInResult) {
             res.status(400).render('login', {errs:'Podany login nie widnieje w bazie danych'})
         }
-        const validPass = await bcrypt.compare(req.body.password, result.password)
+        const validPass = await bcrypt.compare(req.body.password, loggedInResult.password)
         if(!validPass) {
-            console.log('złe hasło')
             res.status(400).render('login',{errs:'Złe hasło!'})
         }
 
         //creating token with users ID and permission and storing it as a cookie
-        const token = jwt.sign({_id: result._id, permission: result.permission}, process.env.TOKEN_SECRET)
+        const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
 
-        res.status(200)
-        .cookie('token', token, {
-          secure: true,
-        })
-        .redirect('/api/raporty')
+        if(loggedInResult.shift!=0) {
+          const shiftLoggedIn = loggedInResult.shift
+          var nowDate = new Date()
+
+          saveDate = new Date()
+          saveDate.setHours(10)
+
+          startDate = new Date()
+          endDate = new Date()
+          if (
+            shiftLoggedIn != 3 ||
+            (nowDate.getHours() > 6 && nowDate.getHours() < 24)
+          ) {
+            startDate.setHours(8, 00)
+            endDate.setHours(24)
+            Raport.findOne({
+              shift: shiftLoggedIn,
+              date: {
+                // searching for the same day between 8 - 24
+                $gte: startDate,
+                $lte: endDate,
+              },
+            })
+            .exec(function (err, resultRap) {
+              if (err) {
+                return next(err)
+              }
+              if (resultRap == null) {
+                User.find({
+                  shift: shiftLoggedIn,
+                  isAvaible: true,
+                })
+                .exec(function (err, team) {
+                  if (err) {
+                    res.status(500).json(err)
+                    return next(err)
+                  }
+                  raport = new Raport({
+                    date: saveDate,
+                    shift: shiftLoggedIn,
+                    teamAbsent: team,
+                    teamPresent: [],
+                  })
+                  raport.save()
+                  res.status(200)
+                  .cookie('token', token, {
+                    secure: true,
+                  })
+                  .redirect('/api/raporty')
+                })
+              } 
+              if(resultRap){
+                res.status(200)
+                .cookie('token', token, {
+                  secure: true,
+                })
+                .redirect('/api/raporty')
+              }
+            })
+          }
+          // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
+          if (shiftLoggedIn == 3 && 6 > nowDate.getHours() && 0 < nowDate.getHours()) {
+            startDate.setHours(8, 00)
+            endDate.setHours(24)
+
+            startDate.setDate(startDate.getDate() - 1)
+            endDate.setDate(startDate.getDate() - 1)
+
+            Raport.findOne({
+              shift: shiftLoggedIn,
+              date: {
+                // searching for the previous date 6 - 24
+                $gte: startDate,
+                $lte: nowDate,
+              },
+            })
+            .exec(function (err, resultRap) {
+              if (err) {
+                return next(err)
+              }
+              if (resultRap == null) {
+                User.find({
+                  shift: shiftLoggedIn,
+                  isAvaible: true,
+                })
+                .exec(function (err, team) {
+                  if (err) {
+                    res.status(500).json(err)
+                    return next(err)
+                  }
+
+                  raport = new Raport({
+                    date: saveDate,
+                    shift: shiftLoggedIn,
+                    teamAbsent: team,
+                    teamPresent: [],
+                  })
+                  raport.save()
+                  res.status(200)
+                  .cookie('token', token, {
+                    secure: true,
+                  })
+                  .redirect('/api/raporty')
+                })
+              } 
+              if(resultRap){
+                res.status(200)
+                .cookie('token', token, {
+                  secure: true,
+                })
+                .redirect('/api/raporty')
+              }
+            })
+          }
+
+        }
+        if(loggedInResult.shift == 0) {
+          res.status(200)
+          .cookie('token', token, {
+            secure: true,
+          })
+          .redirect('/api/raporty')
+        }
+
     })
 }
+
+
