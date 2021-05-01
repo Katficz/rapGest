@@ -8,6 +8,8 @@ const Device = require('../models/device')
 
 const async = require('async')
 const failure = require('../models/failure')
+
+const { DateTime } = require('luxon')
 //HOME PAGE
 
 exports.raport_GET_list = function (req, res) {
@@ -57,52 +59,49 @@ exports.raport_GET_list = function (req, res) {
       var shiftB = []
       var shiftC = []
       var dates = []
+      var pushDate = startDate
       for (var i = 4; i > 0; i--) {
-        dates.push(
-          startDate.getDate() +
-            i +
-            '-' +
-            (startDate.getMonth() + 1) +
-            '-' +
-            (startDate.getYear() + 1900)
-        )
+        pushDate.setDate(pushDate.getDate()+1)
+        dates.push(DateTime.fromJSDate(pushDate).toFormat('dd.LL.yyyy'))
       }
-      for (var i = 1; i < 5; i++) {
+      console.log(dates)
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftC.length; j++) {
-          if (result.shiftC[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftC.length; j++) {
+          if(result.shiftC[j].virtual_date==dates[i]) {
             shiftC.push(result.shiftC[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftC.push(0)
         }
       }
-      for (var i = 1; i < 5; i++) {
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftB.length; j++) {
-          if (result.shiftB[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftB.length; j++) {
+          if(result.shiftB[j].virtual_date==dates[i]) {
             shiftB.push(result.shiftB[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftB.push(0)
         }
       }
-      for (var i = 1; i < 5; i++) {
+      for(var i = 0; i<dates.length;i++) {
         var match = false
-        for (var j = 0; j < result.shiftA.length; j++) {
-          if (result.shiftA[j].date.getDate() == startDate.getDate() + i) {
+        for(var j = 0; j < result.shiftA.length; j++) {
+          if(result.shiftA[j].virtual_date==dates[i]) {
             shiftA.push(result.shiftA[j].url)
             match = true
           }
         }
-        if (!match) {
+        if(!match) {
           shiftA.push(0)
         }
       }
+
       res.render('raport-list-home', {
         title: 'Witaj! Wybierz raport',
         shiftA: shiftA,
@@ -269,7 +268,7 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  //raportCreator(req, res, next, true, 1)
+  res.send('zmiana tutaj bedzie!')
 }
 
 exports.raport_GET_one = function (req, res) {
@@ -280,7 +279,8 @@ exports.raport_GET_failures = function(req, res, next) {
   res.send('get failure')
 }
 exports.raport_GET_firstSection = function(req, res, next) {
-  res.send('get failure ni')
+  
+  res.send('get first section ni')
 }
 
 
