@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 
 const MasterplanSchema = new Schema({
   name: { type: String, required: true },
+  desc: { type: String },
   date: { type: Date, required: true },
   isDone: { type: Boolean, required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User' },

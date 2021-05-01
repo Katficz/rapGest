@@ -76,6 +76,9 @@ router.get(
 // GET request for creating new MASTERPLAN
 router.get('/masterplan/create', masterplan_controller.masterplan_create_get)
 
+// GET request for creating new FULLCALENDAR
+router.get('/masterplan/calendar', masterplan_controller.masterplan_calendar)
+
 // POST request for creating new masterplan
 router.post('/masterplan/create', masterplan_controller.masterplan_create_post)
 

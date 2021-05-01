@@ -1,1 +1,76 @@
-h1 hello
+extends layout
+block content
+  
+  div.col-lg-4#external-events
+    h4 Draggable Events
+    #external-events-list
+
+      #inside
+    p
+      input#drop-remove(type='checkbox')
+      label(for='drop-remove') remove after drop
+    p
+       button.btn.btn-danger.mt-3(type="button" id='addDraggable' onclick="")  dodaj 
+  div.col#calendar-wrap
+    #calendar
+
+
+
+  link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css')
+  script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js')
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+      },
+      navLinks: true, // can click day/week names to navigate views
+      nowIndicator: true,
+
+      weekNumbers: true,
+      weekNumberCalculation: 'ISO',
+      
+      editable: true,
+      droppable: true, // this allows things to be dropped onto the calendar
+      drop: function(arg) {
+        console.log(calendar.getEvents())
+        // is the "remove after drop" checkbox checked?
+        if (document.getElementById('drop-remove').checked) {
+          // if so, remove the element from the "Draggable Events" list
+          arg.draggedEl.parentNode.removeChild(arg.draggedEl);
+        }
+      }
+    });
+    calendar.render();
+    });
+
+  script.
+    // addPlan() fires when #addDraggable is clicked
+    function addPlan() {
+      randomNumber = Math.random(); 
+      pasteDiv = `
+                    <div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-main" id=`+ 'a' + randomNumber +`>New Event</div>`
+      inside = document.querySelector('#external-events-list')
+      inside.insertAdjacentHTML('beforeend', pasteDiv)
+
+    let myDraggableEl = document.getElementById('a' + randomNumber)
+
+
+    new FullCalendar.Draggable(myDraggableEl, {
+      eventData:  {
+          title: 'mój nowy event',
+          id: 'someid'
+        }
+    });
+
+    var calendar = document.getElementById('calendar');
+    
+    console.log(calendar.getEventById('a' + randomNumber))
+    }
+    let el = document.getElementById("addDraggable");
+    el.addEventListener("click", addPlan, false);
+
+

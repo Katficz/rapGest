@@ -24,6 +24,10 @@ exports.masterplan_list = function (req, res, next) {
     })
 }
 
+exports.masterplan_calendar = function (req, res, next) {
+  res.render('test.pug')
+}
+
 // Display detail page for a specific plan.
 exports.masterplan_detail = function (req, res, next) {
   Masterplan.findById(req.params.id)
