@@ -251,6 +251,10 @@ exports.raport_GET_failures = function(req, res, next) {
        path:'failure',
        populate:'collaborators'
      })
+     .populate({
+       path: 'failure',
+       populate: 'author',
+     })
      .exec(callback)
    },
   deviceTypes: function (callback) {
@@ -267,20 +271,23 @@ exports.raport_GET_failures = function(req, res, next) {
    if(err) {
      return next(err)
     }
+    User.findById(req.verifiedId)
+    .exec(function(err, loggedInUser) {
+      if(err) {
+        return next(err)
+      }
+      coWorkers = result.raport.teamPresent.concat(result.specialists)
+      res.render('raport-failures', {
+        title: 'Edytuj awarie', 
+        myRaport: result.raport,
+        deviceTypes: result.deviceTypes,
+        prodLines: result.prodLines,
+        devices: result.devices,
+        coWorkers: coWorkers,
+        loggedInUser: loggedInUser
+      })
+    })
 
-
-  coWorkers = result.raport.teamPresent.concat(result.specialists)
-  console.log(coWorkers[0], coWorkers[1], coWorkers[2], coWorkers[3], coWorkers[4], 'asdfasdfasdf')
-  console.log(result.raport.failure[0].collaborators[0], result.raport.failure[0].collaborators[1])
-  res.render('raport-failures', {
-    title: 'Edytuj awarie', 
-    myRaport: result.raport,
-    deviceTypes: result.deviceTypes,
-    prodLines: result.prodLines,
-    devices: result.devices,
-    coWorkers: coWorkers,
-    creatorId: req.verifiedId
-  })
  })
 }
 
@@ -353,7 +360,6 @@ exports.raport_GET_one = function (req, res) {
 }
 
 exports.raport_GET_firstSection = function(req, res, next) {
-  console.log(req.verifiedMyRaportId)
   Raport.findById(req.verifiedMyRaportId)
   .populate('teamPresent')
   .populate('teamAbsent')

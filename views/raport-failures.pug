@@ -7,7 +7,7 @@ block content
                 h3.h3.text-center Lista awarii
                 button.btn.btn-outline-warning#newFailure(type="button" onclick='addFBtn()') Dodaj Awarię
 
-                div.accordion#failureAccordion.mt-2
+                div.accordion#failureAccordion.mt-2(data-raport=myRaport data-coworkers=coWorkers data-loggedInUser=loggedInUser.fullname)
                     
                     if myRaport.failure.length!=0
                         
@@ -17,7 +17,7 @@ block content
                                 
                                 div.card-header.gestamp-bg-color
                                     h2.mb-0 
-                                        button.btn.btn-link.btn-block.text-left.collapsed(type="button" data-toggle="collapse" data-target='#collapse'+index aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num #{index + 1}
+                                        button.btn.btn-link.btn-block.text-left.collapsed(type="button" data-toggle="collapse" data-target='#collapse'+index aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num #{index + 1} #{failure.author.fullname}
                                 
                                 div.collapse(data-parent="#failureAccordion" id='collapse'+index)
                                     
@@ -29,79 +29,79 @@ block content
                                                 
                                                 div.form-group.col-4
                                                     label(for="prodLineOption") Linia produkcyjna
-                                                    select#prodLineOption.form-control(name="prodLine")
+                                                    select#prodLineOption.form-control(disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                         each prodLineIterate in prodLines 
                                                             option(value!=prodLineIterate._id selected=(failure.prodLine.name==prodLineIterate.name)) #{prodLineIterate.name}      
                                                 div.form-group.col-4
                                                     label(for="deviceTypeOption") Typ urządzenia
-                                                    select#deviceTypeOption.form-control
+                                                    select#deviceTypeOption.form-control(disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                         each deviceTypeIt in deviceTypes
                                                             option(value!=deviceTypeIt._id selected=(failure.deviceType.name==deviceTypeIt.name)) #{deviceTypeIt.name}  
                                                 div.form-group.col-4
                                                     label(for="device") Urządzenie
-                                                    select#deviceOption.form-control
+                                                    select#deviceOption.form-control(disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                         each deviceIt in devices
                                                             option(value!=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
                                             div.form-row
                                                 div.form-group.col-4
                                                     label(for="sprawdzmy to") Godzina rozpoczęcia
-                                                    input.form-control#startTime(type='time', name='name' value=failure.startTime)
+                                                    input.form-control#startTime(type='time', name='name' value=failure.startTime disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                 div.form-group.col-4
                                                     label(for="sprawdzmy to") Czas trwania [hh:mm]
-                                                    input.form-control#duration(type='time', name='name' value=failure.duration)
+                                                    input.form-control#duration(type='time', name='name' value=failure.duration disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                 div.form-group.col-4
                                                     p Efekt
-                                                    input.mx-1(type="radio" name="efect" value="OK" checked=(failure.effect===true))
+                                                    input.mx-1(type="radio" name="efect" value="OK" checked=(failure.effect===true) disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                     label.mr-2(for="efect") OK
-                                                    input.mx-1(type="radio" name="efect" value="NOK" checked=(failure.effect===false))
+                                                    input.mx-1(type="radio" name="efect" value="NOK" checked=(failure.effect===false) disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                     label(for="efect") NOK
 
                                             div.form-row
                                                 div.form-group.col-12
                                                     label(for="orderNum") Numer zlecenia
-                                                    textarea.form-control#orderNum(type='text' name='orderNum') #{failure.orderNum}
+                                                    textarea.form-control#orderNum(type='text' name='orderNum' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.orderNum}
 
                                             div.form-row
                                                 div.form-group.col-12
                                                     label(for="cause") Przyczyna
-                                                    textarea.text-break.form-control#cause(type='text', name='cause') #{failure.cause}
+                                                    textarea.text-break.form-control#cause(type='text', name='cause' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.cause}
 
                                             div.form-row
                                                 div.form-group.col-12
                                                     label(for="diagnostics") Diagnostyka
-                                                    textarea.form-control#diagnostics(type='text', name='diagnostics') #{failure.diagnostics}
+                                                    textarea.form-control#diagnostics(type='text', name='diagnostics' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.diagnostics}
 
                                             div.form-row
                                                 div.form-group.col-12
                                                     label(for="actions") Wykonane akcje
-                                                    textarea.form-control#actions(type='text', name='actions') #{failure.action}
+                                                    textarea.form-control#actions(type='text', name='actions' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.action}
 
                                             div.form-row
                                                 div.form-group.col-6
                                                     label(for="usedParts") Wykorzystane części
-                                                    textarea.form-control#usedParts(type='text', name='usedParts') #{failure.usedParts}
+                                                    textarea.form-control#usedParts(type='text', name='usedParts' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.usedParts}
                                                 div.form-group.col-6
                                                     label(for="missingParts") Brakujące części
-                                                    textarea.form-control#missingParts(type='text', name='missingParts') #{failure.missingParts}
+                                                    textarea.form-control#missingParts(type='text', name='missingParts' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) #{failure.missingParts}
 
                                             div.form-row
                                                 div.form-group.col-12
-                                                    label Pracujący przy awarii:
+                                                    p Pracujący przy awarii:
                                                         ul.nice-shifts-border.list-unstyled
                                                                 each employee in coWorkers
-                                                                    div.nonCollabWorkers(data-emplo=employee._id style="display: none")
+                                                                    div(class='aa'+failure._id.toString() data-emplo=employee._id)
                                                                         li
-                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id)
-                                                                            label(for='techCo Worker') #{employee.name} #{employee.surname}
+                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='nonCollabs' value=employee._id disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
+                                                                            label(for='nonCollabs') #{employee.name} #{employee.surname}
                                             div.form-row
                                                 div.form-group.col-12
-                                                    button.btn.btn-outline-danger#deleteFailure(type="button" onclick='deleteSomeFail(this)') Usuń
-                                                    button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)') Zapisz
+                                                    button.btn.btn-outline-danger#deleteFailure(type="button" onclick='deleteSomeFail(this)' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) Usuń
+                                                    button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) Zapisz
 
                     div.card#card(style="display: none")
                         div.card-header.gestamp-bg-color
                             h2.mb-0 
-                                button.btn.btn-link.btn-block.text-left(type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num 1
+                                button.btn.btn-link.btn-block.text-left(type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num 1 #{loggedInUser.fullname}
                         div#collapse1.collapse(data-parent="#failureAccordion")
                             div.card-body
                                 form(data-rapId=myRaport._id)
@@ -164,12 +164,12 @@ block content
                                             textarea.form-control#missingParts(type='text', name='missingParts')
                                     div.form-row
                                         div.form-group.col-12
-                                            label Współpracujący przy awarii:
+                                            p Współpracujący przy awarii:
                                                 ul.nice-shifts-border.list-unstyled
                                                     each employee in coWorkers
                                                         div(style="width:100%")
                                                             li
-                                                                input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id checked=(creatorId==employee._id?true:false) disabled=(creatorId==employee._id?true:false))
+                                                                input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id)
                                                                 label(for='techCoWorker') #{employee.name} #{employee.surname}          
 
 
@@ -184,23 +184,39 @@ block content
         const activateSubMenu = document.querySelector('#myRaportSubMenu')
         activateSubMenu.className+=" active"
 
-        var nonCollabWorkers = document.querySelectorAll('.nonCollabWorkers')
-        var failure = JSON.parse(document.querySelector('#startUpOption').dataset.failure)
-        var savedCollaborators = failure.collaborators
-        var imAdded = []
-        for(let i = 0;i<nonCollabWorkers.length;i++) {
-                if(!(savedCollaborators.includes(nonCollabWorkers[i].dataset.emplo))) {
-                    nonCollabWorkers[i].style.display = 'initial'
-                }
-        }
         const bigDiv = document.querySelector('#failureAccordion')
+
+        //startupforcollaborators
+        var failures = JSON.parse(bigDiv.dataset.raport).failure
+        for(var i = 0;i<failures.length;i++) {
+            var divyDoPokazania = document.querySelectorAll('div.aa'+failures[i]._id)
+            for(var j = 0;j<divyDoPokazania.length;j++) {
+                for(var k = 0;k<failures[i].collaborators.length;k++) {
+                    if(divyDoPokazania[j].dataset.emplo==failures[i].collaborators[k]._id) {
+                        divyDoPokazania[j].firstChild.firstChild.checked = true
+                    }
+                }
+            }
+        };
+
+
+
+
+        //- var nonCollabWorkers = document.querySelectorAll('.nonCollabWorkers')
+        //- var failure = JSON.parse(document.querySelector('#startUpOption').dataset.failure)
+        //- var savedCollaborators = failure.collaborators
+        //- for(let i = 0;i<nonCollabWorkers.length;i++) {
+        //-     if(!(savedCollaborators.includes(nonCollabWorkers[i].dataset.emplo))) {
+        //-         nonCollabWorkers[i].style.display = 'initial'
+        //-     }
+        //- }
         var failureNum = bigDiv.childElementCount -1
 
         function addFBtn() {
             failureNum++
             var newDiv = bigDiv.lastChild.cloneNode(true)
-
-            newDiv.firstChild.firstChild.lastChild.textContent = 'Awaria num '+failureNum
+            fullName = bigDiv.dataset.loggedinuser.toString()
+            newDiv.firstChild.firstChild.lastChild.textContent = 'Awaria num '+ failureNum + ' ' + fullName
             newDiv.firstChild.firstChild.lastChild.dataset.target = '#collapse'+failureNum
             newDiv.lastChild.id = 'collapse'+failureNum
             newDiv.style.display = 'flex'
@@ -247,10 +263,10 @@ block content
             }
         }
         colabCheckBoxestest = document.querySelectorAll('.collabsCheckBox')
-
+        var zmienna
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
-            zmienna =form
+            zmienna =button
             prodLineId = form.childNodes[0].childNodes[0].childNodes[1].selectedOptions[0].value
             deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
             deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
@@ -274,12 +290,13 @@ block content
             missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
             
             collaborators = []
-            colabCheckBoxes = document.querySelectorAll('.collabsCheckBox')
-            for(let i = 0;i<colabCheckBoxes.length-2;i++) {
-                if(colabCheckBoxes[i].checked && colabCheckBoxes[i].style.display=='initial') {
-                    collaborators.push(colabCheckBoxes[i].value)
+            for(let i = 0;i<button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes.length;i++) {
+                if(button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes[i].firstChild.firstChild.checked) {
+                    collaborators.push(button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes[i].firstChild.firstChild.value) // inputy
                 }
+
             }
+
             fetch('/api/zapisz-awarie/'+form.dataset.rapid, {
                 method: 'POST',
                 headers: {

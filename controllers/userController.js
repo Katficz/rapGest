@@ -246,7 +246,6 @@ exports.user_GET_login = function(req, res) {
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
 exports.user_POST_login = async function(req, res, next) {
-    
     User.findOne({login: req.body.login})
     .exec(async function(err, loggedInResult) {
         if(err) {
@@ -259,9 +258,6 @@ exports.user_POST_login = async function(req, res, next) {
         if(!validPass) {
             res.status(400).render('login',{errs:'Złe hasło!'})
         }
-
-        //creating token with users ID and permission and storing it as a cookie
-        const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
 
         //checking if raports exists for taday and loggedinshift- if not creates one
         if(loggedInResult.shift!=0) {
@@ -337,7 +333,7 @@ exports.user_POST_login = async function(req, res, next) {
             Raport.findOne({
               shift: shiftLoggedIn,
               date: {
-                // searching for the previous date 6 - 24
+                // searching for the previous date 8 - 24
                 $gte: startDate,
                 $lte: nowDate,
               },
