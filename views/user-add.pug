@@ -9,10 +9,10 @@ block content
                 form(method='POST' action='')
                     div.form-group
                         label(for='login') Login:
-                        input#login.form-control(type='text', placehoder='SamKozak123' name='login')
+                        input#login.form-control(type='text', placehoder='SamKozak123' name='login' value=(undefined===user ? '' : user.login))
  
-                        label(for='hasło') Dodaj hasło:
-                        input#password.form-control(type='text', name='password', value=(undefined===user ? '' : user.name))
+                        label(for='hasło') Hasło:
+                        input#password.form-control(type='text', name='password', disabled=(undefined===user ? false : true))
  
                         label(for='name') Imię:
                         input#name.form-control(type='text', placehoder='Sam' name='name', value=(undefined===user ? '' : user.name))
@@ -53,10 +53,10 @@ block content
 
                     button.btn.btn-primary(type='submit') Zapisz
 
-                if errors
-                    ul
-                        for error in errors
-                            li!=error.msg
+    if errors
+        ul
+            for error in errors
+                li!=error.msg
 
 
 

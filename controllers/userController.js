@@ -125,16 +125,21 @@ exports.user_POST_update = [
     .escape()
     .withMessage('Podaj Nazwisko'),
 
-  body('email').normalizeEmail().isEmail(),
+  body('email').optional({ checkFalsy: true }).isEmail().normalizeEmail(),
 
   async function (req, res, next) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      res.render('user-list', { title: 'Użytkownik', errors: errors.array() })
-      return
+      User.find()
+      .sort([['surname', 'ascending']])
+      .exec(function (err, result) {
+        if (err) {
+          return next(err)
+        }
+        console.log(errors.array())
+      res.render('user-list', { title: 'Użytkownik', user_list: result, errors: errors.array() })
+      })
     } else {
-      const salt = await bcrypt.genSalt(10)
-      const hashPassword = await bcrypt.hash(req.body.password, salt)
       User.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
         surname: req.body.surname,
@@ -143,7 +148,6 @@ exports.user_POST_update = [
         isEmployed: !!req.body.isEmployed,
         permission: req.body.permission,
         position: req.body.position,
-        password: hashPassword,
       }).exec(function (err, result) {
         if (err) {
           return next(err)
