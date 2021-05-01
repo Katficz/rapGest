@@ -263,6 +263,7 @@ exports.user_POST_login = async function(req, res, next) {
         //creating token with users ID and permission and storing it as a cookie
         const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
 
+        //checking if raports exists for taday and loggedinshift- if not creates one
         if(loggedInResult.shift!=0) {
           const shiftLoggedIn = loggedInResult.shift
           var nowDate = new Date()
@@ -307,6 +308,7 @@ exports.user_POST_login = async function(req, res, next) {
                     teamPresent: [],
                   })
                   raport.save()
+                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id}, process.env.TOKEN_SECRET)
                   res.status(200)
                   .cookie('token', token, {
                     secure: true,
@@ -315,6 +317,7 @@ exports.user_POST_login = async function(req, res, next) {
                 })
               } 
               if(resultRap){
+                const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: resultRap._id}, process.env.TOKEN_SECRET)
                 res.status(200)
                 .cookie('token', token, {
                   secure: true,
@@ -361,6 +364,7 @@ exports.user_POST_login = async function(req, res, next) {
                     teamPresent: [],
                   })
                   raport.save()
+                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id}, process.env.TOKEN_SECRET)
                   res.status(200)
                   .cookie('token', token, {
                     secure: true,
@@ -369,6 +373,7 @@ exports.user_POST_login = async function(req, res, next) {
                 })
               } 
               if(resultRap){
+                const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: resultRap._id}, process.env.TOKEN_SECRET)
                 res.status(200)
                 .cookie('token', token, {
                   secure: true,
@@ -380,6 +385,7 @@ exports.user_POST_login = async function(req, res, next) {
 
         }
         if(loggedInResult.shift == 0) {
+          const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
           res.status(200)
           .cookie('token', token, {
             secure: true,

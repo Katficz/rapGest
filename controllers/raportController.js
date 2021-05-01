@@ -10,8 +10,8 @@ const async = require('async')
 const failure = require('../models/failure')
 
 const { DateTime } = require('luxon')
-//HOME PAGE
 
+//HOME PAGE
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
   startDate.setTime(
@@ -64,7 +64,6 @@ exports.raport_GET_list = function (req, res) {
         pushDate.setDate(pushDate.getDate()+1)
         dates.push(DateTime.fromJSDate(pushDate).toFormat('dd.LL.yyyy'))
       }
-      console.log(dates)
       for(var i = 0; i<dates.length;i++) {
         var match = false
         for(var j = 0; j < result.shiftC.length; j++) {
@@ -152,6 +151,14 @@ exports.raport_GET_update = function (req, res, next) {
         return next(err)
       }
 
+      var roundAroundPlaces =[
+        ['kettle', 'isKettle', 'Kotłownia'],
+        ['compressor', 'isCompressor', 'Kompresownia'],
+        ['ice', 'isIce', 'Wieża Chłodu'],
+        ['electric', 'isElectric', 'Rozdzielnia'],
+        ['workshop', 'isWorkshop', 'Warsztat'],
+      ]
+
       res.render('raport-update', {
         title:
           'Edytuj Raport zmiany ' +
@@ -161,14 +168,15 @@ exports.raport_GET_update = function (req, res, next) {
         data: result,
         absent: result.raport.teamAbsent,
         present: result.raport.teamPresent,
+        roundAroundPlaces: roundAroundPlaces,
       })
     }
   )
 }
-
+///FETCH ENDPOINTS FOR RAPORTS FIRST SECTION 
 exports.raport_POST_saveAdditionalInfo = function (req, res, next) {
   Raport.findByIdAndUpdate(req.params.id, {
-    additionalInfo: req.body.roundAround,
+    additionalInfo: req.body.additionalInfo,
   }).exec(function (err) {
     if (err) {
       res.status(500).json(err)
@@ -192,7 +200,7 @@ exports.raport_POST_saveRoundAround = function (req, res) {
   })
 }
 
-exports.raport_POST_saveTeam = function (req, res) {
+exports.raport_POST_saveTeam = function (req, res, next) {
   Raport.findByIdAndUpdate(req.params.id, {
     teamPresent: req.body.teamPresent,
     teamAbsent: req.body.teamAbsent,
@@ -200,17 +208,84 @@ exports.raport_POST_saveTeam = function (req, res) {
     if (err) {
       res.status(500).json(err)
       return next(err)
-    } else {
+    } 
+    else 
+    {
       res.status(200).json('Succes!')
     }
   })
   //Raport.findByIdAndUpdate(req.params._id)
 }
+//FETCH FIRST SECTIO ENDS HERE
 
+// get ONLY failures for .../awarie endpoint
+exports.raport_GET_failures = function(req, res, next) { 
+ async.parallel(
+   {
+    specialists: function(callback) {
+     User.find({
+      permission: 'specjalista',
+      isAvaible: true,
+      })
+      .exec(callback)
+   },
+   raport: function(callback) {
+     Raport.findById(req.verifiedMyRaportId)
+     .populate('teamPresent')
+     .populate({
+       path: 'failure',
+       populate: {
+         path: 'prodLine',
+         model: 'ProdLine',
+       },
+     })
+     .populate({
+       path: 'failure',
+       populate: 'deviceType',
+     })
+     .populate({
+       path: 'failure',
+       populate: 'device',
+     })
+     .populate({
+       path:'failure',
+       populate:'collaborators'
+     })
+     .exec(callback)
+   },
+  deviceTypes: function (callback) {
+    DeviceType.find().sort().exec(callback)
+  },
+  prodLines: function (callback) {
+    ProdLine.find().sort().exec(callback)
+  },
+  devices: function (callback) {
+    Device.find().sort().exec(callback)
+  },
+ },
+ function(err, result) {
+   if(err) {
+     return next(err)
+    }
+
+
+  coWorkers = result.raport.teamPresent.concat(result.specialists)
+  console.log(coWorkers[0], coWorkers[1], coWorkers[2], coWorkers[3], coWorkers[4], 'asdfasdfasdf')
+  console.log(result.raport.failure[0].collaborators[0], result.raport.failure[0].collaborators[1])
+  res.render('raport-failures', {
+    title: 'Edytuj awarie', 
+    myRaport: result.raport,
+    deviceTypes: result.deviceTypes,
+    prodLines: result.prodLines,
+    devices: result.devices,
+    coWorkers: coWorkers,
+    creatorId: req.verifiedId
+  })
+ })
+}
+
+//FETCH ENDPOINTS FOR RAPORT MANAGMENT
 exports.raport_POST_deleteFailure = function (req, res) {
-  var failureId = req.body.failureId
-  var raportId = req.params.id
-
   Raport.findByIdAndUpdate(req.params.id, {
     $pullAll: { failure: [req.body.failureId] },
   }).exec(function (err, result) {
@@ -228,13 +303,14 @@ exports.raport_POST_deleteFailure = function (req, res) {
   })
 }
 
-exports.raport_POST_saveFailure = function (req, res) {
+exports.raport_POST_saveFailure = function (req, res, next) {
   if (req.body.failureId) {
     var id = req.body.failureId
     delete req.body.failureId
+    req.body.author = req.verifiedId
     failure.findByIdAndUpdate(id, req.body).exec(function (err, result) {
       if (err) {
-        res.status(500).json({ error: err })
+        return next(err)
       }
       res.status(200).json(result)
     })
@@ -243,6 +319,7 @@ exports.raport_POST_saveFailure = function (req, res) {
 
   if (!req.body.failureId) {
     delete req.body.failureId
+    req.body.author = req.verifiedId
     const failure = new Failure(req.body)
     failure.save(function (err) {
       if (err) {
@@ -262,7 +339,7 @@ exports.raport_POST_saveFailure = function (req, res) {
     })
   }
 }
-
+//FETCH RAPORT ENDS HERE
 exports.raport_POST_update = function (req, res) {
   res.send('update raport POST NI')
 }
@@ -275,12 +352,33 @@ exports.raport_GET_one = function (req, res) {
   res.send('get specific raport GET NI')
 }
 
-exports.raport_GET_failures = function(req, res, next) { 
-  res.send('get failure')
-}
 exports.raport_GET_firstSection = function(req, res, next) {
-  
-  res.send('get first section ni')
+  console.log(req.verifiedMyRaportId)
+  Raport.findById(req.verifiedMyRaportId)
+  .populate('teamPresent')
+  .populate('teamAbsent')
+  .exec(function(err, result) {
+
+    var roundAroundPlaces =[
+      ['kettle', 'isKettle', 'Kotłownia'],
+      ['compressor', 'isCompressor', 'Kompresownia'],
+      ['ice', 'isIce', 'Wieża Chłodu'],
+      ['electric', 'isElectric', 'Rozdzielnia'],
+      ['workshop', 'isWorkshop', 'Warsztat'],
+    ]
+    if(err) {
+      return next(err)
+    }
+    res.render('raport-first-section', {
+      title:'Podstawowe informacje',   
+      raportId: req.verifiedMyRaportId,
+      absent: result.teamAbsent,
+      present: result.teamPresent,
+      roundAroundPlaces: roundAroundPlaces,
+      roundAround: result.roundAround,
+      additionalInfo: result.additionalInfo
+    })
+  })
 }
 
 

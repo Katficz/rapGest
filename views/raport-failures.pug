@@ -1,72 +1,17 @@
 extends layout 
-block content 
+
+block content
     div.container
         div.row
-            h1.col-12.h1.text-center.m-4= title
-
-            div.col-xl-5.col-sm-12.mt-4
-                div.raportTableTitle.text-center.mt-1 Skład Osobowy
-                if present||absent
-                    div.form-group
-                        form#team(data-raportId=data.raport._id data-raportSavedTeam=data.raport.team)
-                            table.table.table-sm.mb-0
-                                thead 
-                                    tr
-                                        th(scope="col") Imię
-                                        th(scope="col") Nazwisko
-                                        th.text-center(scope="col") Obecność
-                                tbody 
-                                    each employee in present
-                                        tr
-                                            td!= employee.name 
-                                            td!= employee.surname
-                                            td.text-center
-                                                input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id checked)
-
-                                    each employee in absent
-                                        tr
-                                            td!= employee.name 
-                                            td!= employee.surname
-                                            td.text-center
-                                                input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id)
-                            buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveTeam()') Zapisz skład osobowy
-                else
-                    p BRAK SKŁADU OSOBOWEGO DLA TEJ ZMIANY
-                div.raportTableTitle.text-center Obchód
-                div.form-group
-                    table.table.table-bordered.mb-0
-                        thead 
-                            tr
-                                th(scole="col") Miejsce
-                                th(scole="col") Dodatkowy opis
-                                th.text-center(scole="col" style="width: 12%") OK/NOK
-                        tbody
-                            each place in roundAroundPlaces
-                                tr
-                                    td 
-                                        p #{place[2]}
-                                    td
-                                        textarea.form-control.roundAroundText(rows="1" id=place[0]) #{data.raport.roundAround[place[0]]}
-                                    td(align="center")
-                                        input.m-1.roundAroundCheckBox(type="checkbox" id=place[1] name=place[1] checked=data.raport.roundAround[place[1]])
-                    buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveRoundAround()') Zapisz Obchód
-
-
-                form#addiitonalInfo
-                    div.raportTableTitle.text-center Dodatkowe informacje
-                    div.form-group
-                        textarea#freeText.form-control(rows="5") #{data.raport.additionalInfo}
-                    buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-5(type="button" onclick='saveAdditionalInfo()') Zapisz dodatkowy opis
-
-            div.col-xl-7.col-md-12.col-sm-12
+            div.col-xl-10.offset-xl-1.col-l-12
                 h3.h3.text-center Lista awarii
                 button.btn.btn-outline-warning#newFailure(type="button" onclick='addFBtn()') Dodaj Awarię
 
                 div.accordion#failureAccordion.mt-2
                     
-                    if data.raport.failure.length!=0
-                       
-                        each failure, index in data.raport.failure
+                    if myRaport.failure.length!=0
+                        
+                        each failure, index in myRaport.failure
 
                             div.card#card(value=failure._id)
                                 
@@ -78,24 +23,24 @@ block content
                                     
                                     div.card-body
                                         
-                                        form(data-rapId=data.raport._id data-failureId=failure._id)
+                                        form(data-rapId=myRaport._id data-failureId=failure._id)
                                             
-                                            div.form-row#startUpOption(value!=failure)
+                                            div.form-row#startUpOption(data-failure=failure)
                                                 
                                                 div.form-group.col-4
                                                     label(for="prodLineOption") Linia produkcyjna
                                                     select#prodLineOption.form-control(name="prodLine")
-                                                        each prodLineIterate in data.prodLines 
+                                                        each prodLineIterate in prodLines 
                                                             option(value!=prodLineIterate._id selected=(failure.prodLine.name==prodLineIterate.name)) #{prodLineIterate.name}      
                                                 div.form-group.col-4
                                                     label(for="deviceTypeOption") Typ urządzenia
                                                     select#deviceTypeOption.form-control
-                                                        each deviceTypeIt in data.deviceTypes
+                                                        each deviceTypeIt in deviceTypes
                                                             option(value!=deviceTypeIt._id selected=(failure.deviceType.name==deviceTypeIt.name)) #{deviceTypeIt.name}  
                                                 div.form-group.col-4
                                                     label(for="device") Urządzenie
                                                     select#deviceOption.form-control
-                                                        each deviceIt in data.devices
+                                                        each deviceIt in devices
                                                             option(value!=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
                                             div.form-row
                                                 div.form-group.col-4
@@ -141,30 +86,40 @@ block content
 
                                             div.form-row
                                                 div.form-group.col-12
+                                                    label Pracujący przy awarii:
+                                                        ul.nice-shifts-border.list-unstyled
+                                                                each employee in coWorkers
+                                                                    div.nonCollabWorkers(data-emplo=employee._id style="display: none")
+                                                                        li
+                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id)
+                                                                            label(for='techCo Worker') #{employee.name} #{employee.surname}
+                                            div.form-row
+                                                div.form-group.col-12
                                                     button.btn.btn-outline-danger#deleteFailure(type="button" onclick='deleteSomeFail(this)') Usuń
                                                     button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)') Zapisz
+
                     div.card#card(style="display: none")
                         div.card-header.gestamp-bg-color
                             h2.mb-0 
                                 button.btn.btn-link.btn-block.text-left(type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num 1
                         div#collapse1.collapse(data-parent="#failureAccordion")
                             div.card-body
-                                form(data-rapId=data.raport._id)
+                                form(data-rapId=myRaport._id)
                                     div.form-row
                                         div.form-group.col-4
                                             label(for="inputState") Linia
                                             select#inputState.form-control
-                                                each prodLine in data.prodLines 
+                                                each prodLine in prodLines 
                                                     option(value!=prodLine._id) #{prodLine.name}
                                         div.form-group.col-4
                                             label(for="inputState") Typ Urządzenia
                                             select#inputState.form-control
-                                                each deviceType in data.deviceTypes
+                                                each deviceType in deviceTypes
                                                     option(value!=deviceType._id) #{deviceType.name}
                                         div.form-group.col-4
                                             label(for="inputState") Urządzenie
                                             select#inputState.form-control
-                                                each device in data.devices
+                                                each device in devices
                                                     option(value!=device._id) #{device.name}
                                     div.form-row
                                         div.form-group.col-4
@@ -207,141 +162,40 @@ block content
                                         div.form-group.col-6
                                             label(for="missingParts") Brakujące części
                                             textarea.form-control#missingParts(type='text', name='missingParts')
+                                    div.form-row
+                                        div.form-group.col-12
+                                            label Współpracujący przy awarii:
+                                                ul.nice-shifts-border.list-unstyled
+                                                    each employee in coWorkers
+                                                        div(style="width:100%")
+                                                            li
+                                                                input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id checked=(creatorId==employee._id?true:false) disabled=(creatorId==employee._id?true:false))
+                                                                label(for='techCoWorker') #{employee.name} #{employee.surname}          
+
 
                                     div.form-row
                                         div.form-group.col-12
                                             button.btn.btn-outline-danger#deleteFailure(type="button" name="deleteDiv" onclick="deleteSomeFail(this)") Usuń
                                             button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)') Zapisz
-                                        
-
-                                            
-
 
     script.
-        //its kinda fucked up, but adding new one is cloning form make visible:none which is last child of #failureAccordion
-        //when new failure is added filled in and saved id of this failure is stored in form div
-        //raport id of this raport is stored also in form 
-        //form Node is used as form variable in saveSomeFailure() and used to pass data to backend
+        const activateLink = document.querySelector('#seconSectionActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#myRaportSubMenu')
+        activateSubMenu.className+=" active"
 
+        var nonCollabWorkers = document.querySelectorAll('.nonCollabWorkers')
+        var failure = JSON.parse(document.querySelector('#startUpOption').dataset.failure)
+        var savedCollaborators = failure.collaborators
+        var imAdded = []
+        for(let i = 0;i<nonCollabWorkers.length;i++) {
+                if(!(savedCollaborators.includes(nonCollabWorkers[i].dataset.emplo))) {
+                    nonCollabWorkers[i].style.display = 'initial'
+                }
+        }
         const bigDiv = document.querySelector('#failureAccordion')
-        const teamForm = document.querySelector('#team')
-
-
-        //SAVE ADDITINAL INFO
-        function saveAdditionalInfo() {
-            const freeText = document.querySelector('#freeText')
-            fetch('/api/zapisz-dodatkowe-info/'+teamForm.dataset.raportid, {
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({roundAround: freeText.value})
-            })
-            .then(function(res, err) {
-                return res.json()
-            })
-            .then(function(response) {
-                console.log(response)
-                if(response.message) {
-                    alert(response.message)
-                }
-                else{
-                    alert(response)
-                }
-            })
-            .catch((err) => {
-                alert(err.message)
-            })
-        }
-
-        //ALL THE WORK WITH ROUNDAROUND // CREATING AND EMPTY SPACE IN FRONT OF TR ELEMENT WILL BREAK THIS
-
-
-        //save fetch team
-        function saveTeam() {
-            var teamPresent = []
-            var teamAbsent = []
-            // Access users' chcekboxes in some ugly way that only smart boys can understand
-            for(var i = 1; i<teamForm.childNodes[0].childNodes[1].childNodes.length;i++) {
-                if(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].checked == true) {
-                    teamPresent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
-                }
-                else {
-                    teamAbsent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
-                }
-            }
-            fetch('/api/zapisz-sklad/'+teamForm.dataset.raportid, {
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        teamPresent: teamPresent,
-                        teamAbsent: teamAbsent,
-                    })
-            })
-            .then(function(res) {
-                return res.json()
-            })
-            .then(function(response) {
-                if(response.message) {
-                    alert(response.message)
-                }
-                else{
-                    alert(response)
-                }
-            })
-            .catch((err) => {
-                alert(err.message)
-            })
-        }
-
-        function saveRoundAround() {
-            const roundAroundText = document.querySelectorAll('.roundAroundText')
-            const roundAroundCheckBox = document.querySelectorAll('.roundAroundCheckBox')
-
-            var roundAroundPlaces =[
-                ['kettle', 'isKettle', 'Kotłownia'],
-                ['compressor', 'isCompressor', 'Kompresownia'],
-                ['ice', 'isIce', 'Wieża Chłodu'],
-                ['electric', 'isElectric', 'Rozdzielnia'],
-                ['workshop', 'isWorkshop', 'Warsztat'],
-            ]
-            var sendMe = {}
-            for(let i = 0;i<roundAroundPlaces.length;i++) {
-                sendMe[roundAroundPlaces[i][0]] = roundAroundText[i].value
-                sendMe[roundAroundPlaces[i][1]] = roundAroundCheckBox[i].checked
-            }
-
-            fetch('/api/zapisz-obchod/'+teamForm.dataset.raportid, {
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(sendMe)
-            })
-            .then(function(res) {
-                return res.json()
-            })
-            .then(function(response) {
-                if(response.message) {
-                    alert(response.message)
-                }
-                else{
-                    alert(response)
-                }
-            })
-            .catch((err) => {
-                alert(err.message)
-            })
-
-        }
-
-        //e add new Failure button onclick
         var failureNum = bigDiv.childElementCount -1
+
         function addFBtn() {
             failureNum++
             var newDiv = bigDiv.lastChild.cloneNode(true)
@@ -352,7 +206,7 @@ block content
             newDiv.style.display = 'flex'
             bigDiv.appendChild(newDiv)
         }
-        // add / delete failure buttons onlick
+
         function deleteSomeFail(button) {
             var form = button.parentNode.parentNode.parentNode
             if(form.dataset.failureid) {
@@ -392,6 +246,8 @@ block content
                 accordionDiv.removeChild(deleteMeDiv)
             }
         }
+        colabCheckBoxestest = document.querySelectorAll('.collabsCheckBox')
+
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
             zmienna =form
@@ -409,7 +265,7 @@ block content
             orderNum = form.childNodes[2].childNodes[0].childNodes[1].value
 
             cause = form.childNodes[3].childNodes[0].childNodes[1].value
-  
+
             diagnostics = form.childNodes[4].childNodes[0].childNodes[1].value
 
             action = form.childNodes[5].childNodes[0].childNodes[1].value
@@ -417,6 +273,13 @@ block content
             usedParts = form.childNodes[6].childNodes[0].childNodes[1].value
             missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
             
+            collaborators = []
+            colabCheckBoxes = document.querySelectorAll('.collabsCheckBox')
+            for(let i = 0;i<colabCheckBoxes.length-2;i++) {
+                if(colabCheckBoxes[i].checked && colabCheckBoxes[i].style.display=='initial') {
+                    collaborators.push(colabCheckBoxes[i].value)
+                }
+            }
             fetch('/api/zapisz-awarie/'+form.dataset.rapid, {
                 method: 'POST',
                 headers: {
@@ -436,7 +299,9 @@ block content
                     effect: effect,
                     action: action,
                     usedParts: usedParts,
-                    missingParts: missingParts})
+                    missingParts: missingParts,
+                    collaborators: collaborators,
+                    })
             })
             .then(function(response) {
                 return response.json();

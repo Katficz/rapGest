@@ -25,8 +25,19 @@ const raportSchema = new Schema({
     enum: [1, 2, 3],
   },
   roundAround: {
-    // FUQ IT IM MAKING IT EASIER
     type: Object,
+    default: {
+      kettle: '',
+      compressor: '',
+      ice: '',
+      electric: '',
+      workshop: '',
+      isKettle: false,
+      isCompressor: false,
+      isIce: false,
+      isElectric: false,
+      isWorkshop: false,
+    }
   },
   failure: [
     {
