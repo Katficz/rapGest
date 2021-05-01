@@ -11,6 +11,7 @@ exports.authTech = function(req, res, next) {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         req.verifiedId = verified._id
         req.verifiedPerm = verified.permission
+        req.verifiedMyRaportId = verified.myRaportId
         req.verifiedShift = verified.shift
         return next()
     } 

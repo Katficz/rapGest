@@ -1,0 +1,195 @@
+extends layout 
+
+block content
+    div.col-xl-8.offset-xl-2.col-l-12
+        h1.h1.text-center.m-2 #{title}
+        div.accordion#firstSectionAccordion.my-5
+            div.card
+                div.card-header.gestamp-bg-color#teamCheckHeading
+                    h2.mb-0
+                        button.btn.btn-link.btn-block.text-left(type='button' data-toggle="collapse" data-target='#teamCheck' style="color:white") Skład Osobowy 
+                div.collapse#teamCheck
+                    div.card-body
+                        if present||absent
+                            div.form-group
+                                form#team(data-raportId=raportId)
+                                    table.table.table-sm.mb-0
+                                        thead 
+                                            tr
+                                                th(scope="col") Imię
+                                                th(scope="col") Nazwisko
+                                                th.text-center(scope="col") Obecność
+                                        tbody 
+                                            each employee in present
+                                                tr
+                                                    td!= employee.name 
+                                                    td!= employee.surname
+                                                    td.text-center
+                                                        input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id checked)
+
+                                            each employee in absent
+                                                tr
+                                                    td!= employee.name 
+                                                    td!= employee.surname
+                                                    td.text-center
+                                                        input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id)
+                                    buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveTeam()') Zapisz skład osobowy
+
+            div.card
+                div.card-header.gestamp-bg-color#roundAroundkHeading
+                    h2.mb-0
+                        button.btn.btn-link.btn-block.text-left(type='button' data-toggle="collapse" data-target='#roundAround' style="color:white") Obchód 
+                div.collapse#roundAround
+                    div.card-body 
+                        div.form-group
+                            table.table.table-bordered.mb-0
+                                thead 
+                                    tr
+                                        th(scole="col") Miejsce
+                                        th(scole="col") Dodatkowy opis
+                                        th.text-center(scole="col" style="width: 12%") OK/NOK
+                                tbody
+                                    each place in roundAroundPlaces
+                                        tr
+                                            td 
+                                                p #{place[2]}
+                                            td
+                                                textarea.form-control.roundAroundText(rows="1" id=place[0]) #{roundAround[place[0]]}
+                                            td(align="center")
+                                                input.m-1.roundAroundCheckBox(type="checkbox" id=place[1] name=place[1] checked=roundAround[place[1]])
+                            buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveRoundAround()') Zapisz skład osobowy
+
+
+
+
+            div.card
+                div.card-header.gestamp-bg-color#additionalInfoCheckHeading
+                    h2.mb-0
+                        button.btn.btn-link.btn-block.text-left(type='button' data-toggle="collapse" data-target='#additionalInfo' style="color:white") Dodatkowe Informacje
+                div.collapse#additionalInfo
+                    div.card-body
+                        div.raportTableTitle.text-center Dodatkowe informacje
+                        div.form-group
+                            textarea#freeText.form-control(rows="5") #{additionalInfo}
+                        buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-5(type="button" onclick='saveAdditionalInfo()') Zapisz dodatkowy opis
+
+
+
+    script.
+        const activateLink = document.querySelector('#firstSectionActive')
+        activateLink.className+=" active"
+        const activateSubMenu = document.querySelector('#myRaportSubMenu')
+        activateSubMenu.className+=" active"
+        const teamForm = document.querySelector('#team')
+        //teamform contains raports ID in it
+
+        function saveTeam() {
+            var teamPresent = []
+            var teamAbsent = []
+            // Access users' chcekboxes in some ugly way that only smart boys can understand
+            for(var i = 1; i<teamForm.childNodes[0].childNodes[1].childNodes.length;i++) {
+                if(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].checked == true) {
+                    teamPresent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+                }
+                else {
+                    teamAbsent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+                }
+            }
+            fetch('/api/zapisz-sklad/'+teamForm.dataset.raportid,{
+                method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        teamPresent: teamPresent,
+                        teamAbsent: teamAbsent,
+                    })
+            })
+            .then(function(res) {
+                return res.json()
+            })
+            .then(function(response) {
+                if(response.message) {
+                    alert(response.message)
+                }
+                else{
+                    alert(response)
+                }
+            })
+            .catch((err) => {
+                alert(err.message)
+            })
+        }
+    
+        function saveRoundAround() {
+            const roundAroundText = document.querySelectorAll('.roundAroundText')
+            const roundAroundCheckBox = document.querySelectorAll('.roundAroundCheckBox')
+            var roundAroundPlaces =[
+                ['kettle', 'isKettle', 'Kotłownia'],
+                ['compressor', 'isCompressor', 'Kompresownia'],
+                ['ice', 'isIce', 'Wieża Chłodu'],
+                ['electric', 'isElectric', 'Rozdzielnia'],
+                ['workshop', 'isWorkshop', 'Warsztat'],
+            ]
+            var sendMe = {}
+            for(let i = 0;i<roundAroundPlaces.length;i++) {
+                sendMe[roundAroundPlaces[i][0]] = roundAroundText[i].value
+                sendMe[roundAroundPlaces[i][1]] = roundAroundCheckBox[i].checked
+            }
+
+            fetch('/api/zapisz-obchod/'+teamForm.dataset.raportid, {
+                method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sendMe)
+            })
+            .then(function(res) {
+                return res.json()
+            })
+            .then(function(response) {
+                if(response.message) {
+                    alert(response.message)
+                }
+                else{
+                    alert(response)
+                }
+            })
+            .catch((err) => {
+                alert(err.message)
+            })
+        }
+    
+        function saveAdditionalInfo() {
+            const freeText = document.querySelector('#freeText')
+            fetch('/api/zapisz-dodatkowe-info/'+teamForm.dataset.raportid, {
+                method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({additionalInfo: freeText.value})
+            })
+            .then(function(res, err) {
+                return res.json()
+            })
+            .then(function(response) {
+                console.log(response)
+                if(response.message) {
+                    alert(response.message)
+                }
+                else{
+                    alert(response)
+                }
+            })
+            .catch((err) => {
+                alert(err.message)
+            })
+        }
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
+    
