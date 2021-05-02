@@ -10,7 +10,7 @@ dotenv.config()
 //connecting to DB
 
 mongoose
-  .connect(process.env.DB_ATLAS, {
+  .connect(process.env.DB_LOCAL, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,

@@ -134,6 +134,10 @@ exports.raport_GET_update = function (req, res, next) {
             path: 'failure',
             populate: 'device',
           })
+          .populate({
+            path: 'failure',
+            populate: 'author',
+          })
           .exec(callback)
       },
       deviceTypes: function (callback) {
@@ -158,7 +162,8 @@ exports.raport_GET_update = function (req, res, next) {
         ['electric', 'isElectric', 'Rozdzielnia'],
         ['workshop', 'isWorkshop', 'Warsztat'],
       ]
-
+      var canUpdate = true
+      if(req.verifiedPerm=='technik') canUpdate = false
       res.render('raport-update', {
         title:
           'Edytuj Raport zmiany ' +
@@ -220,75 +225,86 @@ exports.raport_POST_saveTeam = function (req, res, next) {
 
 // get ONLY failures for .../awarie endpoint
 exports.raport_GET_failures = function(req, res, next) { 
- async.parallel(
-   {
-    specialists: function(callback) {
-     User.find({
-      permission: 'specjalista',
-      isAvaible: true,
-      })
-      .exec(callback)
-   },
-   raport: function(callback) {
-     Raport.findById(req.verifiedMyRaportId)
-     .populate('teamPresent')
-     .populate({
-       path: 'failure',
-       populate: {
-         path: 'prodLine',
-         model: 'ProdLine',
-       },
-     })
-     .populate({
-       path: 'failure',
-       populate: 'deviceType',
-     })
-     .populate({
-       path: 'failure',
-       populate: 'device',
-     })
-     .populate({
-       path:'failure',
-       populate:'collaborators'
-     })
-     .populate({
-       path: 'failure',
-       populate: 'author',
-     })
-     .exec(callback)
-   },
-  deviceTypes: function (callback) {
-    DeviceType.find().sort().exec(callback)
-  },
-  prodLines: function (callback) {
-    ProdLine.find().sort().exec(callback)
-  },
-  devices: function (callback) {
-    Device.find().sort().exec(callback)
-  },
- },
- function(err, result) {
-   if(err) {
-     return next(err)
-    }
-    User.findById(req.verifiedId)
-    .exec(function(err, loggedInUser) {
+  if(req.verifiedShift != 0) {
+    async.parallel(
+      {
+        specialists: function(callback) {
+        User.find({
+          permission: 'specjalista',
+          isAvaible: true,
+          })
+          .exec(callback)
+      },
+      raport: function(callback) {
+        Raport.findById(req.verifiedMyRaportId)
+        .populate('teamPresent')
+        .populate({
+          path: 'failure',
+          populate: {
+            path: 'prodLine',
+            model: 'ProdLine',
+          },
+        })
+        .populate({
+          path: 'failure',
+          populate: 'deviceType',
+        })
+        .populate({
+          path: 'failure',
+          populate: 'device',
+        })
+        .populate({
+          path:'failure',
+          populate:'collaborators'
+        })
+        .populate({
+          path: 'failure',
+          populate: 'author',
+        })
+        .exec(callback)
+      },
+      deviceTypes: function (callback) {
+        DeviceType.find().sort().exec(callback)
+      },
+      prodLines: function (callback) {
+        ProdLine.find().sort().exec(callback)
+      },
+      devices: function (callback) {
+        Device.find().sort().exec(callback)
+      },
+    },
+    function(err, result) {
       if(err) {
         return next(err)
-      }
-      coWorkers = result.raport.teamPresent.concat(result.specialists)
-      res.render('raport-failures', {
-        title: 'Edytuj awarie', 
-        myRaport: result.raport,
-        deviceTypes: result.deviceTypes,
-        prodLines: result.prodLines,
-        devices: result.devices,
-        coWorkers: coWorkers,
-        loggedInUser: loggedInUser
-      })
-    })
+        }
+        User.findById(req.verifiedId)
+        .exec(function(err, loggedInUser) {
+          if(err) {
+            return next(err)
+          }
+          coWorkers = result.raport.teamPresent.concat(result.specialists)
+          res.render('raport-failures', {
+            title: 'Edytuj awarie', 
+            myRaport: result.raport,
+            deviceTypes: result.deviceTypes,
+            prodLines: result.prodLines,
+            devices: result.devices,
+            coWorkers: coWorkers,
+            loggedInUser: loggedInUser
+          })
+        })
 
- })
+    })
+}
+if(req.verifiedShift == 0) {
+  console.log(req.verifiedPerm)
+  if(req.verifiedPerm == 'admin' || req.verifiedPerm=='specjalista') {
+    res.send("Edytuj raport przez kalendarz")
+  }
+  if(req.verifiedPerm=='technik') {
+    res.send('Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany')
+  }
+}
 }
 
 //FETCH ENDPOINTS FOR RAPORT MANAGMENT
@@ -360,31 +376,42 @@ exports.raport_GET_one = function (req, res) {
 }
 
 exports.raport_GET_firstSection = function(req, res, next) {
-  Raport.findById(req.verifiedMyRaportId)
-  .populate('teamPresent')
-  .populate('teamAbsent')
-  .exec(function(err, result) {
+  if(req.verifiedShift != 0){
+    Raport.findById(req.verifiedMyRaportId)
+    .populate('teamPresent')
+    .populate('teamAbsent')
+    .exec(function(err, result) {
 
-    var roundAroundPlaces =[
-      ['kettle', 'isKettle', 'Kotłownia'],
-      ['compressor', 'isCompressor', 'Kompresownia'],
-      ['ice', 'isIce', 'Wieża Chłodu'],
-      ['electric', 'isElectric', 'Rozdzielnia'],
-      ['workshop', 'isWorkshop', 'Warsztat'],
-    ]
-    if(err) {
-      return next(err)
-    }
-    res.render('raport-first-section', {
-      title:'Podstawowe informacje',   
-      raportId: req.verifiedMyRaportId,
-      absent: result.teamAbsent,
-      present: result.teamPresent,
-      roundAroundPlaces: roundAroundPlaces,
-      roundAround: result.roundAround,
-      additionalInfo: result.additionalInfo
+      var roundAroundPlaces =[
+        ['kettle', 'isKettle', 'Kotłownia'],
+        ['compressor', 'isCompressor', 'Kompresownia'],
+        ['ice', 'isIce', 'Wieża Chłodu'],
+        ['electric', 'isElectric', 'Rozdzielnia'],
+        ['workshop', 'isWorkshop', 'Warsztat'],
+      ]
+      if(err) {
+        return next(err)
+      }
+      res.render('raport-first-section', {
+        title:'Podstawowe informacje',   
+        raportId: req.verifiedMyRaportId,
+        absent: result.teamAbsent,
+        present: result.teamPresent,
+        roundAroundPlaces: roundAroundPlaces,
+        roundAround: result.roundAround,
+        additionalInfo: result.additionalInfo
+      })
     })
-  })
+  }
+  if(req.verifiedShift == 0) {
+    console.log(req.verifiedPerm)
+    if(req.verifiedPerm == 'admin' || req.verifiedPerm=='specjalista') {
+      res.send("Edytuj raport przez kalendarz")
+    }
+    if(req.verifiedPerm=='technik') {
+      res.send('Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany')
+    }
+  }
 }
 
 
