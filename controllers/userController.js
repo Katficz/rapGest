@@ -125,16 +125,21 @@ exports.user_POST_update = [
     .escape()
     .withMessage('Podaj Nazwisko'),
 
-  body('email').normalizeEmail().isEmail(),
+  body('email').optional({ checkFalsy: true }).isEmail().normalizeEmail(),
 
   async function (req, res, next) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      res.render('user-list', { title: 'Użytkownik', errors: errors.array() })
-      return
+      User.find()
+      .sort([['surname', 'ascending']])
+      .exec(function (err, result) {
+        if (err) {
+          return next(err)
+        }
+        console.log(errors.array())
+      res.render('user-list', { title: 'Użytkownik', user_list: result, errors: errors.array() })
+      })
     } else {
-      const salt = await bcrypt.genSalt(10)
-      const hashPassword = await bcrypt.hash(req.body.password, salt)
       User.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
         surname: req.body.surname,
@@ -143,7 +148,6 @@ exports.user_POST_update = [
         isEmployed: !!req.body.isEmployed,
         permission: req.body.permission,
         position: req.body.position,
-        password: hashPassword,
       }).exec(function (err, result) {
         if (err) {
           return next(err)
@@ -246,7 +250,6 @@ exports.user_GET_login = function(req, res) {
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
 exports.user_POST_login = async function(req, res, next) {
-    
     User.findOne({login: req.body.login})
     .exec(async function(err, loggedInResult) {
         if(err) {
@@ -259,9 +262,6 @@ exports.user_POST_login = async function(req, res, next) {
         if(!validPass) {
             res.status(400).render('login',{errs:'Złe hasło!'})
         }
-
-        //creating token with users ID and permission and storing it as a cookie
-        const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
 
         //checking if raports exists for taday and loggedinshift- if not creates one
         if(loggedInResult.shift!=0) {
@@ -308,7 +308,7 @@ exports.user_POST_login = async function(req, res, next) {
                     teamPresent: [],
                   })
                   raport.save()
-                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id}, process.env.TOKEN_SECRET)
+                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id,}, process.env.TOKEN_SECRET)
                   res.status(200)
                   .cookie('token', token, {
                     secure: true,
@@ -337,7 +337,7 @@ exports.user_POST_login = async function(req, res, next) {
             Raport.findOne({
               shift: shiftLoggedIn,
               date: {
-                // searching for the previous date 6 - 24
+                // searching for the previous date 8 - 24
                 $gte: startDate,
                 $lte: nowDate,
               },
@@ -385,7 +385,7 @@ exports.user_POST_login = async function(req, res, next) {
 
         }
         if(loggedInResult.shift == 0) {
-          const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission}, process.env.TOKEN_SECRET)
+          const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, shift: 0}, process.env.TOKEN_SECRET)
           res.status(200)
           .cookie('token', token, {
             secure: true,

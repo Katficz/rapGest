@@ -29,6 +29,7 @@ exports.authSpec = function(req, res, next) {
         if(verified.permission == 'specjalista' || verified.permission == 'admin') {
             req.verifiedId = verified._id
             req.verifiedPerm = verified.permission
+            req.verifiedShift = verified.shift
             return next()
         }
         else {
@@ -49,6 +50,8 @@ exports.authAdmin = function(req, res, next) {
         if(verified.permission == 'admin') {
             req.verifiedId = verified._id
             req.verifiedPerm = verified.permission
+            req.verifiedShift = verified.shift
+
             return next()
         }
         else {
