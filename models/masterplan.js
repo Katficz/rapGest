@@ -6,7 +6,7 @@ const MasterplanSchema = new Schema({
   name: { type: String, required: true },
   desc: { type: String },
   date: { type: Date, required: true },
-  isDone: { type: Boolean, required: true },
+  status: { type: Number, required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   plans: [{ type: Schema.Types.ObjectId, ref: 'Plan' }],
 })

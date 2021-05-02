@@ -157,19 +157,16 @@ a.green-link {
 }
 
 #external-events .fc-event {
+  max-width: 280px;
   margin: 3px 0;
   cursor: move;
+  overflow: hidden;
 }
 
 #external-events p {
   margin: 1.5em 0;
   font-size: 11px;
   color: #666;
-}
-
-#external-events p input {
-  margin: 0;
-  vertical-align: middle;
 }
 
 #calendar-wrap {

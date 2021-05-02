@@ -1,0 +1,247 @@
+extends layout
+block content
+
+  div.col-lg-4#external-events
+    h3 Lista Planów
+    #external-events-list
+      each masterplan in masterplans
+        h4 #{masterplan.name}
+          button.btn.btn-secondary.btn-sm.float-right(type='button' data-toggle='modal' data-target=('#ID'+masterplan._id))
+            | Dodaj Plan Dzienny
+          // Modal
+          p.mt-4
+          .modal.fade(id=('ID'+masterplan._id) tabindex='-1' role='dialog' aria-labelledby='exampleModalLongTitle' aria-hidden='true')
+            .modal-dialog.modal-lg(role='document')
+              .modal-content
+                .modal-header
+                  h5#exampleModalLongTitle.modal-title #{masterplan.name} - Plan Dzienny
+                  button.close(type='button' data-dismiss='modal' aria-label='Close')
+                    span(aria-hidden='true') &times;
+                .modal-body(title=masterplan._id)
+                  .container-fluid
+                    .row
+                      .col(class='this_is_unnecessary_class')
+                        div(class='row')
+                          div.col
+                            label Nazwa planu dziennego   
+                            input.form-control.planName(type='text')
+                        div.mt-4(class='row')
+                          div.col
+                            | Opis
+                            textarea.form-control.planDescription(rows='2' type='text')
+                        div(class='row')
+                          div.col.mt-4
+                            label Numer zlecenia
+                            input.form-control.planOrderNumber(type='text')
+                        div(class='row')
+                          div.col
+                            label Linia
+                            select.planLine.form-control(type='select' name='line' )
+                              option(value=undefined selected) Dowolne
+                              each line in lines
+                                if plan
+                                  option(value=line._id selected=(line._id.toString() === plan.line._id.toString() ? 'selected' : false)) line.name
+                                else
+                                  option(value=line._id) #{line.name}
+                          div.col
+                            label Operacja
+                            select.planOperation.form-control(type='select' name='operation' )
+                              option(value=undefined selected) Dowolne
+                              each operation in operations
+                                if plan
+                                  option(value=operation._id selected=(operation._id.toString() === plan.operation._id.toString() ? 'selected' : false)) operation.name
+                                else
+                                  option(value=operation._id) #{operation.name}
+                        div.mt-4(class='row')
+                          div.col
+                            label Typ Urządzenia
+                            select.planDevicetype.form-control(type='select' name='devicetype' )
+                              option(value=undefined selected) Dowolne
+                              each devicetype in devicetypes
+                                if plan
+                                  option(value=devicetype._id selected=(devicetype._id.toString() === plan.devicetype._id.toString() ? 'selected' : false)) devicetype.name
+                                else
+                                  option(value=devicetype._id) #{devicetype.name}
+                          div.col
+                            label Urządzenie
+                            select.planDevice.form-control(type='select' name='device' )
+                              option(value=undefined selected) Dowolne
+                              each device in devices
+                                if plan
+                                  option(value=device._id selected=(device._id.toString() === plan.device._id.toString() ? 'selected' : false)) device.name
+                                else
+                                  option(value=device._id) #{device.name}
+                        div.mt-4(class='row')
+                          div.col
+                            div.form-check
+                              input.planIsParalyzing(class="form-check-input" type="checkbox" value=1 checked=(plan===undefined ? false : plan.isParalyzing))
+                              label Konieczne zatrzymanie linii.
+                        //- div.mt-4(class='row')
+                        //-   div.col Stan Pracy:
+                        //-   div.col.d-flex.justify-content-between
+                        //-       .form-check.form-check-inline 
+                        //-         input.form-check-input.statusRepaired(type='radio' name='inlineRadioOptions' value='1')
+                        //-         label.form-check-label  Oczekująca
+                        //-       .form-check.form-check-inline
+                        //-         input.form-check-input.statusNotRepaired(type='radio' name='inlineRadioOptions' value='2')
+                        //-         label.form-check-label  Rozpoczęta
+                        //-       .form-check.form-check-inline
+                        //-         input.form-check-input.statusTemporary(type='radio' name='inlineRadioOptions' value='3')
+                        //-         label.form-check-label  Zakończona
+                .modal-footer
+                  button.btn.btn-secondary(type='button' data-dismiss='modal') Zamknij
+                  button.btn.btn-primary(type='button' id='ABB' onclick='addSubPlan(this)') Zapisz
+
+    div
+      button.btn.btn-danger.mt-3(type="button" id='testSendButton' onclick="")  test 
+  div.col#calendar-wrap
+    #calendar
+
+
+
+  link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css')
+  script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js')
+  script.
+    // this set holds ID's of all modified events
+    let modifiedEvents = new Set
+    // Array that holds created plan objects' additional info that doesn't fit into Calendar
+    let createdPlans = []
+
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+      },
+      navLinks: true, // can click day/week names to navigate views
+      nowIndicator: true,
+      weekNumbers: true,
+      weekNumberCalculation: 'ISO',
+      editable: true,
+      droppable: true, // this allows things to be dropped onto the calendar
+      /* I am using eventChange and eventReceive to track changes in the calendar */
+      eventChange: function(info){
+        if (!modifiedEvents.has(info.event.id)) {
+          modifiedEvents.add(info.event.id)
+        }
+      },
+      eventReceive: function(info){
+        if (!modifiedEvents.has(info.event.id)) {
+          modifiedEvents.add(info.event.id)
+        }
+      },
+      drop: function(arg) {
+        // remove the element from the "Draggable Events" list
+        arg.draggedEl.parentNode.removeChild(arg.draggedEl);
+      },
+      events: [
+        {
+          id: 'a',
+          title: 'my event',
+          start: '2021-05-02'
+        }
+      ]
+    });
+    calendar.render();
+
+    /* FUNCTIONS */
+    // id of newly created plans is ('ID' + temporaryId)
+    let temporaryId = 1
+    function addSubPlan(button){
+      let form = button.parentNode.previousSibling   // class='modal-body' title='masterplan mongoId'
+      let planMasterplanId = form.title
+      let planName = form.querySelector('.planName').value
+      let planDescription = form.querySelector('.planDescription').value
+      let planOrderNumber = form.querySelector('.planOrderNumber').value
+      let planLine = form.querySelector('.planLine').value
+      let planOperation = form.querySelector('.planOperation').value
+      let planDevicetype = form.querySelector('.planDevicetype').value
+      let planDevice = form.querySelector('.planDevice').value
+      let planIsParalyzing = form.querySelector('.planIsParalyzing').checked
+      // 1 - nierozpoczęte, 2 - rozgrzebane 3 - zrobione
+      let planStatus = 1
+
+      createdPlans['ID'+temporaryId] = {
+        name: planName, 
+        description: planDescription,
+        orderNumber: planOrderNumber,
+        isParalyzing: planIsParalyzing,
+        status: planStatus }
+
+      if (planLine !== 'Dowolne')
+        createdPlans['ID'+temporaryId].line = planLine
+      if (planOperation !== 'Dowolne')
+        createdPlans['ID'+temporaryId].operation = planOperation
+      if (planDevicetype !== 'Dowolne')
+        createdPlans['ID'+temporaryId].devicetype = planDevicetype
+      if (planDevice !== 'Dowolne')
+        createdPlans['ID'+temporaryId].device = planDevice
+
+
+
+
+      // paste new bar below masterplan header & button
+      pasteDiv = `<div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-main" 
+                  id=ID`+temporaryId+'>'+planName+`</div>`
+      whereToPaste = document.querySelector('#ID'+planMasterplanId)
+      whereToPaste.insertAdjacentHTML('beforebegin', pasteDiv)
+      // make it Draggable
+      let myDraggableEl = document.getElementById('ID'+temporaryId)
+      new FullCalendar.Draggable(myDraggableEl, {
+        eventData:  {
+          title: planName,
+          id: 'ID'+ temporaryId,
+          }
+      });
+      temporaryId++
+    }
+
+
+    function saveModifiedPlans(){
+      //console.log('modifiedEvents: ',modifiedEvents)
+      //console.log('createdPlans', createdPlans)
+      for (let planId of modifiedEvents){
+        event = calendar.getEventById(planId)
+        // check if it is newly created plan or plan from db
+        if (planId.slice(0,2) === 'ID'){
+          createdPlans[planId].dateStart = event.start
+          createdPlans[planId].dateEnd = event.end
+          saveNewPlan(createdPlans[planId])
+        } else {
+          // it is mongoDB id
+        }
+      }
+    }
+
+
+    function saveNewPlan(newPlan){
+      fetch('/api/masterplan/calendar/saveNewPlan', {
+        method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newPlan)
+      })
+      .then(function(res) {
+        return res.json()
+      })
+      .then(function(response) {
+        if(response.message) {
+          console.log(response.message)
+        }
+        else{
+          console.log(response)
+        }
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
+    }
+
+
+    /* LISTENERS */
+    let el2 = document.getElementById("testSendButton");
+    el2.addEventListener("click", saveModifiedPlans, false);
+

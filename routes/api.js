@@ -112,6 +112,12 @@ router.get('/masterplan', masterplan_controller.masterplan_list)
 // GET request for one device item
 router.get('/masterplan/:id', masterplan_controller.masterplan_detail)
 
+// POST ROUTES FOR SAVING NEW AND EXISTING PLANS VIA CALENDAR PAGE
+router.post(
+  '/masterplan/calendar/saveNewPlan',
+  masterplan_controller.masterplan_saveNewPlan
+)
+
 /// DEVICES ///
 
 //GET all devices

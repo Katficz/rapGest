@@ -5,20 +5,19 @@ const Schema = mongoose.Schema
 
 const PlanSchema = new Schema({
   name: { type: String, required: true },
-  desc: { type: String },
-  date_created: { type: Date, required: true },
-  date_execution: { type: Date },
+  description: { type: String },
+  date: { type: Date, required: true },
+  dateStart: { type: Date },
+  dateEnd: { type: Date },
   shift: { type: Number },
-  hours: { type: Number },
   line: { type: Schema.Types.ObjectId, ref: 'Line' },
   operation: { type: Schema.Types.ObjectId, ref: 'Operation' },
   devicetype: { type: Schema.Types.ObjectId, ref: 'Devicetype' },
   device: { type: Schema.Types.ObjectId, ref: 'Device' },
   orderNumber: { type: String },
   isParalyzing: { type: Boolean, required: true },
-  status: { type: Number },
+  status: { type: Number, required: true },
   comments: { type: String },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 })
 
 PlanSchema.virtual('virtual_num_to_word').get(function () {

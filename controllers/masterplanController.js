@@ -25,7 +25,53 @@ exports.masterplan_list = function (req, res, next) {
 }
 
 exports.masterplan_calendar = function (req, res, next) {
-  res.render('test.pug')
+  async.parallel(
+    {
+      users: function (callback) {
+        User.find().exec(callback)
+      },
+      lines: function (callback) {
+        ProdLine.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      devicetypes: function (callback) {
+        DeviceType.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      devices: function (callback) {
+        Device.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      operations: function (callback) {
+        Operation.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      masterplans: function (callback) {
+        Masterplan.find()
+          .sort([['date', 'descending']])
+          .exec(callback)
+      },
+    },
+    function (err, result) {
+      if (err) {
+        return next(err)
+      }
+      // success
+      res.render('plan-calendar', {
+        users: result.users,
+        lines: result.lines,
+        devicetypes: result.devicetypes,
+        devices: result.devices,
+        operations: result.operations,
+        masterplans: result.masterplans,
+        shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
+      })
+    }
+  )
 }
 
 // Display detail page for a specific plan.
@@ -41,7 +87,7 @@ exports.masterplan_detail = function (req, res, next) {
         err.status(404)
         return next(err)
       }
-      res.render('plan-detail', {
+      res.render('test', {
         title: 'Zaplanowane zadanie',
         masterplan: result,
       })
@@ -92,6 +138,41 @@ exports.masterplan_create_get = function (req, res, next) {
     }
   )
 }
+
+exports.masterplan_saveNewPlan = [
+  body('name', 'nazwa jest wymagana').isLength({ min: 1 }).escape(),
+  body('description').optional().escape(),
+  body('dateStart').isISO8601().toDate(),
+  body('dateEnd').optional({ checkFalsy: true }).isISO8601().toDate(),
+  body('line').optional().escape(),
+  body('operation').optional().escape(),
+  body('devicetype').optional().escape(),
+  body('device').optional().escape(),
+  body('orderNumber').optional().escape(),
+  body('status').escape().toInt(),
+
+  (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      res.status(500).json(errors)
+      return next(errors)
+    } else {
+      let planObj = req.body
+      planObj.date = new Date()
+      //planObj.date = new Date()
+      let plan = new Plan(planObj)
+
+      plan.save(function (err) {
+        if (err) {
+          res.status(500).json(err)
+          return next(err)
+        } else {
+          res.status(200).json('Succes!')
+        }
+      })
+    }
+  },
+]
 
 // Handle plan create on POST.
 exports.masterplan_create_post = [
