@@ -368,7 +368,15 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  res.send('zmiana tutaj bedzie!')
+  Raport.findById(req.verifiedMyRaportId)
+    .populate('teamPresent')
+    .populate('teamMissing')
+    .exec(function (err, result) {
+      if (err) {
+        return next(err)
+      }
+      res.render('raport-detail', { raport: result })
+    })
 }
 
 exports.raport_GET_one = function (req, res) {

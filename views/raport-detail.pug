@@ -1,0 +1,149 @@
+extends layout
+block content  
+   div(class='col')
+      div(class='row')
+         div(class='col mx-md-5 mt-4')
+            h1.mt-5.text-center #{raport.virtual_date} 
+            h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
+            p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
+
+            a.btn.btn-primary.my-5.mr-2(href='/api/raport/'+ raport._id +'/download' target="_blank") Pobierz PDF
+
+            //a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
+
+            a.btn.btn-primary.my-5.mr-2(href='#'+raport._id) Zmodyfikuj    
+            table(class='table table-bordered')
+               caption Skład zmiany
+                  thead
+                     tr
+                        th(scope="col") Imię
+                        th(scope="col") Nazwisko
+                        th(scope="col") Specjalizacja
+                        th(width="13%" scope="col") Obecność
+                  tbody
+                     // in the route when 'raport' is created, presence is not passed as an argument so it's undefined
+                     // checks on length prevent iterations over empty list AND if the presence is not saved for the first time, basic form generates
+                     if (raport.teamPresent.length != 0)
+                        each user in raport.teamPresent
+                           tr
+                              td #{user.name}
+                              td #{user.surname}
+                              td #{user.position}
+                              td
+                                 button.btn.btn-success.umfy-btn(disabled) TAK                
+                     if (raport.teamAbsent.length != 0)
+                        each user in raport.teamAbsent
+                           tr
+                              td #{user.name}
+                              td #{user.surname}
+                              td #{user.position}
+                              td
+                                 button.btn.btn-danger.umfy-btn(disabled) NIE
+
+            table(class="table table-bordered") 
+               caption Obchód
+               thead 
+                  tr 
+                     th(width="20%" scope="col") Miejsce
+                     th(scope="col") Komentarz
+                     th(width="13%" scope="col") Stan
+               tbody
+                  tr
+                     td Kotłownia
+                     td #{raport.roundAround.kettle}
+                     td 
+                        button.btn.umfy-btn(class=(raport.roundAround.isKettle === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isKettle === true ? 'OK ' : 'NOK')}
+                  tr
+                     td Kompresownia
+                     td #{raport.roundAround.compressor}
+                     td 
+                        button.btn.umfy-btn(class=(raport.roundAround.isCompressor === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isCompressor === true ? 'OK ' : 'NOK')}
+                  tr
+                     td Wieża Chłodu
+                     td #{raport.roundAround.ice}
+                     td 
+                        button.btn.umfy-btn(class=(raport.roundAround.isIce === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isIce === true ? 'OK ' : 'NOK')}
+                  tr
+                     td Rozdzielnia
+                     td #{raport.roundAround.electric}
+                     td 
+                        button.btn.umfy-btn(class=(raport.roundAround.isElectric === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isElectric === true ? 'OK ' : 'NOK')}
+                  tr
+                     td Warsztat
+                     td #{raport.roundAround.workshop}
+                     td 
+                        button.btn.umfy-btn(class=(raport.roundAround.isWorkshop === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isWorkshop === true ? 'OK ' : 'NOK')}
+
+
+            table(class='table table-bordered') 
+               caption Prace Planowane
+               thead 
+                  tr
+                     th(scope="col") Opis
+                     th(scope="col") Komentarz
+                     th(width="13%" scope="col") Stan
+               tbody
+                  //- each item in raport.plan
+                  //-    tr
+                  //-       td #{item.desc}
+                  //-       td #{item.comments}
+                  //-       td 
+                  //-          button.btn.umfy-btn(class=(item.isDone === true ? 'btn-success' : 'btn-danger') disabled) #{(item.isDone=== true ? 'OK ' : 'NOK')}
+
+
+            table(class='table table-bordered')
+               caption Dodatkowe informacje
+               tbody
+                  td.p-1.pb-5 #{raport.additionalInfo}
+
+
+            each failure in raport.failure
+               table(class='my-5 table table-bordered')
+                  caption.h5 Awaria #{(failure._id)}
+                  thead
+                     tr
+                        //tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
+                        th(width="20%" class='text-center' scope='col') Status:
+                        //th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+                        th(scope='col') Efekt #{failure.effect}
+                  tbody
+                     tr.umfy-table-separator
+                        td Czas trwania awarii: 
+                        td #{failure.duration}
+                     tr
+                        td Operacja 
+                        td #{failure.operation==null ? '' : failure.operation.name}
+                     tr
+                        td Linia 
+                        td #{failure.prodLine==null ? '' : failure.prodLine.name}
+                     tr
+                        td Typ
+                        td #{failure.deviceType==null ? '' : failure.deviceType.name}
+                     tr.umfy-table-separator
+                        td Urządzenie
+                        td #{failure.device==null ? '' :failure.device.name}
+                     tr
+                        td Przyczyna 
+                        td #{failure.cause}
+                     tr
+                        td Diagnostyka 
+                        td #{failure.diagnostics}
+                     tr.umfy-table-separator
+                        td Działanie 
+                        td #{failure.action}
+                     tr
+                        td Numer zlecenia 
+                        td #{failure.orderNum}
+                     tr
+                        td Użyte części
+                        td #{failure.usedParts}
+                     tr
+                        td Części do zamówienia 
+                        td #{failure.missingParts}
+                     tr.umfy-table-separator
+                        td Prace na postój 
+                        td #{failure.plannedActions}
+
+
+
+

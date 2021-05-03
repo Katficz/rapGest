@@ -70,7 +70,13 @@ body
             a.nav-link.dropdown(href="#") Znajdź raport/awarię
 
           il.nav-item.dropdown
-            a.nav-link.dropdown(href="/api/masterplan") Prace planowane
+            a.nav-link.dropdown-toggle#myRaportSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Prace planowane
+            div.dropdown-menu(aria-labelledby="myRaportSubMenu")
+              a.dropdown-item#planListActive(href='/api/masterplan') Lista Prac Planowanych
+              div.dropdown-divider(aria-labelledby="PlanSubMenu")
+              a.dropdown-item#planCalendarActive(href='/api/masterplan/calendar') Kalendarz Prac
+
+
 
           il.nav-item.dropdown
             a.nav-link.dropdown(href="#") Panel Specjalisty
