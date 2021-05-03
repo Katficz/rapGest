@@ -56,9 +56,14 @@ exports.masterplan_calendar = function (req, res, next) {
           .exec(callback)
       },
       plans: function (callback) {
-        Plan.find({}, ['_id', 'name', 'dateStart', 'dateEnd', 'status']).exec(
-          callback
-        )
+        Plan.find({}, [
+          '_id',
+          'name',
+          'dateStart',
+          'dateEnd',
+          'status',
+          'allDay',
+        ]).exec(callback)
       },
     },
     function (err, result) {
@@ -68,11 +73,27 @@ exports.masterplan_calendar = function (req, res, next) {
       // take all PLANS and make calendar events out of them
       let events_list = []
       for (plan of result.plans) {
+        if (plan.status === 3) {
+          // Zakończone: green
+          backgroundColor = '#28a745'
+          borderColor = '#28a745'
+        } else if (plan.status === 2) {
+          // rozpoczęte: yellow
+          backgroundColor = '#ffc107'
+          borderColor = '#ffc107'
+        } else {
+          // nie rozpoczęte: blue
+          backgroundColor = '#3788d8'
+          borderColor = '#3788d8'
+        }
         events_list.push({
           id: plan._id,
           title: plan.name,
           start: plan.dateStart,
           end: plan.dateEnd,
+          allDay: plan.allDay,
+          backgroundColor: backgroundColor,
+          borderColor: borderColor,
           url: '/api/plan/' + plan._id,
         })
       }
@@ -205,6 +226,7 @@ exports.masterplan_saveNewPlan = [
   body('device').optional().escape(),
   body('orderNumber').optional().escape(),
   body('status').escape().toInt(),
+  body('allDay').isBoolean(),
 
   (req, res, next) => {
     const errors = validationResult(req)
@@ -243,6 +265,7 @@ exports.masterplan_saveNewPlan = [
 exports.masterplan_updateExistingPlan = [
   body('dateStart').isISO8601().toDate(),
   body('dateEnd').optional({ checkFalsy: true }).isISO8601().toDate(),
+  body('allDay').isBoolean(),
 
   (req, res, next) => {
     const errors = validationResult(req)
@@ -258,6 +281,7 @@ exports.masterplan_updateExistingPlan = [
           _id: modifiedPlan.id,
           dateStart: modifiedPlan.dateStart,
           dateEnd: modifiedPlan.dateEnd,
+          allDay: modifiedPlan.allDay,
         },
         function (err) {
           if (err) {

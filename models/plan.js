@@ -18,6 +18,7 @@ const PlanSchema = new Schema({
   isParalyzing: { type: Boolean, required: true },
   status: { type: Number, required: true },
   comments: { type: String },
+  allDay: { type: Boolean },
 })
 
 // Virtual for plan's URL

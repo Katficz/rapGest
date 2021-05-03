@@ -14,9 +14,11 @@ const { DateTime } = require('luxon')
 //HOME PAGE
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
+  // this is bad
   startDate.setTime(
     startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000
   )
+  // just setHours(0,0,0,0) and use getDate - 3
   startDate.setDate(startDate.getDate() - 4)
   async.parallel(
     {
@@ -61,42 +63,42 @@ exports.raport_GET_list = function (req, res) {
       var dates = []
       var pushDate = startDate
       for (var i = 4; i > 0; i--) {
-        pushDate.setDate(pushDate.getDate()+1)
+        pushDate.setDate(pushDate.getDate() + 1)
         dates.push(DateTime.fromJSDate(pushDate).toFormat('dd.LL.yyyy'))
       }
-      for(var i = 0; i<dates.length;i++) {
+      for (var i = 0; i < dates.length; i++) {
         var match = false
-        for(var j = 0; j < result.shiftC.length; j++) {
-          if(result.shiftC[j].virtual_date==dates[i]) {
+        for (var j = 0; j < result.shiftC.length; j++) {
+          if (result.shiftC[j].virtual_date == dates[i]) {
             shiftC.push(result.shiftC[j].url)
             match = true
           }
         }
-        if(!match) {
+        if (!match) {
           shiftC.push(0)
         }
       }
-      for(var i = 0; i<dates.length;i++) {
+      for (var i = 0; i < dates.length; i++) {
         var match = false
-        for(var j = 0; j < result.shiftB.length; j++) {
-          if(result.shiftB[j].virtual_date==dates[i]) {
+        for (var j = 0; j < result.shiftB.length; j++) {
+          if (result.shiftB[j].virtual_date == dates[i]) {
             shiftB.push(result.shiftB[j].url)
             match = true
           }
         }
-        if(!match) {
+        if (!match) {
           shiftB.push(0)
         }
       }
-      for(var i = 0; i<dates.length;i++) {
+      for (var i = 0; i < dates.length; i++) {
         var match = false
-        for(var j = 0; j < result.shiftA.length; j++) {
-          if(result.shiftA[j].virtual_date==dates[i]) {
+        for (var j = 0; j < result.shiftA.length; j++) {
+          if (result.shiftA[j].virtual_date == dates[i]) {
             shiftA.push(result.shiftA[j].url)
             match = true
           }
         }
-        if(!match) {
+        if (!match) {
           shiftA.push(0)
         }
       }
@@ -155,7 +157,7 @@ exports.raport_GET_update = function (req, res, next) {
         return next(err)
       }
 
-      var roundAroundPlaces =[
+      var roundAroundPlaces = [
         ['kettle', 'isKettle', 'Kotłownia'],
         ['compressor', 'isCompressor', 'Kompresownia'],
         ['ice', 'isIce', 'Wieża Chłodu'],
@@ -163,7 +165,7 @@ exports.raport_GET_update = function (req, res, next) {
         ['workshop', 'isWorkshop', 'Warsztat'],
       ]
       var canUpdate = true
-      if(req.verifiedPerm=='technik') canUpdate = false
+      if (req.verifiedPerm == 'technik') canUpdate = false
       res.render('raport-update', {
         title:
           'Edytuj Raport zmiany ' +
@@ -178,7 +180,7 @@ exports.raport_GET_update = function (req, res, next) {
     }
   )
 }
-///FETCH ENDPOINTS FOR RAPORTS FIRST SECTION 
+///FETCH ENDPOINTS FOR RAPORTS FIRST SECTION
 exports.raport_POST_saveAdditionalInfo = function (req, res, next) {
   Raport.findByIdAndUpdate(req.params.id, {
     additionalInfo: req.body.additionalInfo,
@@ -213,9 +215,7 @@ exports.raport_POST_saveTeam = function (req, res, next) {
     if (err) {
       res.status(500).json(err)
       return next(err)
-    } 
-    else 
-    {
+    } else {
       res.status(200).json('Succes!')
     }
   })
@@ -224,87 +224,87 @@ exports.raport_POST_saveTeam = function (req, res, next) {
 //FETCH FIRST SECTIO ENDS HERE
 
 // get ONLY failures for .../awarie endpoint
-exports.raport_GET_failures = function(req, res, next) { 
-  if(req.verifiedShift != 0) {
+exports.raport_GET_failures = function (req, res, next) {
+  if (req.verifiedShift != 0) {
     async.parallel(
       {
-        specialists: function(callback) {
-        User.find({
-          permission: 'specjalista',
-          isAvaible: true,
-          })
-          .exec(callback)
+        specialists: function (callback) {
+          User.find({
+            permission: 'specjalista',
+            isAvaible: true,
+          }).exec(callback)
+        },
+        raport: function (callback) {
+          Raport.findById(req.verifiedMyRaportId)
+            .populate('teamPresent')
+            .populate({
+              path: 'failure',
+              populate: {
+                path: 'prodLine',
+                model: 'ProdLine',
+              },
+            })
+            .populate({
+              path: 'failure',
+              populate: 'deviceType',
+            })
+            .populate({
+              path: 'failure',
+              populate: 'device',
+            })
+            .populate({
+              path: 'failure',
+              populate: 'collaborators',
+            })
+            .populate({
+              path: 'failure',
+              populate: 'author',
+            })
+            .exec(callback)
+        },
+        deviceTypes: function (callback) {
+          DeviceType.find().sort().exec(callback)
+        },
+        prodLines: function (callback) {
+          ProdLine.find().sort().exec(callback)
+        },
+        devices: function (callback) {
+          Device.find().sort().exec(callback)
+        },
       },
-      raport: function(callback) {
-        Raport.findById(req.verifiedMyRaportId)
-        .populate('teamPresent')
-        .populate({
-          path: 'failure',
-          populate: {
-            path: 'prodLine',
-            model: 'ProdLine',
-          },
-        })
-        .populate({
-          path: 'failure',
-          populate: 'deviceType',
-        })
-        .populate({
-          path: 'failure',
-          populate: 'device',
-        })
-        .populate({
-          path:'failure',
-          populate:'collaborators'
-        })
-        .populate({
-          path: 'failure',
-          populate: 'author',
-        })
-        .exec(callback)
-      },
-      deviceTypes: function (callback) {
-        DeviceType.find().sort().exec(callback)
-      },
-      prodLines: function (callback) {
-        ProdLine.find().sort().exec(callback)
-      },
-      devices: function (callback) {
-        Device.find().sort().exec(callback)
-      },
-    },
-    function(err, result) {
-      if(err) {
-        return next(err)
+      function (err, result) {
+        if (err) {
+          return next(err)
         }
-        User.findById(req.verifiedId)
-        .exec(function(err, loggedInUser) {
-          if(err) {
+        User.findById(req.verifiedId).exec(function (err, loggedInUser) {
+          if (err) {
             return next(err)
           }
           coWorkers = result.raport.teamPresent.concat(result.specialists)
           res.render('raport-failures', {
-            title: 'Edytuj awarie', 
+            title: 'Edytuj awarie',
             myRaport: result.raport,
             deviceTypes: result.deviceTypes,
             prodLines: result.prodLines,
             devices: result.devices,
             coWorkers: coWorkers,
-            loggedInUser: loggedInUser
+            loggedInUser: loggedInUser,
           })
         })
-
-    })
-}
-if(req.verifiedShift == 0) {
-  console.log(req.verifiedPerm)
-  if(req.verifiedPerm == 'admin' || req.verifiedPerm=='specjalista') {
-    res.send("Edytuj raport przez kalendarz")
+      }
+    )
   }
-  if(req.verifiedPerm=='technik') {
-    res.send('Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany')
+  if (req.verifiedShift == 0) {
+    console.log(req.verifiedPerm)
+    if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
+      res.send('Edytuj raport przez kalendarz')
+    }
+    if (req.verifiedPerm == 'technik') {
+      res.send(
+        'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany'
+      )
+    }
   }
-}
 }
 
 //FETCH ENDPOINTS FOR RAPORT MANAGMENT
@@ -375,44 +375,42 @@ exports.raport_GET_one = function (req, res) {
   res.send('get specific raport GET NI')
 }
 
-exports.raport_GET_firstSection = function(req, res, next) {
-  if(req.verifiedShift != 0){
+exports.raport_GET_firstSection = function (req, res, next) {
+  if (req.verifiedShift != 0) {
     Raport.findById(req.verifiedMyRaportId)
-    .populate('teamPresent')
-    .populate('teamAbsent')
-    .exec(function(err, result) {
-
-      var roundAroundPlaces =[
-        ['kettle', 'isKettle', 'Kotłownia'],
-        ['compressor', 'isCompressor', 'Kompresownia'],
-        ['ice', 'isIce', 'Wieża Chłodu'],
-        ['electric', 'isElectric', 'Rozdzielnia'],
-        ['workshop', 'isWorkshop', 'Warsztat'],
-      ]
-      if(err) {
-        return next(err)
-      }
-      res.render('raport-first-section', {
-        title:'Podstawowe informacje',   
-        raportId: req.verifiedMyRaportId,
-        absent: result.teamAbsent,
-        present: result.teamPresent,
-        roundAroundPlaces: roundAroundPlaces,
-        roundAround: result.roundAround,
-        additionalInfo: result.additionalInfo
+      .populate('teamPresent')
+      .populate('teamAbsent')
+      .exec(function (err, result) {
+        var roundAroundPlaces = [
+          ['kettle', 'isKettle', 'Kotłownia'],
+          ['compressor', 'isCompressor', 'Kompresownia'],
+          ['ice', 'isIce', 'Wieża Chłodu'],
+          ['electric', 'isElectric', 'Rozdzielnia'],
+          ['workshop', 'isWorkshop', 'Warsztat'],
+        ]
+        if (err) {
+          return next(err)
+        }
+        res.render('raport-first-section', {
+          title: 'Podstawowe informacje',
+          raportId: req.verifiedMyRaportId,
+          absent: result.teamAbsent,
+          present: result.teamPresent,
+          roundAroundPlaces: roundAroundPlaces,
+          roundAround: result.roundAround,
+          additionalInfo: result.additionalInfo,
+        })
       })
-    })
   }
-  if(req.verifiedShift == 0) {
+  if (req.verifiedShift == 0) {
     console.log(req.verifiedPerm)
-    if(req.verifiedPerm == 'admin' || req.verifiedPerm=='specjalista') {
-      res.send("Edytuj raport przez kalendarz")
+    if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
+      res.send('Edytuj raport przez kalendarz')
     }
-    if(req.verifiedPerm=='technik') {
-      res.send('Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany')
+    if (req.verifiedPerm == 'technik') {
+      res.send(
+        'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany'
+      )
     }
   }
 }
-
-
-

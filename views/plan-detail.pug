@@ -4,63 +4,58 @@ block content
       div(class='row')
          div.col
             h1 #{title}
-            h3 Jest częścią planu: 
+            h3.mt-4 Jest częścią planu: 
                a(href=(masterplan==null? '#' :masterplan.url)) #{masterplan==null? '' : masterplan.name}
 
-      div(class='row')
+      div.mt-4(class='row')
          div.col
-            div#accordion
-               div.card-header
-                  button(class="btn btn-block" data-toggle="collapse" data-target=("#collapse"+plan._id) aria-expanded="true" aria-controls="collapseOne")
-                     div #{plan.name} 
-                     div #{plan.dateStart.toLocaleString()}  —  #{plan.dateEnd===null? 'Cały dzień' : plan.dateEnd.toLocaleString()} 
+            table(class='table table-bordered')
+               thead.table-dark
+                  tr
+                     th.text-center(scope="col" colspan='2') #{plan.name}
 
-               div(id=("collapse"+plan._id) class="collapse show" aria-labelledby="headingOne" data-parent="#accordion")
-                  div.card-body
-                     table(class='table table-bordered')
-                        thead.table-dark
-                           tr
-                              th.text-center(scope="col" colspan='2') #{plan.name}
-
-                        tbody
-                           tr
-                              td(style='width: 50%;') Status
-                                 if plan.status===1
-                                    td.text-danger Oczekujące
-                                 else if plan.status===2
-                                    td.text-warning W trakcie realizacji
-                                 else
-                                    td.text-success Zakończone
-                           tr
-                              td Data utworzenia
-                              td #{plan.date.toLocaleString()}
-                           tr
-                              td Opis
-                              td #{plan.description}
-                           tr
-                              td Numer zlecenia
-                              td #{plan.orderNumber}
-                           tr
-                              td Początek
-                              td #{plan.dateStart.toLocaleString()}
-                           tr.umfy-table-separator
-                              td Koniec
-                              td #{plan.dateEnd==null? 'Cały dzień' : plan.dateEnd.toLocaleString()}
-                           tr
-                              td Linia 
-                              td #{plan.line==null? '' : plan.line.name}
-                           tr
-                              td Operacja
-                              td #{plan.operation==null? '' : plan.operation.name}
-                           tr
-                              td Typ
-                              td #{plan.devicetype==null? '' : plan.devicetype.name}
-                           tr.umfy-table-separator
-                              td Urządzenie
-                              td #{plan.device==null? '' : plan.device.name}
-                           tr
-                              td Wymagane wstrzymanie produkcji
-                              td #{plan.isParalyzing===true ? 'TAK' : 'NIE'}
+               tbody
+                  tr
+                     td(style='width: 50%;') Status
+                        if plan.status===1
+                           td.text-primary Oczekujące
+                        else if plan.status===2
+                           td.text-warning W trakcie realizacji
+                        else
+                           td.text-success Zakończone
+                  tr
+                     td Data utworzenia
+                     td #{plan.date.toLocaleString()}
+                  tr
+                     td Opis
+                     td #{plan.description}
+                  tr
+                     td Numer zlecenia
+                     td #{plan.orderNumber}
+                  tr
+                     td Początek
+                     td #{plan.dateStart.toLocaleString()}
+                  tr.umfy-table-separator
+                     td Koniec
+                     if plan.allDay
+                        td Cały dzień
+                     else
+                        td #{plan.dateEnd==null? '' : plan.dateEnd.toLocaleString()}
+                  tr
+                     td Linia 
+                     td #{plan.line==null? '' : plan.line.name}
+                  tr
+                     td Operacja
+                     td #{plan.operation==null? '' : plan.operation.name}
+                  tr
+                     td Typ
+                     td #{plan.devicetype==null? '' : plan.devicetype.name}
+                  tr.umfy-table-separator
+                     td Urządzenie
+                     td #{plan.device==null? '' : plan.device.name}
+                  tr
+                     td Wymagane wstrzymanie produkcji
+                     td #{plan.isParalyzing===true ? 'TAK' : 'NIE'}
 
       div(class='row')
          div(class='col mx-md-5 mt-4')

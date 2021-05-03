@@ -60,10 +60,11 @@ exports.plan_detail = function (req, res, next) {
 // Display operation delete form on GET.
 exports.plan_delete_get = function (req, res, next) {
   Plan.findById(req.params.id).exec(function (err, result) {
+    console.log('wyjeb')
     if (err) {
       return next(err)
     }
-    if (result.operation == null) {
+    if (result == null) {
       // No results.
       res.redirect('/api/masterplan/calendar')
     }

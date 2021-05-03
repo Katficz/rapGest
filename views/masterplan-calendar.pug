@@ -1,7 +1,7 @@
 extends layout
 block content
 
-  div.col-lg-4#external-events
+  div.col-md-3#external-events
     h3 Lista Planów
     #external-events-list
       each masterplan in masterplans
@@ -24,7 +24,7 @@ block content
                         div(class='row')
                           div.col
                             label Nazwa planu dziennego   
-                            input.form-control.planName(type='text')
+                            input.form-control.planName(type='text' required)
                         div.mt-4(class='row')
                           div.col
                             | Opis
@@ -78,6 +78,7 @@ block content
 
   link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css')
   script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js')
+  script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/locales-all.min.js')
   script.
     // PLAN: ['_id', 'name', 'dateStart', 'dateEnd', 'status']
     let events_list = !{JSON.stringify(events_list)}
@@ -100,6 +101,7 @@ block content
       editable: true,
       droppable: true, // this allows things to be dropped onto the calendar
       /* I am using eventChange and eventReceive to track changes in the calendar */
+      locale: 'pl',
       eventChange: function(info){
         if (!modifiedEvents.has(info.event.id)) {
           modifiedEvents.add(info.event.id)
@@ -131,58 +133,62 @@ block content
     let temporaryId = 1
     function addSubPlan(button){
       let form = button.parentNode.previousSibling   // class='modal-body' title='masterplan mongoId'
-      let planMasterplanId = form.title
       let planName = form.querySelector('.planName').value
-      let planDescription = form.querySelector('.planDescription').value
-      let planOrderNumber = form.querySelector('.planOrderNumber').value
-      let planLine = form.querySelector('.planLine').value
-      let planOperation = form.querySelector('.planOperation').value
-      let planDevicetype = form.querySelector('.planDevicetype').value
-      let planDevice = form.querySelector('.planDevice').value
-      let planIsParalyzing = form.querySelector('.planIsParalyzing').checked
-      // wypełnia zmiana przy raporcie: 1 - nierozpoczęte, 2 - rozgrzebane 3 - zrobione
-      let planStatus = 1
+      if (planName.length !== 0)
+      {
+        let planMasterplanId = form.title
+        let planDescription = form.querySelector('.planDescription').value
+        let planOrderNumber = form.querySelector('.planOrderNumber').value
+        let planLine = form.querySelector('.planLine').value
+        let planOperation = form.querySelector('.planOperation').value
+        let planDevicetype = form.querySelector('.planDevicetype').value
+        let planDevice = form.querySelector('.planDevice').value
+        let planIsParalyzing = form.querySelector('.planIsParalyzing').checked
+        // wypełnia zmiana przy raporcie: 1 - nierozpoczęte, 2 - rozgrzebane 3 - zrobione
+        let planStatus = 1
 
-      createdPlans['ID'+temporaryId] = {
-        masterplanId: planMasterplanId,
-        name: planName, 
-        description: planDescription,
-        orderNumber: planOrderNumber,
-        isParalyzing: planIsParalyzing,
-        status: planStatus }
+        createdPlans['ID'+temporaryId] = {
+          masterplanId: planMasterplanId,
+          name: planName, 
+          description: planDescription,
+          orderNumber: planOrderNumber,
+          isParalyzing: planIsParalyzing,
+          status: planStatus }
 
-      // If line name is not picked it's value is equal to "dowolne". Don't save such objects.
-      if (planLine !== 'Dowolne')
-        createdPlans['ID'+temporaryId].line = planLine
-      if (planOperation !== 'Dowolne')
-        createdPlans['ID'+temporaryId].operation = planOperation
-      if (planDevicetype !== 'Dowolne')
-        createdPlans['ID'+temporaryId].devicetype = planDevicetype
-      if (planDevice !== 'Dowolne')
-        createdPlans['ID'+temporaryId].device = planDevice
-
-
+        // If line name is not picked it's value is equal to "dowolne". Don't save such objects.
+        if (planLine !== 'Dowolne')
+          createdPlans['ID'+temporaryId].line = planLine
+        if (planOperation !== 'Dowolne')
+          createdPlans['ID'+temporaryId].operation = planOperation
+        if (planDevicetype !== 'Dowolne')
+          createdPlans['ID'+temporaryId].devicetype = planDevicetype
+        if (planDevice !== 'Dowolne')
+          createdPlans['ID'+temporaryId].device = planDevice
 
 
-      // paste new bar below masterplan header & button
-      pasteDiv = `<div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-main" 
-                  id=ID`+temporaryId+'>'+planName+`</div>`
-      whereToPaste = document.querySelector('#ID'+planMasterplanId)
-      whereToPaste.insertAdjacentHTML('beforebegin', pasteDiv)
-      // make it Draggable
-      let myDraggableEl = document.getElementById('ID'+temporaryId)
-      new FullCalendar.Draggable(myDraggableEl, {
-        eventData:  {
-          title: planName,
-          id: 'ID'+ temporaryId,
-          }
-      });
-      temporaryId++
+
+
+        // paste new bar below masterplan header & button
+        pasteDiv = `<div class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-main" 
+                    id=ID`+temporaryId+'>'+planName+`</div>`
+        whereToPaste = document.querySelector('#ID'+planMasterplanId)
+        whereToPaste.insertAdjacentHTML('beforebegin', pasteDiv)
+        // make it Draggable
+        let myDraggableEl = document.getElementById('ID'+temporaryId)
+        new FullCalendar.Draggable(myDraggableEl, {
+          eventData:  {
+            title: planName,
+            id: 'ID'+ temporaryId,
+            }
+        });
+        temporaryId++
+      }
+      else { alert('Tytuł Pracy Planowanej nie może być pusty.')}
     }
 
 
     function saveModifiedPlans(){
-      //console.log('modifiedEvents: ',modifiedEvents)
+      console.log('modifiedEvents: ',modifiedEvents)
       //console.log('createdPlans', createdPlans)
       for (let planId of modifiedEvents){
         event = calendar.getEventById(planId)
@@ -190,13 +196,15 @@ block content
         if (planId.slice(0,2) === 'ID'){
           createdPlans[planId].dateStart = event.start
           createdPlans[planId].dateEnd = event.end
+          createdPlans[planId].allDay = event.allDay
           saveNewPlan(createdPlans[planId])
         } else {
           //end is mongoDB id
-          let modifiedPlan = {id: planId, dateStart: event.start, dateEnd: event.end}
+          let modifiedPlan = {id: planId, dateStart: event.start, dateEnd: event.end, allDay: event.allDay}
           updateExistingPlan(modifiedPlan)
         }
       }
+      modifiedEvents.clear()
     }
 
 

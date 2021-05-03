@@ -13,7 +13,7 @@ block content
             tr
               td(style='width: 50%;') Status
               if masterplan.status===1
-                td.text-danger Oczekujące
+                td.text-primary Oczekujące
               else if masterplan.status===2
                 td.text-warning W trakcie realizacji
               else
@@ -36,7 +36,10 @@ block content
           div.card-header
             button(class="btn btn-block" data-toggle="collapse" data-target=("#collapse"+plan._id) aria-expanded="true" aria-controls="collapseOne")
               div #{plan.name} 
-              div #{plan.dateStart.toLocaleString()}  —  #{plan.dateEnd==null? 'Cały dzień' : plan.dateEnd.toLocaleString()} 
+                if plan.allDay
+                  div Cały dzień
+                else
+                  div #{plan.dateStart.toLocaleString()}  —  #{plan.dateEnd==null? '' : plan.dateEnd.toLocaleString()} 
 
           div(id=("collapse"+plan._id) class="collapse" aria-labelledby="headingOne" data-parent="#accordion")
             div.card-body
@@ -50,7 +53,7 @@ block content
                   tr
                     td(style='width: 50%;') Status
                         if plan.status===1
-                          td.text-danger Oczekujące
+                          td.text-primary Oczekujące
                         else if plan.status===2
                           td.text-warning W trakcie realizacji
                         else
