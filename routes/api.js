@@ -10,6 +10,7 @@ const raportController = require('../controllers/raportController')
 const userController = require('../controllers/userController')
 const operation_controller = require('../controllers/device/operationController')
 const masterplan_controller = require('../controllers/masterplanController')
+const plan_controller = require('../controllers/planController')
 
 //to authenticate specific routes, add auth.authTech/authSpec/authAdmin to middleware
 const auth = require('./verifyToken')
@@ -72,7 +73,30 @@ router.get(
 )
 
 /// PLANS ///
+router.get('/plan/:id/delete', plan_controller.plan_delete_get)
 
+// POST delete little plan
+router.post('/plan/:id/delete', plan_controller.plan_delete_post)
+
+// GET request to update plan
+router.get('/plan/:id/update', plan_controller.plan_update_get)
+
+// POST request to update plan
+router.post('/plan/:id/update', plan_controller.plan_update_post)
+//view plan detail
+router.get('/plan/:id', plan_controller.plan_detail)
+
+/// MASTERPLANS ///
+// POST ROUTE FOR SAVING NEW PLANS VIA CALENDAR PAGE
+router.post(
+  '/masterplan/calendar/saveNewPlan',
+  masterplan_controller.masterplan_saveNewPlan
+)
+// POST ROUTE FOR UPDATING EXISTING PLANS VIA CALENDAR PAGE
+router.post(
+  '/masterplan/calendar/updateExistingPlan',
+  masterplan_controller.masterplan_updateExistingPlan
+)
 // GET request for creating new MASTERPLAN
 router.get('/masterplan/create', masterplan_controller.masterplan_create_get)
 
@@ -111,12 +135,6 @@ router.get('/masterplan', masterplan_controller.masterplan_list)
 
 // GET request for one device item
 router.get('/masterplan/:id', masterplan_controller.masterplan_detail)
-
-// POST ROUTES FOR SAVING NEW AND EXISTING PLANS VIA CALENDAR PAGE
-router.post(
-  '/masterplan/calendar/saveNewPlan',
-  masterplan_controller.masterplan_saveNewPlan
-)
 
 /// DEVICES ///
 

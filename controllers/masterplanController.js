@@ -18,7 +18,7 @@ exports.masterplan_list = function (req, res, next) {
       if (err) {
         return next(err)
       }
-      res.render('plan-list', {
+      res.render('masterplan-list', {
         masterplan_list: result,
       })
     })
@@ -51,24 +51,40 @@ exports.masterplan_calendar = function (req, res, next) {
           .exec(callback)
       },
       masterplans: function (callback) {
-        Masterplan.find()
+        Masterplan.find({ status: 2 })
           .sort([['date', 'descending']])
           .exec(callback)
+      },
+      plans: function (callback) {
+        Plan.find({}, ['_id', 'name', 'dateStart', 'dateEnd', 'status']).exec(
+          callback
+        )
       },
     },
     function (err, result) {
       if (err) {
         return next(err)
       }
+      // take all PLANS and make calendar events out of them
+      let events_list = []
+      for (plan of result.plans) {
+        events_list.push({
+          id: plan._id,
+          title: plan.name,
+          start: plan.dateStart,
+          end: plan.dateEnd,
+          url: '/api/plan/' + plan._id,
+        })
+      }
       // success
-      res.render('plan-calendar', {
+      res.render('masterplan-calendar', {
         users: result.users,
         lines: result.lines,
         devicetypes: result.devicetypes,
         devices: result.devices,
         operations: result.operations,
         masterplans: result.masterplans,
-        shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
+        events_list: events_list,
       })
     }
   )
@@ -78,6 +94,34 @@ exports.masterplan_calendar = function (req, res, next) {
 exports.masterplan_detail = function (req, res, next) {
   Masterplan.findById(req.params.id)
     .populate('user')
+    .populate({
+      path: 'plans',
+      populate: {
+        path: 'device',
+        model: 'Device',
+      },
+    })
+    .populate({
+      path: 'plans',
+      populate: {
+        path: 'line',
+        model: 'ProdLine',
+      },
+    })
+    .populate({
+      path: 'plans',
+      populate: {
+        path: 'operation',
+        model: 'Operation',
+      },
+    })
+    .populate({
+      path: 'plans',
+      populate: {
+        path: 'devicetype',
+        model: 'DeviceType',
+      },
+    })
     .exec(function (err, result) {
       if (err) {
         return next(err)
@@ -87,7 +131,7 @@ exports.masterplan_detail = function (req, res, next) {
         err.status(404)
         return next(err)
       }
-      res.render('test', {
+      res.render('masterplan-detail', {
         title: 'Zaplanowane zadanie',
         masterplan: result,
       })
@@ -96,49 +140,60 @@ exports.masterplan_detail = function (req, res, next) {
 
 // Display plan create form on GET.
 exports.masterplan_create_get = function (req, res, next) {
-  async.parallel(
-    {
-      users: function (callback) {
-        User.find().exec(callback)
-      },
-      lines: function (callback) {
-        ProdLine.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-      devicetypes: function (callback) {
-        DeviceType.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-      devices: function (callback) {
-        Device.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-      operations: function (callback) {
-        Operation.find()
-          .sort([['name', 'ascending']])
-          .exec(callback)
-      },
-    },
-    function (err, result) {
+  User.find()
+    .sort([['name', 'ascending']])
+    .exec(function (err, result) {
       if (err) {
         return next(err)
       }
-      // success
-      res.render('plan-form', {
-        users: result.users,
-        lines: result.lines,
-        devicetypes: result.devicetypes,
-        devices: result.devices,
-        operations: result.operations,
-        shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
+      res.render('masterplan-form', {
+        users: result,
       })
-    }
-  )
+    })
 }
 
+// Handle plan create on POST.
+exports.masterplan_create_post = [
+  body('name', 'Tytuł jest wymagany').isLength({ min: 1 }).escape(),
+  body('desc', 'Opis jest wymagany').optional().escape(),
+  body('user').isLength({ min: 1 }).escape(),
+  body('status').isNumeric(),
+
+  (req, res, next) => {
+    const errors = validationResult(req)
+    let masterplan = new Masterplan({
+      name: req.body.name,
+      desc: req.body.desc,
+      date: new Date(),
+      status: req.body.status,
+      user: req.body.user,
+    })
+
+    if (!errors.isEmpty()) {
+      User.find()
+        .sort([['name', 'ascending']])
+        .exec(function (err, result) {
+          if (err) {
+            return next(err)
+          }
+          res.render('masterplan-form', {
+            users: result,
+            masterplan: masterplan,
+          })
+        })
+      return
+    } else {
+      masterplan.save(function (err) {
+        if (err) {
+          return next(err)
+        }
+        res.redirect('/api/masterplan')
+      })
+    }
+  },
+]
+
+// post method used in calendar view
 exports.masterplan_saveNewPlan = [
   body('name', 'nazwa jest wymagana').isLength({ min: 1 }).escape(),
   body('description').optional().escape(),
@@ -159,10 +214,20 @@ exports.masterplan_saveNewPlan = [
     } else {
       let planObj = req.body
       planObj.date = new Date()
-      //planObj.date = new Date()
+      let masterplanId = planObj.masterplanId
+      delete planObj.masterplanId
+
       let plan = new Plan(planObj)
 
       plan.save(function (err) {
+        if (err) {
+          res.status(500).json(err)
+          return next(err)
+        }
+      })
+      Masterplan.findByIdAndUpdate(masterplanId, {
+        $push: { plans: { _id: plan._id } },
+      }).exec(function (err) {
         if (err) {
           res.status(500).json(err)
           return next(err)
@@ -174,142 +239,73 @@ exports.masterplan_saveNewPlan = [
   },
 ]
 
-// Handle plan create on POST.
-exports.masterplan_create_post = [
-  body('desc', 'Opis jest wymagany').isLength({ min: 1 }).escape(),
-  body('date_created').optional({ checkFalsy: true }).isISO8601().toDate(),
-  body('date_execution').optional({ checkFalsy: true }).isISO8601().toDate(),
-  body('shift').escape().toInt(),
-  body('isDone').escape().toBoolean(),
-  body('comments').escape(),
+// post method used in calendar view
+exports.masterplan_updateExistingPlan = [
+  body('dateStart').isISO8601().toDate(),
+  body('dateEnd').optional({ checkFalsy: true }).isISO8601().toDate(),
 
   (req, res, next) => {
     const errors = validationResult(req)
-    let dateExecution = new Date(req.body.date_execution)
-    dateExecution.setHours(6, 0, 0, 0)
-    let plan = new Plan({
-      desc: req.body.desc,
-      date_created: new Date(),
-      date_execution: dateExecution,
-      shift: req.body.shift,
-      isDone: false,
-      comments: req.body.comments,
-      user: req.body.user,
-    })
-
     if (!errors.isEmpty()) {
-      User.find().exec(function (err, users) {
-        if (err) {
-          return next(err)
-        }
-        res.render('plan_form', {
-          title: 'Zaplanuj pracę',
-          user_list: users,
-          plan: plan,
-          shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
-          errors: errors.array(),
-        })
-      })
-
-      return
+      res.status(500).json(errors)
+      return next(errors)
     } else {
-      plan.save(function (err) {
-        if (err) {
-          return next(err)
-        }
-        exe0 = new Date(req.body.date_execution)
-        exe24 = new Date(req.body.date_execution)
-        exe0.setHours(6, 0, 0, 0)
-        exe24.setHours(29, 59, 0, 0)
+      let modifiedPlan = req.body
 
-        Raport.findOneAndUpdate(
-          {
-            date: dateExecution,
-            shift: req.body.shift,
-          },
-          { $push: { masterplan: plan._id } }
-        ).exec(function (err, theraport) {
+      Plan.findByIdAndUpdate(
+        modifiedPlan.id,
+        {
+          _id: modifiedPlan.id,
+          dateStart: modifiedPlan.dateStart,
+          dateEnd: modifiedPlan.dateEnd,
+        },
+        function (err) {
           if (err) {
+            res.status(500).json(err)
             return next(err)
+          } else {
+            res.status(200).json('Succes!')
           }
-          console.log('i found one and updated:', theraport)
-        })
-
-        res.redirect(plan.url)
-      })
+        }
+      )
     }
   },
 ]
 
 // Display plan delete form on GET.
 exports.masterplan_delete_get = function (req, res, next) {
-  async.parallel(
-    {
-      plan: function (callback) {
-        Plan.findById(req.params.id).exec(callback)
-      },
-      // plan_raports: function (callback) {
-      //    Raport.find({ plan: req.params.id }).exec(callback)
-      // },
-    },
-    function (err, results) {
-      if (err) {
-        return next(err)
-      }
-      if (results.plan == null) {
-        // No results.
-        res.redirect('/api/plan')
-      }
-      // Successful, so render.
-      res.render('plan_delete', {
-        title: 'Usuń plan',
-        plan: results.plan,
-      })
+  Masterplan.findById(req.params.id).exec(function (err, result) {
+    if (err) {
+      return next(err)
     }
-  )
+    if (result == null) {
+      // No results.
+      res.redirect('/api/masterplan')
+    }
+    // Successful, so render.
+    res.render('masterplan-delete', {
+      title: 'Usuń plan',
+      masterplan: result,
+    })
+  })
 }
 // Handle plan delete on POST.
 exports.masterplan_delete_post = function (req, res) {
-  async.parallel(
-    {
-      plan: function (callback) {
-        Plan.findById(req.body.planid).exec(callback)
-      },
-      //plan_raport: function (callback) {
-      //   Raport.find({ plan: req.body.planid }).exec(callback)
-      //},
-    },
-    function (err, results) {
-      if (err) {
-        return next(err)
-      }
-      // Success
-      // if (results.plan_devices.length > 0) {
-      //    // plan has devices. Render in same way as for GET route.
-      //    res.render('plan_delete', {
-      //       title: 'Usuń linię',
-      //       plan: results.plan,
-      //       plan_devices: results.plan_devices,
-      //    })
-      //    return
-      // } else {
-      // Author has no books. Delete object and redirect to the list of authors.
-      Plan.findByIdAndRemove(req.body.planid, function deletePlan(err) {
-        if (err) {
-          return next(err)
-        }
-        // Success - go to author list
-        res.redirect('/api/plan')
-      })
+  Masterplan.findByIdAndRemove(req.body.planid, function deletePlan(err) {
+    if (err) {
+      return next(err)
     }
-  )
+    // Success - go to author list
+    res.redirect('/api/masterplan')
+  })
 }
+
 // Display plan update form on GET.
 exports.masterplan_update_get = function (req, res, next) {
   async.parallel(
     {
-      plan: function (callback) {
-        Plan.findById(req.params.id).populate('user').exec(callback)
+      masterplan: function (callback) {
+        Masterplan.findById(req.params.id).populate('user').exec(callback)
       },
       users: function (callback) {
         User.find(callback)
@@ -320,17 +316,16 @@ exports.masterplan_update_get = function (req, res, next) {
       if (err) {
         return next(err)
       }
-      if (results.plan == null) {
+      if (results.masterplan == null) {
         let err = new Error('Plan not found')
         err.status = 404
         return next(err)
       }
       // Success
-      res.render('plan_form', {
+      res.render('masterplan-form', {
         title: 'Edytuj plan',
-        shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
-        plan: results.plan,
-        user_list: results.users,
+        masterplan: results.masterplan,
+        users: results.users,
       })
     }
   )
@@ -338,41 +333,46 @@ exports.masterplan_update_get = function (req, res, next) {
 
 // Handle plan update on POST.
 exports.masterplan_update_post = [
-  body('desc', 'Opis jest wymagany').isLength({ min: 1 }).escape(),
-  body('date_created').optional({ checkFalsy: true }).isISO8601().toDate(),
-  body('date_execution').optional({ checkFalsy: true }).isISO8601().toDate(),
-  body('shift').escape().toInt(),
-  body('isDone').escape().toBoolean(),
-  body('comments').escape(),
+  body('name', 'Tytuł jest wymagany').isLength({ min: 1 }).escape(),
+  body('desc', 'Opis jest wymagany').optional().escape(),
+  body('user').isLength({ min: 1 }).escape(),
+  body('status').isNumeric(),
 
   (req, res, next) => {
     const errors = validationResult(req)
-    let dateExecution = new Date(req.body.date_execution)
-    dateExecution.setHours(12, 0, 0, 0)
-    let plan = new Plan({
+    let masterplan = new Masterplan({
+      name: req.body.name,
       desc: req.body.desc,
-      date_created: new Date(),
-      date_execution: dateExecution,
-      shift: req.body.shift,
-      isDone: false,
-      comments: req.body.comments,
+      date: new Date(),
+      status: req.body.status,
       user: req.body.user,
       _id: req.params.id,
     })
 
     if (!errors.isEmpty()) {
-      res.render('plan_form', {
-        title: 'Edytuj plan',
-        shift_names: ['Poranna', 'Popołudniowa', 'Nocna'],
-        plan: plan,
-      })
+      User.find()
+        .sort([['name', 'ascending']])
+        .exec(function (err, result) {
+          if (err) {
+            return next(err)
+          }
+          res.render('masterplan-form', {
+            users: result,
+            masterplan: masterplan,
+          })
+        })
     } else {
-      Plan.findByIdAndUpdate(req.params.id, plan, {}, function (err, theplan) {
-        if (err) {
-          return next(err)
+      Masterplan.findByIdAndUpdate(
+        req.params.id,
+        masterplan,
+        {},
+        function (err) {
+          if (err) {
+            return next(err)
+          }
+          res.redirect(masterplan.url)
         }
-        res.redirect(theplan.url)
-      })
+      )
     }
   },
 ]

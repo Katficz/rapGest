@@ -1,0 +1,40 @@
+extends layout
+block content
+   div(class="col mx-md-5")
+      div(class='row')
+         div.col.my-2
+            h1.my-5 Zamasterplanuj pracę
+            form(method='POST' action='')
+               div.form-group
+                  label(for='name') Tytuł:
+                  input#name.form-control(type='text', name='name', value=(undefined===masterplan ? '' : masterplan.name))
+                  label.mt-4(for='desc') Opis:
+                  textarea#desc.form-control(rows='2' type='text', name='desc', value=(undefined===masterplan ? '' : masterplan.desc))
+
+                  label.mt-4(for='user') Zlecający:
+                  select#user.form-control(type='select', placeholder='Wybierz autora' name='user' )
+                     for user in users
+                        if masterplan
+                           option(value=user._id selected=(user._id.toString()===masterplan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+                        else
+                           option(value=user._id) #{user.fullname}
+
+                  .row.mt-2
+                      .col.d-flex.justify-content-between.mt-4(style='max-width: 600px;')
+                        .form-check.form-check-inline
+                          input.form-check-input(type='radio' id=('inlineRadio1') name='status' value='1' checked=(masterplan===undefined? '' : masterplan.status===1 ? true : false))
+                          label.form-check-label(for='inlineRadio1')  Nie rozpoczęte
+                        .form-check.form-check-inline
+                          input.form-check-input(type='radio' id=('inlineRadio2') name='status' value='2' checked=(masterplan===undefined? '' : masterplan.status===2 ? true : false))
+                          label.form-check-label(for='inlineRadio2')  W trakcie
+                        .form-check.form-check-inline
+                          input.form-check-input(type='radio' id=('inlineRadio3') name='status' value='3' checked=(masterplan===undefined? '' : masterplan.status===3? true : false))
+                          label.form-check-label(for='inlineRadio3')  Zakończone
+                    
+               button.btn.btn-primary(type='submit') Zapisz
+
+
+      if errors
+         ul
+            for error in errors
+               li!=error.msg

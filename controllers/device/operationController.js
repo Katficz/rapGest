@@ -7,6 +7,7 @@ const async = require('async')
 // Display list of all operations.
 exports.operation_list = function (req, res, next) {
   Operation.find()
+    .sort([['name', 'ascending']])
     .populate('line')
     .exec(function (err, list_operations) {
       if (err) {
@@ -102,71 +103,34 @@ exports.operation_create_post = [
 
 // Display operation delete form on GET.
 exports.operation_delete_get = function (req, res, next) {
-  async.parallel(
-    {
-      operation: function (callback) {
-        Operation.findById(req.params.id).exec(callback)
-      },
-      operation_devices: function (callback) {
-        Device.find({ operation: req.params.id }).exec(callback)
-      },
-    },
-    function (err, results) {
-      if (err) {
-        return next(err)
-      }
-      if (results.operation == null) {
-        // No results.
-        res.redirect('/api/operation')
-      }
-      // Successful, so render.
-      res.render('operation_delete', {
-        operation: results.operation,
-        operation_devices: results.operation_devices,
-      })
+  Operation.findById(req.params.id).exec(function (err, result) {
+    if (err) {
+      return next(err)
     }
-  )
+    if (result == null) {
+      // No results.
+      res.redirect('/api/operation')
+    }
+    // Successful, so render.
+    res.render('operation_delete', {
+      operation: result,
+    })
+  })
 }
 // Handle operation delete on POST.
-exports.operation_delete_post = function (req, res) {
-  async.parallel(
-    {
-      operation: function (callback) {
-        Operation.findById(req.body.operationid).exec(callback)
-      },
-      operation_devices: function (callback) {
-        Device.find({ operation: req.body.operationid }).exec(callback)
-      },
-    },
-    function (err, results) {
+exports.operation_delete_post = function (req, res, next) {
+  Operation.findByIdAndRemove(
+    req.body.operationid,
+    function deleteOperation(err) {
       if (err) {
         return next(err)
       }
-      // Success
-      if (results.operation_devices.length > 0) {
-        // operation has devices. Render in same way as for GET route.
-        res.render('operation_delete', {
-          title: 'Usuń linię',
-          operation: results.operation,
-          operation_devices: results.operation_devices,
-        })
-        return
-      } else {
-        // Author has no books. Delete object and redirect to the list of authors.
-        Operation.findByIdAndRemove(
-          req.body.operationid,
-          function deleteOperation(err) {
-            if (err) {
-              return next(err)
-            }
-            // Success - go to author list
-            res.redirect('/api/operation')
-          }
-        )
-      }
+      // Success - go to author list
+      res.redirect('/api/operation')
     }
   )
 }
+
 // Display operation update form on GET.
 exports.operation_update_get = function (req, res) {
   async.parallel(

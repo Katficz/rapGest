@@ -1,0 +1,95 @@
+extends layout
+
+block content
+  div.col
+    div(class='row')
+      div(class="col mx-md-5")
+        h1 #{title}
+        table(class='table table-bordered')
+          thead.table-dark
+            tr
+              th.h2.text-center(scope="col" colspan='2') #{masterplan.name}
+          tbody
+            tr
+              td(style='width: 50%;') Status
+              if masterplan.status===1
+                td.text-danger Oczekujące
+              else if masterplan.status===2
+                td.text-warning W trakcie realizacji
+              else
+                td.text-success Zakończone
+            tr
+              td Data utworzenia
+              td #{masterplan.date.toLocaleString()}
+            tr 
+              td Opis
+              td #{masterplan.desc}
+            tr
+              td Zaplanował
+              td #{masterplan.user.fullname}
+
+    div(class='row')
+      div(class='col mx-md-5 mt-4')
+        h2 Plany podległe:
+        div#accordion
+        each plan in masterplan.plans
+          div.card-header
+            button(class="btn btn-block" data-toggle="collapse" data-target=("#collapse"+plan._id) aria-expanded="true" aria-controls="collapseOne")
+              div #{plan.name} 
+              div #{plan.dateStart.toLocaleString()}  —  #{plan.dateEnd==null? 'Cały dzień' : plan.dateEnd.toLocaleString()} 
+
+          div(id=("collapse"+plan._id) class="collapse" aria-labelledby="headingOne" data-parent="#accordion")
+            div.card-body
+              table(class='table table-bordered')
+                thead
+                  tr
+                    th.text-center(scope="col" colspan='2')
+                      a(href=plan.url) Otwórz odnośnik
+
+                tbody
+                  tr
+                    td(style='width: 50%;') Status
+                        if plan.status===1
+                          td.text-danger Oczekujące
+                        else if plan.status===2
+                          td.text-warning W trakcie realizacji
+                        else
+                          td.text-success Zakończone
+                  tr
+                    td Data utworzenia
+                    td #{plan.date.toLocaleString()}
+                  tr
+                    td Opis
+                    td #{plan.description}
+                  tr
+                    td Numer zlecenia
+                    td #{plan.orderNumber}
+                  tr
+                    td Początek
+                    td #{plan.dateStart.toLocaleString()}
+                  tr.umfy-table-separator
+                    td Koniec
+                    td #{plan.dateEnd==null? 'Cały dzień' : plan.dateEnd.toLocaleString()}
+                  tr
+                    td Linia 
+                    td #{plan.line==null? '' : plan.line.name}
+                  tr
+                    td Operacja
+                    td #{plan.operation==null? '' : plan.operation.name}
+                  tr
+                    td Typ
+                    td #{plan.devicetype==null? '' : plan.devicetype.name}
+                  tr.umfy-table-separator
+                    td Urządzenie
+                    td #{plan.device==null? '' : plan.device.name}
+                  tr
+                    td Wymagane wstrzymanie produkcji
+                    td #{plan.isParalyzing===true ? 'TAK' : 'NIE'}
+
+    div(class='row')
+      div(class='col mx-md-5 mt-4')
+        a.btn.btn-primary.my-5.mr-2(href=masterplan.url + '/delete') Usuń 
+
+        a.btn.btn-primary.my-5.mr-2(href=masterplan.url+'/update') Zmodyfikuj 
+
+

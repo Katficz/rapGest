@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  div(class="col mx-md-5 my-5")
+    h1.pb-3 Usuń Plan Dzienny: 
+     h1 #[strong #{plan.name}]
+
+    p.mt-5.h4 Czy na pewno chcesz usunąć ten Plan?
+
+    form(method='POST' action='')
+      div.form-group
+        input#planid.form-control(type='hidden',name='planid', required='true', value=plan._id )
+
+      button.btn.btn-danger(type='submit') Usuń
+

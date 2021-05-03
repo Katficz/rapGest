@@ -37,63 +37,40 @@ block content
                           div.col
                             label Linia
                             select.planLine.form-control(type='select' name='line' )
-                              option(value=undefined selected) Dowolne
+                              option(value='Dowolne' selected) Dowolne
                               each line in lines
                                 if plan
-                                  option(value=line._id selected=(line._id.toString() === plan.line._id.toString() ? 'selected' : false)) line.name
-                                else
                                   option(value=line._id) #{line.name}
                           div.col
                             label Operacja
                             select.planOperation.form-control(type='select' name='operation' )
-                              option(value=undefined selected) Dowolne
+                              option(value='Dowolne' selected) Dowolne
                               each operation in operations
-                                if plan
-                                  option(value=operation._id selected=(operation._id.toString() === plan.operation._id.toString() ? 'selected' : false)) operation.name
-                                else
                                   option(value=operation._id) #{operation.name}
                         div.mt-4(class='row')
                           div.col
                             label Typ Urządzenia
                             select.planDevicetype.form-control(type='select' name='devicetype' )
-                              option(value=undefined selected) Dowolne
+                              option(value='Dowolne' selected) Dowolne
                               each devicetype in devicetypes
-                                if plan
-                                  option(value=devicetype._id selected=(devicetype._id.toString() === plan.devicetype._id.toString() ? 'selected' : false)) devicetype.name
-                                else
                                   option(value=devicetype._id) #{devicetype.name}
                           div.col
                             label Urządzenie
                             select.planDevice.form-control(type='select' name='device' )
-                              option(value=undefined selected) Dowolne
+                              option(value='Dowolne' selected) Dowolne
                               each device in devices
-                                if plan
-                                  option(value=device._id selected=(device._id.toString() === plan.device._id.toString() ? 'selected' : false)) device.name
-                                else
                                   option(value=device._id) #{device.name}
                         div.mt-4(class='row')
                           div.col
                             div.form-check
-                              input.planIsParalyzing(class="form-check-input" type="checkbox" value=1 checked=(plan===undefined ? false : plan.isParalyzing))
+                              input.planIsParalyzing(class="form-check-input" type="checkbox" value=1)
                               label Konieczne zatrzymanie linii.
-                        //- div.mt-4(class='row')
-                        //-   div.col Stan Pracy:
-                        //-   div.col.d-flex.justify-content-between
-                        //-       .form-check.form-check-inline 
-                        //-         input.form-check-input.statusRepaired(type='radio' name='inlineRadioOptions' value='1')
-                        //-         label.form-check-label  Oczekująca
-                        //-       .form-check.form-check-inline
-                        //-         input.form-check-input.statusNotRepaired(type='radio' name='inlineRadioOptions' value='2')
-                        //-         label.form-check-label  Rozpoczęta
-                        //-       .form-check.form-check-inline
-                        //-         input.form-check-input.statusTemporary(type='radio' name='inlineRadioOptions' value='3')
-                        //-         label.form-check-label  Zakończona
                 .modal-footer
                   button.btn.btn-secondary(type='button' data-dismiss='modal') Zamknij
-                  button.btn.btn-primary(type='button' id='ABB' onclick='addSubPlan(this)') Zapisz
+                  button.btn.btn-primary(type='button' id='ABB' onclick='addSubPlan(this)') Dodaj
 
     div
-      button.btn.btn-danger.mt-3(type="button" id='testSendButton' onclick="")  test 
+      button.btn.btn-danger.mt-3(type="button" id='testSendButton' onclick="")  Zapisz 
   div.col#calendar-wrap
     #calendar
 
@@ -102,6 +79,8 @@ block content
   link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css')
   script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js')
   script.
+    // PLAN: ['_id', 'name', 'dateStart', 'dateEnd', 'status']
+    let events_list = !{JSON.stringify(events_list)}
     // this set holds ID's of all modified events
     let modifiedEvents = new Set
     // Array that holds created plan objects' additional info that doesn't fit into Calendar
@@ -135,13 +114,15 @@ block content
         // remove the element from the "Draggable Events" list
         arg.draggedEl.parentNode.removeChild(arg.draggedEl);
       },
-      events: [
-        {
-          id: 'a',
-          title: 'my event',
-          start: '2021-05-02'
+      events: events_list,
+      eventClick: function(info) {
+        info.jsEvent.preventDefault(); // don't let the browser navigate
+
+        if (info.event.url) {
+          window.open(info.event.url);
         }
-      ]
+      }
+      
     });
     calendar.render();
 
@@ -159,16 +140,18 @@ block content
       let planDevicetype = form.querySelector('.planDevicetype').value
       let planDevice = form.querySelector('.planDevice').value
       let planIsParalyzing = form.querySelector('.planIsParalyzing').checked
-      // 1 - nierozpoczęte, 2 - rozgrzebane 3 - zrobione
+      // wypełnia zmiana przy raporcie: 1 - nierozpoczęte, 2 - rozgrzebane 3 - zrobione
       let planStatus = 1
 
       createdPlans['ID'+temporaryId] = {
+        masterplanId: planMasterplanId,
         name: planName, 
         description: planDescription,
         orderNumber: planOrderNumber,
         isParalyzing: planIsParalyzing,
         status: planStatus }
 
+      // If line name is not picked it's value is equal to "dowolne". Don't save such objects.
       if (planLine !== 'Dowolne')
         createdPlans['ID'+temporaryId].line = planLine
       if (planOperation !== 'Dowolne')
@@ -209,7 +192,9 @@ block content
           createdPlans[planId].dateEnd = event.end
           saveNewPlan(createdPlans[planId])
         } else {
-          // it is mongoDB id
+          //end is mongoDB id
+          let modifiedPlan = {id: planId, dateStart: event.start, dateEnd: event.end}
+          updateExistingPlan(modifiedPlan)
         }
       }
     }
@@ -239,6 +224,32 @@ block content
         console.log(err.message)
       })
     }
+
+    function updateExistingPlan(modifiedPlan){
+      fetch('/api/masterplan/calendar/updateExistingPlan', {
+        method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(modifiedPlan)
+      })
+      .then(function(res) {
+        return res.json()
+      })
+      .then(function(response) {
+        if(response.message) {
+          console.log(response.message)
+        }
+        else{
+          console.log(response)
+        }
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
+    }
+    
 
 
     /* LISTENERS */

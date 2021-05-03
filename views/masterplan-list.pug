@@ -6,6 +6,7 @@ block content
       h1.text-center.my-5 Lista prac planowanych
 
       a.btn.btn-primary.my-2(href="/api/masterplan/create") Utwórz nową pracę planowaną
+      a.btn.btn-primary.my-2.ml-2(href="/api/masterplan/calendar") Kalendarz prac
       table.table.table-bordered.table-striped.table-hover.dark-header-hover
          thead.table-dark
             tr
@@ -18,6 +19,6 @@ block content
                   td.padding0
                      a.black-link(href=masterplan.url) #{masterplan.name}
                   td.padding0
-                     a.black-link(href=masterplan.url) #{masterplan.date}
+                     a.black-link(href=masterplan.url) #{masterplan.date.toLocaleString()}
                   td.padding0 
-                     a.black-link(href=masterplan.url) 10 k
+                     a.black-link(href=masterplan.url) #{masterplan.plans.length}

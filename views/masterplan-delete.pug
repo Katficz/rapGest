@@ -1,0 +1,14 @@
+extends layout
+
+block content
+   div(class="col mx-md-5")
+      h1 #{title}: 
+      h1 #[strong #{masterplan.name}]
+
+      p Czy na pewno chcesz usunąć ten Plan?
+
+      form(method='POST' action='')
+         div.form-group
+            input#planid.form-control(type='hidden',name='planid', required='true', value=masterplan._id )
+
+         button.btn.btn-danger(type='submit') Delete

@@ -1,154 +1,88 @@
 extends layout
 block content
    div(class="col mx-md-5")
-      div(class='row')
-         div.col.my-2
-            h1.my-5 Zamasterplanuj pracę
-            form(method='POST' action='')
-               div.form-group
-                  label(for='name') Tytuł:
-                  input#name.form-control(type='text', name='name', value=(undefined===masterplan ? '' : masterplan.name))
-                  label(for='desc') Opis:
-                  textarea#desc.form-control(rows='2' type='text', name='desc', value=(undefined===masterplan ? '' : masterplan.desc))
-
-                  label(for='user') Zlecający:
-                  select#user.form-control(type='select', placeholder='Wybierz autora' name='user' )
-                     for user in users
-                        if masterplan
-                           option(value=user._id selected=(user._id.toString()===masterplan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+      h1.my-5 #{title}
+      form(method='POST' action='')
+         div.form-group
+            div(class='row')
+               div.col
+                  label Nazwa planu dziennego   
+                  input#name.form-control(name='name' type='text' value=(undefined===plan ? '' : plan.name))
+            div.mt-4(class='row')
+               div.col
+                  | Opis
+                  textarea#description.form-control(name='description' rows='2' type='text') #{undefined===plan ? '' : plan.description}
+            div(class='row')
+               div.col.mt-4
+                  label Numer zlecenia
+                  input#orderNumber.form-control(name='orderNumber' type='text' value=(undefined===plan ? '' : plan.orderNumber))
+            div(class='row')
+               div.col
+                  label Linia
+                  select#line.form-control(type='select' name='line' )
+                     option(value='Dowolne' selected) Dowolne
+                     each line in lines
+                        if plan
+                           if plan.line
+                              option(value=line._id selected=(line._id.toString()===plan.line._id.toString() ? 'selected' : false )) #{line.name}
+                           else
+                              option(value=line._id) #{line.name}
                         else
-                           option(value=user._id) #{user.fullname}
+                           option(value=line._id) #{line.name}
+               div.col
+                  label Operacja
+                  select#operation.form-control(type='select' name='operation' )
+                     option(value='Dowolne' selected) Dowolne
+                     each operation in operations
+                        if plan
+                           if plan.operation
+                              option(value=operation._id selected=(operation._id.toString()===plan.operation._id.toString() ? 'selected' : false )) #{operation.name}
+                           else
+                           option(value=operation._id) #{operation.name}
+                        else
+                           option(value=operation._id) #{operation.name}
+            div.mt-4(class='row')
+               div.col
+                  label Typ Urządzenia
+                  select#devicetype.form-control(type='select' name='devicetype' )
+                     option(value='Dowolne' selected) Dowolne
+                     each devicetype in devicetypes
+                        if plan
+                           if plan.devicetype
+                              option(value=devicetype._id selected=(devicetype._id.toString()===plan.devicetype._id.toString() ? 'selected' : false )) #{devicetype.name}
+                           else
+                           option(value=devicetype._id) #{devicetype.name}
+                        else
+                           option(value=devicetype._id) #{devicetype.name}
+               div.col
+                  label Urządzenie
+                  select#device.form-control(type='select' name='device' )
+                     option(value='Dowolne' selected) Dowolne
+                     each device in devices
+                        if plan
+                           if plan.device
+                              option(value=device._id selected=(device._id.toString()===plan.device._id.toString() ? 'selected' : false )) #{device.name}
+                           else
+                              option(value=device._id) #{device.name}
+                        else
+                           option(value=device._id) #{device.name}
+            div.mt-4(class='row')
+               div.col
+                  div.form-check
+                  input#isParalyzing(name='isParalyzing' class="form-check-input" type="checkbox" value=1)
+                  label Konieczne zatrzymanie linii.
 
+            .row.mt-2
+               .col.d-flex.justify-content-between.mt-4(style='max-width: 600px;')
+                  .form-check.form-check-inline
+                     input.form-check-input(type='radio' id=('inlineRadio1') name='status' value='1' checked=(plan===undefined? '' : plan.status===1 ? true : false))
+                     label.form-check-label(for='inlineRadio1')  Nie rozpoczęte
+                  .form-check.form-check-inline
+                     input.form-check-input(type='radio' id=('inlineRadio2') name='status' value='2' checked=(plan===undefined? '' : plan.status===2 ? true : false))
+                     label.form-check-label(for='inlineRadio2')  W trakcie
+                  .form-check.form-check-inline
+                     input.form-check-input(type='radio' id=('inlineRadio3') name='status' value='3' checked=(plan===undefined? '' : plan.status===3? true : false))
+                     label.form-check-label(for='inlineRadio3')  Zakończone
+                    
 
-      div(class='row')   
-         div.col.my-2            
-          
-            button(class="btn btn-danger" type='button' id="addPlanButton") Dodaj Zadanie
-
-            div.mt-4(class='accordion' id='accordion')
-               .card
-                  .card-header
-                     button.btn.btn-link(type='button' data-toggle='collapse' data-target='#hats' aria-expanded='true' aria-controls='collapseOne')
-                        | Plan 1
-                  .collapse.show(data-parent='#accordion' id='hats')
-                     .card-body
-                        .col
-                           div(class='row')
-                              div.col
-                                 label Nazwa planu dziennego
-                                 input.form-control.planName(type='text')
-                           div.mt-4(class='row')
-                              div.col
-                                 | Opis
-                                 textarea.form-control.planDescription(rows='2' type='text')
-                           div(class='row')
-                              div.col.mt-4
-                                 label Numer zlecenia
-                                 input.form-control.planOrderNumber(type='text')
-                           div.mt-4(class='row')
-                              div.col
-                                 label Planowana data wykonania:
-                                 input.form-control.planDateExecution(type='date' name='date_execution')
-                              div.col
-                                 label Numer zmainy realizującej plan:
-                                 select.form-control.planShift(type='select', placeholder='Wybierz' name='shift' )
-                                    for item in shift_names
-                                       if masterplan
-                                          option(value=(item==='Popołudniowa' ? 2 : (item==='Nocna' ? 3 : 1) )) #{item} 
-                                       else
-                                          option(value=(item==='Popołudniowa' ? 2 : (item==='Nocna' ? 3 : 1) )) #{item}
-                              div.col
-                                 label Szacowany czas realizacji (godziny):
-                                 p
-                                    input.form-control.planTimespan(type='text' value=(plan===undefined ? '' : plan.hours))
-                           div(class='row')
-                              div.col
-                                 label Linia
-                                 select#line.form-control(type='select' name='line' )
-                                    option(value=undefined selected) Dowolne
-                                    each line in lines
-                                       if plan
-                                          option(value=line._id selected=(line._id.toString() === plan.line._id.toString() ? 'selected' : false)) line.name
-                                       else
-                                          option(value=line._id) #{line.name}
-                              div.col
-                                 label Operacja
-                                 select#line.form-control(type='select' name='line' )
-                                    option(value=undefined selected) Dowolne
-                                    each operation in operations
-                                       if plan
-                                          option(value=operation._id selected=(operation._id.toString() === plan.operation._id.toString() ? 'selected' : false)) operation.name
-                                       else
-                                          option(value=operation._id) #{operation.name}
-                              div.col
-                                 label Typ Urządzenia
-                                 select#line.form-control(type='select' name='line' )
-                                    option(value=undefined selected) Dowolne
-                                    each devicetype in devicetypes
-                                       if plan
-                                          option(value=devicetype._id selected=(devicetype._id.toString() === plan.devicetype._id.toString() ? 'selected' : false)) devicetype.name
-                                       else
-                                          option(value=devicetype._id) #{devicetype.name}
-                              div.col
-                                 label Urządzenie
-                                 select#line.form-control(type='select' name='line' )
-                                    option(value=undefined selected) Dowolne
-                                    each device in devices
-                                       if plan
-                                          option(value=device._id selected=(device._id.toString() === plan.device._id.toString() ? 'selected' : false)) device.name
-                                       else
-                                          option(value=device._id) #{device.name}
-                           div.mt-4(class='row')
-                              div.col
-                                 div.form-check
-                                    input.planIsParalyzing(class="form-check-input" type="checkbox" value=1 checked=(plan===undefined ? false : plan.isParalyzing))
-                                    label Konieczne zatrzymanie linii.
-                           div.mt-4(class='row')
-                              div.col Stan Pracy:
-                              div.col.d-flex.justify-content-between
-                                 .form-check.form-check-inline 
-                                    input.form-check-input.statusRepaired(type='radio' name='inlineRadioOptions' value='1')
-                                    label.form-check-label  Oczekująca
-                                 .form-check.form-check-inline
-                                    input.form-check-input.statusNotRepaired(type='radio' name='inlineRadioOptions' value='2')
-                                    label.form-check-label  Rozpoczęta
-                                 .form-check.form-check-inline
-                                    input.form-check-input.statusTemporary(type='radio' name='inlineRadioOptions' value='3')
-                                    label.form-check-label  Zakończona
-                           .row
-                              .col.mb-3
-                                 button.btn.btn-primary.mt-3.float-right(class="updateBreakdownButton" type="button" id='postPlanButton' onclick="")  Zapisz 
-
-
-
-
-
-
-
-      div(class='row')
-         div.col.my-2
-            button.btn.btn-primary(type='submit') Zapisz
-
-
-      if errors
-         ul
-            for error in errors
-               li!=error.msg
-
-
-   script.
-      function insertAfter(newNode, referenceNode) {
-         referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
-      }
-      var testelement = document.createElement("div");
-      testelement.innerHTML = "test"+ new Date();
-
-
-      // addPlan() fires when #addPlanButton is clicked
-      function addPlan() {
-         insertAfter(testelement, document.querySelector('#accordion'))
-      }
-      let el = document.getElementById("addPlanButton");
-      el.addEventListener("click", addPlan, false);
-
-
+         button.btn.btn-primary(type='submit') Zapisz

@@ -20,11 +20,6 @@ const PlanSchema = new Schema({
   comments: { type: String },
 })
 
-PlanSchema.virtual('virtual_num_to_word').get(function () {
-  shift_names = ['Poranna', 'Popołudniowa', 'Nocna']
-  return shift_names[this.shift - 1]
-})
-
 // Virtual for plan's URL
 PlanSchema.virtual('url').get(function () {
   return '/api/plan/' + this._id
