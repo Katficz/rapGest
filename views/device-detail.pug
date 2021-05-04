@@ -5,11 +5,11 @@ block content
         h1 #{title}
 
         p #[strong Nazwa:] #{device.name}
-        p #[strong Ip:] #{device.ip}
-        p #[strong Linia:] #{device.prodLine.name}
-        p #[strong Operacja:] #{device.operation.name}
-        p #[strong Typ urządzenia:] #{device.deviceType.name}
-        p #[strong Opis:] #{device.description}
+        p #[strong Ip:] #{device.ip==null ? '' : device.ip}
+        p #[strong Linia:] #{device.line==null ? '' : device.prodLine.name}
+        p #[strong Operacja:] #{device.operation==null ? '' : device.operation.name}
+        p #[strong Typ urządzenia:] #{device.deviceType==null ? '' : device.deviceType.name}
+        p #[strong Opis:] #{device.desctiption==null ? '' : device.description}
 
         a.btn.btn-danger.my-5.mr-2(href=device.url + '/usun') Usuń 
         a.btn.btn-primary.my-5.mr-2(href=device.url + '/edytuj') Zmodyfikuj 

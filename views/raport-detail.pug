@@ -143,6 +143,21 @@ block content
                      tr.umfy-table-separator
                         td Prace na postój 
                         td #{failure.plannedActions}
+                     tr
+                        td Autor
+                        td #{failure.author==null ? '' : failure.author.name}
+                     tr.umfy-table-separator
+                        td Kolaboranci
+                        // Why does it print '<' and '>' ?????
+                        // I cannot treat it like an object because of that (coleague.name)
+                        if failure.collaborators==null
+                           td 
+                        else
+                           td
+                              each coleague in failure.collaborators
+                                    p
+                                       #{coleague}
+                                 
 
 
 

@@ -15,9 +15,9 @@ block content
                         if device.prodLine == line._id.toString()
                             tr
                                 td.padding0(width="33%") 
-                                    a.black-link(href=device.url) #{device.operation.name} 
+                                    a.black-link(href=device.url) #{device.operation==null ? '' : device.operation.name} 
                                 td.padding0(width="33%") 
-                                    a.black-link(href=device.url) #{device.deviceType.name} 
+                                    a.black-link(href=device.url) #{device.deviceType==null ? '' : device.deviceType.name} 
                                 td.padding0(width="33%") 
                                     a.black-link(href=device.url) #{device.name}
 
