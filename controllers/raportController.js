@@ -417,6 +417,33 @@ exports.raport_GET_one = function (req, res) {
   Raport.findById(req.params.id)
       .populate('teamPresent')
       .populate('teamMissing')
+      .populate({
+        path: 'failure',
+        populate: {
+          path: 'prodLine',
+          model: 'ProdLine',
+        },
+      })
+      .populate({
+        path: 'failure',
+        populate: 'operation',
+      })
+      .populate({
+        path: 'failure',
+        populate: 'deviceType',
+      })
+      .populate({
+        path: 'failure',
+        populate: 'device',
+      })
+      .populate({
+        path: 'failure',
+        populate: 'collaborators',
+      })
+      .populate({
+        path: 'failure',
+        populate: 'author',
+      })
       .exec(function (err, result) {
         if (err) {
           return next(err)
