@@ -250,6 +250,9 @@ exports.user_GET_login = function(req, res) {
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
 exports.user_POST_login = async function(req, res, next) {
+    var dataTeraz = new Date()
+    dataTeraz.setHours(dataTeraz.getHours()+2)
+    console.log(dataTeraz)
     User.findOne({login: req.body.login})
     .exec(async function(err, loggedInResult) {
         if(err) {
@@ -269,7 +272,7 @@ exports.user_POST_login = async function(req, res, next) {
         if(loggedInResult.shift!=0) {
           const shiftLoggedIn = loggedInResult.shift
           var nowDate = new Date()
-
+          nowDate.setHours(nowDate.getHours()+2)
           saveDate = new Date()
           saveDate.setHours(10)
 
@@ -335,6 +338,8 @@ exports.user_POST_login = async function(req, res, next) {
             startDate.setHours(8, 00)
             endDate.setHours(24)
 
+            startDate.setHours(startDate.getHours() + 2)
+            endDate.setHours(startDate.getHours() + 2)
             startDate.setDate(startDate.getDate() - 1)
             endDate.setDate(startDate.getDate() - 1)
 
@@ -343,7 +348,7 @@ exports.user_POST_login = async function(req, res, next) {
               date: {
                 // searching for the previous date 8 - 24
                 $gte: startDate,
-                $lte: nowDate,
+                $lte: endDate,
               },
             })
             .exec(function (err, resultRap) {

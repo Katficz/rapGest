@@ -16,9 +16,7 @@ const { DocumentProvider } = require('mongoose')
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
   // this is bad
-  startDate.setTime(
-    startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000
-  )
+  startDate.setHours(startDate.getHours()+2)
   // just setHours(0,0,0,0) and use getDate - 3
   startDate.setDate(startDate.getDate() - 4)
   async.parallel(
