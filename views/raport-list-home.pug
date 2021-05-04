@@ -74,7 +74,7 @@ block content
         parsedThird = JSON.parse(thirdTr.dataset.shiftc)
         for(var i = 1;i<firstTr.childNodes.length;i++) {
             if(parsedFirst[i-1] != 0) {
-                firstTr.childNodes[i].firstChild.firstChild.href = parsedFirst[i-1] + '/edytuj'
+                firstTr.childNodes[i].firstChild.firstChild.href = parsedFirst[i-1]
                 firstTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
                 firstTr.childNodes[i].firstChild.classList.add('btn-success')
             }
@@ -86,7 +86,7 @@ block content
         }
         for(var i = 1;i<secondTr.childNodes.length;i++) {
             if(parsedSecond[i-1] != 0) {
-                secondTr.childNodes[i].firstChild.firstChild.href = parsedSecond[i-1] + '/edytuj'
+                secondTr.childNodes[i].firstChild.firstChild.href = parsedSecond[i-1]
                 secondTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
                 secondTr.childNodes[i].firstChild.classList.add('btn-success')
             }
@@ -98,7 +98,7 @@ block content
         }
         for(var i = 1;i<thirdTr.childNodes.length;i++) {
             if(parsedThird[i-1] != 0) {
-                thirdTr.childNodes[i].firstChild.firstChild.href = parsedThird[i-1] + '/edytuj'
+                thirdTr.childNodes[i].firstChild.firstChild.href = parsedThird[i-1]
                 thirdTr.childNodes[i].firstChild.firstChild.text = 'Raport w bazie'
                 thirdTr.childNodes[i].firstChild.classList.add('btn-success')
             }

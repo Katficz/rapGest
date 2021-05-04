@@ -11,7 +11,7 @@ block content
 
             //a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
 
-            a.btn.btn-primary.my-5.mr-2(href='#'+raport._id) Zmodyfikuj    
+            a.btn.btn-primary.my-5.mr-2(href='/api/raporty/'+raport._id+'/edytuj' hidden=(permission==='technik'?true:false)) Zmodyfikuj    
             table(class='table table-bordered')
                caption Skład zmiany
                   thead

@@ -3,7 +3,6 @@ const { body, validationResult, cookie } = require('express-validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
-const cookieParser = require('cookie-parser')
 const Raport = require('../models/raport')
 
 dotenv.config();
@@ -213,6 +212,7 @@ exports.user_GET_shift = function (req, res, next) {
         shift1: shift1,
         shift2: shift2,
         shift3: shift3,
+        permission:req.verifiedPerm
       })
     })
 }
@@ -314,6 +314,7 @@ exports.user_POST_login = async function(req, res, next) {
                   res.status(200)
                   .cookie('token', token, {
                     secure: true,
+                    httpOnly: true,
                   })
                   .redirect('/api/raporty')
                 })
@@ -323,6 +324,7 @@ exports.user_POST_login = async function(req, res, next) {
                 res.status(200)
                 .cookie('token', token, {
                   secure: true,
+                  httpOnly: true,
                 })
                 .redirect('/api/raporty')
               }
@@ -370,6 +372,7 @@ exports.user_POST_login = async function(req, res, next) {
                   res.status(200)
                   .cookie('token', token, {
                     secure: true,
+                    httpOnly: true,
                   })
                   .redirect('/api/raporty')
                 })
@@ -379,6 +382,7 @@ exports.user_POST_login = async function(req, res, next) {
                 res.status(200)
                 .cookie('token', token, {
                   secure: true,
+                  httpOnly: true,
                 })
                 .redirect('/api/raporty')
               }
@@ -391,6 +395,7 @@ exports.user_POST_login = async function(req, res, next) {
           res.status(200)
           .cookie('token', token, {
             secure: true,
+            httpOnly: true,
           })
           .redirect('/api/raporty')
         }

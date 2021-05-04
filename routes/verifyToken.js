@@ -5,7 +5,10 @@ const jwt = require('jsonwebtoken')
 
 exports.authTech = function(req, res, next) {
     const token = req.cookies.token
-    if(!token) return res.status(401).send('Access Denied')
+    if(!token) {
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest nieplawidłowy!'})
+        return
+    }
 
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
@@ -16,14 +19,16 @@ exports.authTech = function(req, res, next) {
         return next()
     } 
     catch (error) {
-        res.status(400).send('Invalid Token')
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest', url: '/api/raporty'})
     }
 }
 
 exports.authSpec = function(req, res, next) {
     const token = req.cookies.token
-    if(!token) return res.status(401).send('Access Denied')
-
+    if(!token) {
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest nieplawidłowy!'})
+        return
+    }
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         if(verified.permission == 'specjalista' || verified.permission == 'admin') {
@@ -33,18 +38,20 @@ exports.authSpec = function(req, res, next) {
             return next()
         }
         else {
-            return res.status(401).send('Access Denied')
+            res.status(401).render('redirect-access-denied', {title:'Nie posiadasz wystarczającego stopnia dostępu do tego zasobu!'})
         }
     } 
     catch (error) {
-        return res.status(400).send('Invalid Token')
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest nieplawidłowy.', url: '/api/raporty'})
     }
 }
 
 exports.authAdmin = function(req, res, next) {
     const token = req.cookies.token
-    if(!token) return res.status(401).send('Access Denied')
-    
+    if(!token) {
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest nieplawidłowy!'})
+        return
+    }
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET)
         if(verified.permission == 'admin') {
@@ -55,10 +62,10 @@ exports.authAdmin = function(req, res, next) {
             return next()
         }
         else {
-            return res.status(401).send('Access Denied')
+            res.status(401).render('redirect-access-denied', {title:'Nie posiadasz wystarczającego stopnia dostępu do tego zasobu!'})
         }
     } 
     catch (error) {
-        return res.status(400).send('Invalid Token')
+        res.status(400).render('redirect-access-denied', {title:'Coś poszło nie tak... Twój token jest nieplawidłowy!'})
     }
 }

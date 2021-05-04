@@ -1,0 +1,9 @@
+extends layout
+
+block content 
+    dov.col-12
+        h1.h1.text-center.m-5 #{title}
+        br
+        if(url)
+            h2.h2.text-center Zostaniesz przekierowany do strony głównej za 4 sekundy...
+            meta(http-equiv="refresh" content="4;"+url)

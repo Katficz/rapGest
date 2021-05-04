@@ -211,7 +211,7 @@ a.green-link {
   background-color: rgba(8, 158, 0, 0.987); /* Black background color */
   color: #fff; /* White text color */
   text-align: center; /* Centered text */
-  border-radius: 2px; /* Rounded borders */
+  border-radius: 5px; /* Rounded borders */
   padding: 16px; /* Padding */
   position: fixed; /* Sit on top of the screen */
   z-index: 1; /* Add a z-index if needed */

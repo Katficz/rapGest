@@ -10,6 +10,7 @@ const async = require('async')
 const failure = require('../models/failure')
 
 const { DateTime } = require('luxon')
+const { DocumentProvider } = require('mongoose')
 
 //HOME PAGE
 exports.raport_GET_list = function (req, res) {
@@ -297,12 +298,10 @@ exports.raport_GET_failures = function (req, res, next) {
   if (req.verifiedShift == 0) {
     console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.send('Edytuj raport przez kalendarz')
+      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
     }
     if (req.verifiedPerm == 'technik') {
-      res.send(
-        'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany'
-      )
+      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
     }
   }
 }
@@ -368,19 +367,37 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  Raport.findById(req.verifiedMyRaportId)
-    .populate('teamPresent')
-    .populate('teamMissing')
-    .exec(function (err, result) {
-      if (err) {
-        return next(err)
-      }
-      res.render('raport-detail', { raport: result })
-    })
+  if(req.verifiedShift!=0) {
+    Raport.findById(req.verifiedMyRaportId)
+      .populate('teamPresent')
+      .populate('teamMissing')
+      .exec(function (err, result) {
+        if (err) {
+          return next(err)
+        }
+        res.render('raport-detail', { raport: result, permission: req.verifiedPerm})
+      })
+  } 
+  if (req.verifiedShift == 0) {
+    if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
+      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
+    }
+    if (req.verifiedPerm == 'technik') {
+      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
+    }
+  }
 }
 
 exports.raport_GET_one = function (req, res) {
-  res.send('get specific raport GET NI')
+  Raport.findById(req.params.id)
+      .populate('teamPresent')
+      .populate('teamMissing')
+      .exec(function (err, result) {
+        if (err) {
+          return next(err)
+        }
+        res.render('raport-detail', { raport: result, permission: req.verifiedPerm})
+      })
 }
 
 exports.raport_GET_firstSection = function (req, res, next) {
@@ -413,12 +430,10 @@ exports.raport_GET_firstSection = function (req, res, next) {
   if (req.verifiedShift == 0) {
     console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.send('Edytuj raport przez kalendarz')
+      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
     }
     if (req.verifiedPerm == 'technik') {
-      res.send(
-        'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany'
-      )
+      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
     }
   }
 }

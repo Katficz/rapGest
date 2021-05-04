@@ -378,7 +378,7 @@ router.get(
 //GET for updating raport
 router.get(
   '/raporty/:id/edytuj',
-  auth.authTech,
+  auth.authSpec,
   raportController.raport_GET_update
 )
 
@@ -507,7 +507,7 @@ router.get('/uzytkownicy/:id', auth.authTech, userController.user_GET_one)
 ╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝░░╚═╝░╚═════╝░╚══════╝╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░
 */
 //GET shift maganment
-router.get('/zmiany', auth.authAdmin, userController.user_GET_shift)
+router.get('/zmiany', auth.authTech, userController.user_GET_shift)
 
 //POST new shift
 router.post('/zmiany', auth.authAdmin, userController.user_POST_shift)

@@ -29,9 +29,9 @@ block content
                         each employee in shift0 
                             div.toShift1(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
                                 li
-                                    input.mr-1(type='checkbox' name='shift1' value=employee._id onclick="clickShift1(this)" checked=(employee.shift===1 ? true : false))
+                                    input.mr-1(disabled=(permission==='admin'?false:true) type='checkbox' name='shift1' value=employee._id onclick="clickShift1(this)" checked=(employee.shift===1 ? true : false))
                                     label(for='shift1') #{employee.name} #{employee.surname} #{employee.position}
-                    button(type='button') Zapisz zmianę 1
+                    button.align-right.btn.btn-outline-success.btn-block.mb-5(type='button' disabled=(permission==='admin'?false:true) ) Zapisz zmianę 1
             
             div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.secondShift 
                 form#secondForm() 
@@ -39,9 +39,9 @@ block content
                         each employee in shift0 
                             div.toShift2(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
                                 li
-                                    input.mr-1(type='checkbox' name='shift2' value=employee._id onclick="clickShift2(this)" checked=(employee.shift===2 ? true : false))
+                                    input.mr-1(disabled=(permission==='admin'?false:true) type='checkbox' name='shift2' value=employee._id onclick="clickShift2(this)" checked=(employee.shift===2 ? true : false))
                                     label(for='shift2') #{employee.name} #{employee.surname} #{employee.position}
-                    button(type='button') Zapisz zmianę 2
+                    button.align-right.btn.btn-outline-success.btn-block.mb-5(type='button' disabled=(permission==='admin'?false:true) ) Zapisz zmianę 2
             
             div.col-xl-4.col-lg-4.col-md-12.col.sm-12.col-xs-12.thirdShift
                 form#thirdForm() 
@@ -49,9 +49,9 @@ block content
                         each employee in shift0 
                             div.toShift3(data-id=employee._id data-name=employee.name data-surname=employee.surname data-position=employee.position)
                                 li
-                                    input.mr-1(type='checkbox' name='shift3' value=employee._id onclick="clickShift3(this)" checked=(employee.shift===3 ? true : false))
+                                    input.mr-1(disabled=(permission==='admin'?false:true) type='checkbox' name='shift3' value=employee._id onclick="clickShift3(this)" checked=(employee.shift===3 ? true : false))
                                     label(for='shift3') #{employee.name} #{employee.surname} #{employee.position}
-                    button(type='button') Zapisz zmianę 3
+                    button.align-right.btn.btn-outline-success.btn-block.mb-5(type='button' disabled=(permission==='admin'?false:true) ) Zapisz zmianę 3
     div#snackbar 
 
     script.
