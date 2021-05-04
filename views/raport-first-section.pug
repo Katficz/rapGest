@@ -58,7 +58,7 @@ block content
                                             td(align="center")
                                                 input.m-1.roundAroundCheckBox(type="checkbox" id=place[1] name=place[1] checked=roundAround[place[1]])
                             buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveRoundAround()') Zapisz obchód
-
+    
 
 
 
@@ -74,6 +74,7 @@ block content
                         buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-5(type="button" onclick='saveAdditionalInfo()') Zapisz dodatkowy opis
 
 
+    div#snackbar 
 
     script.
         const activateLink = document.querySelector('#firstSectionActive')
@@ -114,7 +115,10 @@ block content
                     alert(response.message)
                 }
                 else{
-                    alert(response)
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = 'Pomyślnie zapisano skład osobowy!'
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
                 }
             })
             .catch((err) => {
@@ -154,8 +158,10 @@ block content
                     alert(response.message)
                 }
                 else{
-                    alert(response)
-                }
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = 'Pomyślnie zapisano obchód!'
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
             })
             .catch((err) => {
                 alert(err.message)
@@ -181,8 +187,10 @@ block content
                     alert(response.message)
                 }
                 else{
-                    alert(response)
-                }
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = 'Pomyślnie zapisano dodatkowe informacje!'
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
             })
             .catch((err) => {
                 alert(err.message)

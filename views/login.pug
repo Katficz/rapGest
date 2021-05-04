@@ -3,21 +3,21 @@ head
   // copypasta do laczenia htmlow w jeden
   meta(charset='utf-8')
   meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
-  title My page title
+  title Raport Sys UR
   link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous")
   link(rel='stylesheet' href='/stylesheets/style.css')
   // the below three lines are a fix to get HTML5 semantic elements working in old versions of Internet Explorer
   //if lt IE 9
     script(src='https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js')
 
-body
+body(style="background-image: url(https://d-nm.ppstatic.pl/kadr/k/r/c5/b3/5af49b54aa831_o.jpg?1526016270); background-repeat: no-repeat; background-position: right; opacity: 0.9;")
 
-    h1.text-center.m-5= title
     div.container
         div.row
-            div.col-xl-6.offset-xl-3.col-xs-12.py-5.logInBox
+            div.text-center.col-xl-6.offset-xl-3.col-xs-12.py-3.logInBox
+                h2.h2.mb-5.mt-3(style="color:white") System raportowania UR Spawalnia
                 if errs 
-                    p #{errs}
+                    p(style="color:rgb(255, 33, 33)") #{errs}
                 form(method='POST' action='')
                     div.form-group
                         div.input-group.mb-3

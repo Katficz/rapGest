@@ -52,6 +52,8 @@ block content
                                     input.mr-1(type='checkbox' name='shift3' value=employee._id onclick="clickShift3(this)" checked=(employee.shift===3 ? true : false))
                                     label(for='shift3') #{employee.name} #{employee.surname} #{employee.position}
                     button(type='button') Zapisz zmianę 3
+    div#snackbar 
+
     script.
         const activateLink = document.querySelector('#userShiftsActive')
         const activateSubMenu = document.querySelector('#userSubMenu')
@@ -91,7 +93,10 @@ block content
             .then(function(response) {
                 return response.json();
             }).then(function(json) {
-                alert(json.body + toSaveIds.shift)
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = json.body + toSaveIds.shift
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
             })
             .catch((err) => {
                 console.error('error: ', err)
@@ -117,8 +122,11 @@ block content
             .then(function(response) {
                 return response.json();
             }).then(function(json) {
-                alert(json.body + toSaveIds.shift)
-            })
+                var snackBar = document.getElementById("snackbar");
+                snackBar.className = "show";
+                snackBar.textContent = json.body + toSaveIds.shift
+                setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);            
+                })
             .catch((err) => {
                 console.error('error: ', err)
             })
@@ -142,8 +150,11 @@ block content
             .then(function(response) {
                 return response.json();
             }).then(function(json) {
-                alert(json.body + toSaveIds.shift)
-            })
+                var snackBar = document.getElementById("snackbar");
+                snackBar.className = "show";
+                snackBar.textContent = json.body + toSaveIds.shift
+                setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
+                })
             .catch((err) => {
                 alert('error: ', err)
             })

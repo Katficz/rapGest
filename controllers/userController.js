@@ -257,10 +257,12 @@ exports.user_POST_login = async function(req, res, next) {
         }
         if(!loggedInResult) {
             res.status(400).render('login', {errs:'Podany login nie widnieje w bazie danych'})
+            return
         }
         const validPass = await bcrypt.compare(req.body.password, loggedInResult.password)
         if(!validPass) {
             res.status(400).render('login',{errs:'Złe hasło!'})
+            return
         }
 
         //checking if raports exists for taday and loggedinshift- if not creates one
