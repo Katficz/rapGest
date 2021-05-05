@@ -151,6 +151,7 @@ exports.plan_update_post = [
 
     let plan = new Plan({
       name: req.body.name,
+      isParalyzing: req.body.isParalyzing,
       description: req.body.description,
       line: req.body.line,
       operation: req.body.operation,

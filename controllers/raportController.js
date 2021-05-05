@@ -16,7 +16,7 @@ const { DocumentProvider } = require('mongoose')
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
   // this is bad
-  startDate.setHours(startDate.getHours()+2)
+  startDate.setHours(startDate.getHours() + 2)
   // just setHours(0,0,0,0) and use getDate - 3
   startDate.setDate(startDate.getDate() - 4)
   async.parallel(
@@ -296,10 +296,17 @@ exports.raport_GET_failures = function (req, res, next) {
   if (req.verifiedShift == 0) {
     console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title: 'Edytuj wybrany raport przez kalendarz',
+        url: '/api/raporty',
+      })
     }
     if (req.verifiedPerm == 'technik') {
-      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title:
+          'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
+        url: '/api/raporty',
+      })
     }
   }
 }
@@ -365,10 +372,10 @@ exports.raport_POST_update = function (req, res) {
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
-  if(req.verifiedShift!=0) {
+  if (req.verifiedShift != 0) {
     Raport.findById(req.verifiedMyRaportId)
       .populate('teamPresent')
-      .populate('teamMissing')
+      .populate('teamAbsent')
       .populate({
         path: 'failure',
         populate: {
@@ -400,56 +407,69 @@ exports.raport_GET_myRaport = function (req, res, next) {
         if (err) {
           return next(err)
         }
-        res.render('raport-detail', { raport: result, permission: req.verifiedPerm})
+        res.render('raport-detail', {
+          raport: result,
+          permission: req.verifiedPerm,
+        })
       })
-  } 
+  }
   if (req.verifiedShift == 0) {
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title: 'Edytuj wybrany raport przez kalendarz',
+        url: '/api/raporty',
+      })
     }
     if (req.verifiedPerm == 'technik') {
-      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title:
+          'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
+        url: '/api/raporty',
+      })
     }
   }
 }
 
 exports.raport_GET_one = function (req, res) {
   Raport.findById(req.params.id)
-      .populate('teamPresent')
-      .populate('teamMissing')
-      .populate({
-        path: 'failure',
-        populate: {
-          path: 'prodLine',
-          model: 'ProdLine',
-        },
+    .populate('teamPresent')
+    .populate('teamAbsent')
+    .populate({
+      path: 'failure',
+      populate: {
+        path: 'prodLine',
+        model: 'ProdLine',
+      },
+    })
+    .populate({
+      path: 'failure',
+      populate: 'operation',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'deviceType',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'device',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'collaborators',
+    })
+    .populate({
+      path: 'failure',
+      populate: 'author',
+    })
+    .exec(function (err, result) {
+      if (err) {
+        return next(err)
+      }
+      res.render('raport-detail', {
+        raport: result,
+        permission: req.verifiedPerm,
       })
-      .populate({
-        path: 'failure',
-        populate: 'operation',
-      })
-      .populate({
-        path: 'failure',
-        populate: 'deviceType',
-      })
-      .populate({
-        path: 'failure',
-        populate: 'device',
-      })
-      .populate({
-        path: 'failure',
-        populate: 'collaborators',
-      })
-      .populate({
-        path: 'failure',
-        populate: 'author',
-      })
-      .exec(function (err, result) {
-        if (err) {
-          return next(err)
-        }
-        res.render('raport-detail', { raport: result, permission: req.verifiedPerm})
-      })
+    })
 }
 
 exports.raport_GET_firstSection = function (req, res, next) {
@@ -482,10 +502,17 @@ exports.raport_GET_firstSection = function (req, res, next) {
   if (req.verifiedShift == 0) {
     console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.render('redirect-access-denied', {title:'Edytuj wybrany raport przez kalendarz', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title: 'Edytuj wybrany raport przez kalendarz',
+        url: '/api/raporty',
+      })
     }
     if (req.verifiedPerm == 'technik') {
-      res.render('redirect-access-denied', {title:'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany', url: '/api/raporty'})
+      res.render('redirect-access-denied', {
+        title:
+          'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
+        url: '/api/raporty',
+      })
     }
   }
 }

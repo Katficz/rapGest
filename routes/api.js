@@ -11,6 +11,7 @@ const userController = require('../controllers/userController')
 const operation_controller = require('../controllers/device/operationController')
 const masterplan_controller = require('../controllers/masterplanController')
 const plan_controller = require('../controllers/planController')
+const search_controller = require('../controllers/searchController')
 
 //to authenticate specific routes, add auth.authTech/authSpec/authAdmin to middleware
 const auth = require('./verifyToken')
@@ -27,66 +28,6 @@ const auth = require('./verifyToken')
 */
 router.post('/zaloguj', userController.user_POST_login)
 router.get('/zaloguj', userController.user_GET_login)
-
-/*
-░█████╗░██████╗░███████╗██████╗░░█████╗░████████╗██╗░█████╗░███╗░░██╗░██████╗
-██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║██╔══██╗████╗░██║██╔════╝
-██║░░██║██████╔╝█████╗░░██████╔╝███████║░░░██║░░░██║██║░░██║██╔██╗██║╚█████╗░
-██║░░██║██╔═══╝░██╔══╝░░██╔══██╗██╔══██║░░░██║░░░██║██║░░██║██║╚████║░╚═══██╗
-╚█████╔╝██║░░░░░███████╗██║░░██║██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
-░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
-*/
-// GET request for creating new line
-router.get(
-  '/operation/create',
-  auth.authTech,
-  operation_controller.operation_create_get
-)
-
-// POST request for creating new operation
-router.post(
-  '/operation/create',
-  auth.authTech,
-  operation_controller.operation_create_post
-)
-
-// GET request to delete operation
-router.get(
-  '/operation/:id/delete',
-  auth.authTech,
-  operation_controller.operation_delete_get
-)
-
-// POST request to delete operation
-router.post(
-  '/operation/:id/delete',
-  auth.authTech,
-  operation_controller.operation_delete_post
-)
-
-// GET request to update operation
-router.get(
-  '/operation/:id/update',
-  auth.authTech,
-  operation_controller.operation_update_get
-)
-
-// POST request to update operation
-router.post(
-  '/operation/:id/update',
-  auth.authTech,
-  operation_controller.operation_update_post
-)
-
-// GET request for list of all operation items
-router.get('/operation', auth.authTech, operation_controller.operation_list)
-
-// GET request for one device item
-router.get(
-  '/operation/:id',
-  auth.authTech,
-  operation_controller.operation_detail
-)
 
 /*
 ██████╗░██╗░░░░░░█████╗░███╗░░██╗░██████╗
@@ -220,13 +161,13 @@ router.get('/urzadzenia/:id', auth.authTech, deviceController.device_GET_one)
 //CZY GET TEŻ DLA DELETE?????
 
 /*
-██████╗░███████╗██╗░░░██╗██╗░█████╗░███████╗████████╗██╗░░░██╗██████╗░███████╗░██████╗
-██╔══██╗██╔════╝██║░░░██║██║██╔══██╗██╔════╝╚══██╔══╝╚██╗░██╔╝██╔══██╗██╔════╝██╔════╝
-██║░░██║█████╗░░╚██╗░██╔╝██║██║░░╚═╝█████╗░░░░░██║░░░░╚████╔╝░██████╔╝█████╗░░╚█████╗░
-██║░░██║██╔══╝░░░╚████╔╝░██║██║░░██╗██╔══╝░░░░░██║░░░░░╚██╔╝░░██╔═══╝░██╔══╝░░░╚═══██╗
-██████╔╝███████╗░░╚██╔╝░░██║╚█████╔╝███████╗░░░██║░░░░░░██║░░░██║░░░░░███████╗██████╔╝
-╚═════╝░╚══════╝░░░╚═╝░░░╚═╝░╚════╝░╚══════╝░░░╚═╝░░░░░░╚═╝░░░╚═╝░░░░░╚══════╝╚═════╝░
-*/
+      ██████╗░███████╗██╗░░░██╗██╗░█████╗░███████╗████████╗██╗░░░██╗██████╗░███████╗░██████╗
+      ██╔══██╗██╔════╝██║░░░██║██║██╔══██╗██╔════╝╚══██╔══╝╚██╗░██╔╝██╔══██╗██╔════╝██╔════╝
+      ██║░░██║█████╗░░╚██╗░██╔╝██║██║░░╚═╝█████╗░░░░░██║░░░░╚████╔╝░██████╔╝█████╗░░╚█████╗░
+      ██║░░██║██╔══╝░░░╚████╔╝░██║██║░░██╗██╔══╝░░░░░██║░░░░░╚██╔╝░░██╔═══╝░██╔══╝░░░╚═══██╗
+      ██████╔╝███████╗░░╚██╔╝░░██║╚█████╔╝███████╗░░░██║░░░░░░██║░░░██║░░░░░███████╗██████╔╝
+      ╚═════╝░╚══════╝░░░╚═╝░░░╚═╝░╚════╝░╚══════╝░░░╚═╝░░░░░░╚═╝░░░╚═╝░░░░░╚══════╝╚═════╝░
+      */
 //GET all device types
 router.get(
   '/typy-urzadzen',
@@ -282,6 +223,65 @@ router.get(
   deviceTypeController.deviceType_GET_one
 )
 
+/*
+        ░█████╗░██████╗░███████╗██████╗░░█████╗░████████╗██╗░█████╗░███╗░░██╗░██████╗
+        ██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║██╔══██╗████╗░██║██╔════╝
+        ██║░░██║██████╔╝█████╗░░██████╔╝███████║░░░██║░░░██║██║░░██║██╔██╗██║╚█████╗░
+        ██║░░██║██╔═══╝░██╔══╝░░██╔══██╗██╔══██║░░░██║░░░██║██║░░██║██║╚████║░╚═══██╗
+        ╚█████╔╝██║░░░░░███████╗██║░░██║██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║██████╔╝
+        ░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
+        */
+// GET request for creating new line
+router.get(
+  '/operation/create',
+  auth.authTech,
+  operation_controller.operation_create_get
+)
+
+// POST request for creating new operation
+router.post(
+  '/operation/create',
+  auth.authTech,
+  operation_controller.operation_create_post
+)
+
+// GET request to delete operation
+router.get(
+  '/operation/:id/delete',
+  auth.authTech,
+  operation_controller.operation_delete_get
+)
+
+// POST request to delete operation
+router.post(
+  '/operation/:id/delete',
+  auth.authTech,
+  operation_controller.operation_delete_post
+)
+
+// GET request to update operation
+router.get(
+  '/operation/:id/update',
+  auth.authTech,
+  operation_controller.operation_update_get
+)
+
+// POST request to update operation
+router.post(
+  '/operation/:id/update',
+  auth.authTech,
+  operation_controller.operation_update_post
+)
+
+// GET request for list of all operation items
+router.get('/operation', auth.authTech, operation_controller.operation_list)
+
+// GET request for one device item
+router.get(
+  '/operation/:id',
+  auth.authTech,
+  operation_controller.operation_detail
+)
 /*
 ██╗░░░░░██╗███╗░░██╗███████╗░██████╗
 ██║░░░░░██║████╗░██║██╔════╝██╔════╝
@@ -511,5 +511,31 @@ router.get('/zmiany', auth.authTech, userController.user_GET_shift)
 
 //POST new shift
 router.post('/zmiany', auth.authAdmin, userController.user_POST_shift)
+
+/*
+░██████╗███████╗░█████╗░██████╗░░█████╗░██╗░░██╗
+██╔════╝██╔════╝██╔══██╗██╔══██╗██╔══██╗██║░░██║
+╚█████╗░█████╗░░███████║██████╔╝██║░░╚═╝███████║
+░╚═══██╗██╔══╝░░██╔══██║██╔══██╗██║░░██╗██╔══██║
+██████╔╝███████╗██║░░██║██║░░██║╚█████╔╝██║░░██║
+╚═════╝░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═╝░░╚═╝
+*/
+// GET request for search page
+router.get('/search/raport', search_controller.search_raport_get)
+
+// POST route to search for specific items
+router.post('/search/raport', search_controller.search_raport_post)
+
+// GET request for search page
+router.get('/search/failure', search_controller.search_failure_get)
+
+// POST route to search for specific items
+router.post('/search/failure', search_controller.search_failure_post)
+
+// GET request for search page
+router.get('/search/plan', search_controller.search_plan_get)
+
+// POST route to search for specific items
+router.post('/search/plan', search_controller.search_plan_post)
 
 module.exports = router

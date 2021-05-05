@@ -64,10 +64,14 @@ body
               div.dropdown-divider(aria-labelledby="userSubMenu")
               a.dropdown-item#userShiftsActive(href='/api/zmiany') Zarządzanie zmianami
         
-
-
           il.nav-item.dropdown
-            a.nav-link.dropdown(href="#") Znajdź raport/awarię
+            a.nav-link.dropdown-toggle#userSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Wyszukiwanie
+
+            div.dropdown-menu(arialabelledby="searchSubMenu")
+              a.dropdown-item#searchAddActive(href='/api/search/raport') Raporty
+              a.dropdown-item#searchListActive(href='/api/search/failure') Awarie
+              a.dropdown-item#searchShiftsActive(href='/api/search/plan') Plany
+        
 
           il.nav-item.dropdown
             a.nav-link.dropdown-toggle#myRaportSubMenu(href="#" data-toggle="dropdown" role="button" aria-button="false" aria-haspopup="true") Prace planowane

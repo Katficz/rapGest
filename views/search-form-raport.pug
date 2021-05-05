@@ -1,0 +1,165 @@
+extends layout
+block content
+   div(class='col mx-md-5')
+      div(class='row')
+         div(class="col my-5")
+            h1.text-center.mb-5 Wyszukiwanie Raportów
+      div(class='row')   
+         div.col.my-2            
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center Obecni na zmianie
+               tbody(id='teamPresent')
+                  tr
+                     td
+                        button(class="btn btn-danger" type='button' id="addUserButtonPresent" onclick='addUserPresent()') Dodaj
+      div(class='row')   
+         div.col.my-2            
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center Nieobecni na zmianie
+               tbody(id='teamAbsent')
+                  tr
+                     td
+                        button(class="btn btn-danger" type='button' id="addUserButtonAbsent" onclick='addUserAbsent()') Dodaj
+      div(class='row' id='lastTable')
+         div.col.my-2
+            table.table.table-bordered.mb-5
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='2') Obchód - wadliwy element
+               tbody
+                  tr
+                     td
+                        select.form-control#roundAround
+                           option(value='Dowolne' selected=true) Dowolne
+                           option(value='isKettle') Kotłownia
+                           option(value='isCompressor') Kompresownia
+                           option(value='isIce') Wieża Chłodu
+                           option(value='isElectric') Rozdzielnia
+                           option(value='isWorkshop') Warsztat
+
+      div(class='row')
+         div.col.my-2
+            button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
+
+
+
+
+   script.
+         let usersList = !{JSON.stringify(users_list)}
+         let users = ''
+         for(let i=0; i<usersList.length; i++) {
+            users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
+         }
+      function addUserPresent(){
+      pasteHTML = (`
+         <tr>
+            <td>
+               <select class='form-control userPresent'>
+                  <option value='Dowolne'> Nie wybrano </option>
+                  `+users+`
+               </select>
+            </td>
+         </tr>
+            `)
+      whereToPaste = document.querySelector('#teamPresent')
+      whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
+         }
+
+
+      function addUserAbsent(){
+      pasteHTML = (`
+         <tr>
+            <td>
+               <select class='form-control userAbsent'>
+                  <option value='Dowolne'> Nie wybrano </option>
+                  `+users+`
+               </select>
+            </td>
+         </tr>
+            `)
+      whereToPaste = document.querySelector('#teamAbsent')
+      whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
+         }
+
+
+      function postSearchButton(){
+         let usersPresent = document.querySelectorAll('.userPresent')
+         let usersAbsent = document.querySelectorAll('.userAbsent')
+         let usersPresent_list = []
+         let usersAbsent_list = []
+         for(usr of usersPresent){
+            if(usr.value !== 'Dowolne')
+               usersPresent_list.push(usr.value)
+         }
+         for(usr of usersAbsent){
+            if(usr.value !== 'Dowolne')
+               usersAbsent_list.push(usr.value)
+         }
+         let roundAround = document.querySelector('#roundAround').value
+
+         searchForm = {}
+         if (roundAround !== 'Dowolne'){
+            searchForm['roundAround'] = roundAround
+         }
+         if (usersPresent_list.length !== 0){
+            searchForm['teamPresent'] = usersPresent_list
+         }
+         if (usersAbsent_list.length !== 0){
+            searchForm['teamAbsent'] = usersAbsent_list
+         }
+         // send data to the server
+         postSearchRaport(searchForm)
+      }
+
+      function postSearchRaport(searchForm){
+         let status
+         fetch('', {
+         method: 'POST',
+            headers: {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(searchForm)
+      })
+      .then(function(res) {
+         status = res.status
+         return res.json()
+      })
+      .then(function(data) {
+         if (status===200){
+            console.log('Success', status)
+            handleResData(data)
+         }
+         else{
+            console.log('Błąd Serwera', status)
+            console.log(data)
+         }
+      })
+      .catch((err) => {
+         console.log(err)
+      })
+      }
+
+      function handleResData(data){
+         let container = ''
+         for (raport of data){
+            let url = '/api/raporty/'+raport._id
+            container = container +`<p><a href=`+url+' </a>'+new Date(raport.date).toLocaleString()+'</p>'
+         }
+         pasteHTML = (`
+         <div class='row'>
+            <div class='col my-2'>
+               <h2> Znaleziono `+data.length+` Raportów.</h2>
+                   `+container+`
+            </div>
+         </div>
+            `)
+      whereToPaste = document.querySelector('#lastTable')
+      whereToPaste.insertAdjacentHTML('afterend', pasteHTML)
+      }
+
+
