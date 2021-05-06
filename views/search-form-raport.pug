@@ -4,6 +4,27 @@ block content
       div(class='row')
          div(class="col my-5")
             h1.text-center.mb-5 Wyszukiwanie Raportów
+      div(class='row')
+         div(class="col my-2")
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='4') Data Utworzenia raportu
+               tbody
+                  td 
+                     label(for='dateStart') Od
+                     input.form-control#dateStart(type='date' name='date_execution')
+                  td 
+
+                     label(for='dateEnd') Do
+                     input.form-control#dateEnd(type='date' name='date_execution')
+                  td 
+                     label(for='shiftnum') Zmiana
+                     select.form-control#shiftnum
+                        option(value='Dowolna' selected='selected') Dowolna
+                        option(value='1') Poranna
+                        option(value='2') Popołudniowa
+                        option(value='3') Nocna
       div(class='row')   
          div.col.my-2            
             table.table.table-bordered
@@ -24,7 +45,7 @@ block content
                   tr
                      td
                         button(class="btn btn-danger" type='button' id="addUserButtonAbsent" onclick='addUserAbsent()') Dodaj
-      div(class='row' id='lastTable')
+      div(class='row')
          div.col.my-2
             table.table.table-bordered.mb-5
                thead.table-dark
@@ -44,49 +65,55 @@ block content
       div(class='row')
          div.col.my-2
             button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
+      div(class='row' id='searchResults')
+         div.col.my-2
 
 
 
 
    script.
-         let usersList = !{JSON.stringify(users_list)}
-         let users = ''
-         for(let i=0; i<usersList.length; i++) {
-            users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
-         }
+      let usersList = !{JSON.stringify(users_list)}
+      let users = ''
+      for(let i=0; i<usersList.length; i++) {
+         users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
+      }
       function addUserPresent(){
-      pasteHTML = (`
-         <tr>
-            <td>
-               <select class='form-control userPresent'>
-                  <option value='Dowolne'> Nie wybrano </option>
-                  `+users+`
-               </select>
-            </td>
-         </tr>
-            `)
-      whereToPaste = document.querySelector('#teamPresent')
-      whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
-         }
+         pasteHTML = (`
+            <tr>
+               <td>
+                  <select class='form-control userPresent'>
+                     <option value='Dowolne'> Nie wybrano </option>
+                     `+users+`
+                  </select>
+               </td>
+            </tr>
+               `)
+         whereToPaste = document.querySelector('#teamPresent')
+         whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
+      }
 
 
       function addUserAbsent(){
-      pasteHTML = (`
-         <tr>
-            <td>
-               <select class='form-control userAbsent'>
-                  <option value='Dowolne'> Nie wybrano </option>
-                  `+users+`
-               </select>
-            </td>
-         </tr>
-            `)
-      whereToPaste = document.querySelector('#teamAbsent')
-      whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
-         }
+         pasteHTML = (`
+            <tr>
+               <td>
+                  <select class='form-control userAbsent'>
+                     <option value='Dowolne'> Nie wybrano </option>
+                     `+users+`
+                  </select>
+               </td>
+            </tr>
+               `)
+         whereToPaste = document.querySelector('#teamAbsent')
+         whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
+      }
 
 
       function postSearchButton(){
+         let dateStart = document.getElementById('dateStart').value
+         let dateEnd = document.getElementById('dateEnd').value
+         let shiftnum = document.getElementById('shiftnum').value
+
          let usersPresent = document.querySelectorAll('.userPresent')
          let usersAbsent = document.querySelectorAll('.userAbsent')
          let usersPresent_list = []
@@ -102,6 +129,15 @@ block content
          let roundAround = document.querySelector('#roundAround').value
 
          searchForm = {}
+         if (shiftnum !== 'Dowolna'){
+            searchForm['shift'] = shiftnum
+         }
+         if (dateStart != ''){
+            searchForm['dateStart'] = dateStart
+         }
+         if (dateEnd != ''){
+            searchForm['dateEnd'] = dateEnd
+         }
          if (roundAround !== 'Dowolne'){
             searchForm['roundAround'] = roundAround
          }
@@ -111,11 +147,16 @@ block content
          if (usersAbsent_list.length !== 0){
             searchForm['teamAbsent'] = usersAbsent_list
          }
+         console.log('FORM', searchForm)
          // send data to the server
          postSearchRaport(searchForm)
       }
 
       function postSearchRaport(searchForm){
+         // clear previous results
+         const e = document.querySelector("#searchResults");
+         e.parentElement.removeChild(e);
+
          let status
          fetch('', {
          method: 'POST',
@@ -148,17 +189,49 @@ block content
          let container = ''
          for (raport of data){
             let url = '/api/raporty/'+raport._id
-            container = container +`<p><a href=`+url+' </a>'+new Date(raport.date).toLocaleString()+'</p>'
+            if (raport.shift===1)
+               shift = 'Poranna'
+            else if (raport.shift===2)
+               shift = 'Popołudniowa'
+            else if (raport.shift===3)
+               shift = 'Nocna'
+            else shift = ''
+
+            container = container +`
+            <tr> 
+               <td class='padding0'> 
+                  <a class='black-link' href=`+url+'>'+new Date(raport.date).toLocaleString() +`</a> 
+               </td> 
+               <td class='padding0'> 
+                  <a class='black-link' href=`+url+'>'+shift+`</a> 
+               </td> 
+               <td class='padding0'> 
+                  <a class='black-link' href=`+url+'>'+ raport.failure.length +`</a> 
+               </td> 
+            </tr>`
          }
+         
          pasteHTML = (`
-         <div class='row'>
+         <div class='row' id='searchResults'>
             <div class='col my-2'>
                <h2> Znaleziono `+data.length+` Raportów.</h2>
-                   `+container+`
+                  <table class='table table-bordered table-hover dark-header-hover'>
+                     <thead class='table-dark'>
+                        <tr>
+                           <th> Data </th>
+                           <th> Zmiana </th>
+                           <th> Liczba Awarii </th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                     `+container+` 
+                     </tbody>
+                  </table>
+                   
             </div>
          </div>
             `)
-      whereToPaste = document.querySelector('#lastTable')
+      whereToPaste = document.querySelector('#postSearchButton')
       whereToPaste.insertAdjacentHTML('afterend', pasteHTML)
       }
 

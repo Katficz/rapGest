@@ -27,7 +27,25 @@ exports.search_raport_get = function (req, res, next) {
 // Send the search form for finding raports
 exports.search_raport_post = function (req, res, next) {
   let searchForm = req.body
+  let dE = new Date(searchForm.dateEnd)
+  dE.setHours(24, 0, 0, 0)
   let query = {}
+  if (searchForm.shift) {
+    query.shift = searchForm.shift
+  }
+  if (searchForm.dateStart && searchForm.dateEnd) {
+    query.date = {
+      $gte: searchForm.dateStart,
+      $lte: dE,
+    }
+  } else {
+    if (searchForm.dateStart && !searchForm.dateEnd) {
+      query.date = { $gte: searchForm.dateStart }
+    }
+    if (searchForm.dateEnd && !searchForm.dateStart) {
+      query.date = { $lte: dE }
+    }
+  }
   if (searchForm.teamPresent) {
     query.teamPresent = { $all: searchForm.teamPresent }
   }
@@ -37,6 +55,7 @@ exports.search_raport_post = function (req, res, next) {
   if (searchForm.roundAround) {
     query['roundAround.' + searchForm.roundAround] = false
   }
+  console.log('Query:', query)
 
   Raport.find(query).exec(function (err, result) {
     if (err) {
