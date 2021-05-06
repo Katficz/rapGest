@@ -3,7 +3,7 @@ block content
    div(class='col mx-md-5')
       div(class='row')
          div(class="col my-5")
-            h1.text-center.mb-5 Wyszukiwanie Raportów
+            h1.text-center.mb-3 Wyszukiwanie Raportów
       div(class='row')
          div(class="col my-2")
             table.table.table-bordered
@@ -154,8 +154,12 @@ block content
 
       function postSearchRaport(searchForm){
          // clear previous results
+         try{
          const e = document.querySelector("#searchResults");
          e.parentElement.removeChild(e);
+         } catch (error){
+            console.log(error)
+         }
 
          let status
          fetch('', {
