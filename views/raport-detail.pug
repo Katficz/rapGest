@@ -119,10 +119,10 @@ block content
                   tbody
                      tr
                         td Czas rozpoczęcia Awarii
-                        td #{failure.startDate.toLocaleString()}
+                        td #{(failure.startDate==null ? '' : failure.startDate.toLocaleString())}
                      tr.umfy-table-separator
                         td Czas zakończenia Awarii
-                        td #{failure.endDate.toLocaleString()}
+                        td #{(failure.endDate==null ? '' : failure.endDate.toLocaleString())}
                      tr
                         td Operacja 
                         td #{failure.operation==null ? '' : failure.operation.name}

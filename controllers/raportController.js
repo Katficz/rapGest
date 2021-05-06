@@ -5,6 +5,7 @@ const Failure = require('../models/failure')
 const ProdLine = require('../models/prod-line')
 const DeviceType = require('../models/device-type')
 const Device = require('../models/device')
+const Operation = require('../models/operation')
 
 const async = require('async')
 const failure = require('../models/failure')
@@ -139,16 +140,31 @@ exports.raport_GET_update = function (req, res, next) {
             path: 'failure',
             populate: 'author',
           })
+          .populate({
+            path: 'failure',
+            populate: 'operation',
+          })
           .exec(callback)
       },
       deviceTypes: function (callback) {
-        DeviceType.find().sort().exec(callback)
+        DeviceType.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
       },
       prodLines: function (callback) {
-        ProdLine.find().sort().exec(callback)
+        ProdLine.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
+      },
+      operations: function (callback) {
+        Operation.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
       },
       devices: function (callback) {
-        Device.find().sort().exec(callback)
+        Device.find()
+          .sort([['name', 'ascending']])
+          .exec(callback)
       },
     },
     function (err, result) {
@@ -262,13 +278,24 @@ exports.raport_GET_failures = function (req, res, next) {
             .exec(callback)
         },
         deviceTypes: function (callback) {
-          DeviceType.find().sort().exec(callback)
+          DeviceType.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
         },
         prodLines: function (callback) {
-          ProdLine.find().sort().exec(callback)
+          ProdLine.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
+        },
+        operations: function (callback) {
+          Operation.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
         },
         devices: function (callback) {
-          Device.find().sort().exec(callback)
+          Device.find()
+            .sort([['name', 'ascending']])
+            .exec(callback)
         },
       },
       function (err, result) {
@@ -285,6 +312,7 @@ exports.raport_GET_failures = function (req, res, next) {
             myRaport: result.raport,
             deviceTypes: result.deviceTypes,
             prodLines: result.prodLines,
+            operations: result.operations,
             devices: result.devices,
             coWorkers: coWorkers,
             loggedInUser: loggedInUser,

@@ -83,20 +83,44 @@ block content
                                             div.form-row#startUpOption(value!=failure)
                                                 
                                                 div.form-group.col-4
-                                                    label(for="prodLineOption") Linia produkcyjna
-                                                    select#prodLineOption.form-control(name="prodLine")
+                                                    label Linia produkcyjna
+                                                    select.prodLineOption.form-control(name="prodLine")
+                                                        option(value='Dowolna' selected) -
                                                         each prodLineIterate in data.prodLines 
-                                                            option(value!=prodLineIterate._id selected=(failure.prodLine.name==prodLineIterate.name)) #{prodLineIterate.name}      
+                                                            if failure.prodLine
+                                                                option(value=prodLineIterate._id selected=(failure.prodLine.name==prodLineIterate.name)) #{prodLineIterate.name}   
+                                                            else
+                                                                option(value=prodLineIterate._id) #{prodLineIterate.name}
+                                                              
                                                 div.form-group.col-4
-                                                    label(for="deviceTypeOption") Typ urządzenia
-                                                    select#deviceTypeOption.form-control
+                                                    label Operacja
+                                                    select.operationOption.form-control
+                                                        option(value='Dowolna' selected) -
+                                                        each operation in data.operations
+                                                            if failure.operation
+                                                                option(value=operation._id selected=(failure.operation.name==operation.name)) #{operation.name}  
+                                                            else
+                                                                option(value=operation._id) #{operation.name}
+
+                                                div.form-group.col-4
+                                                    label Typ urządzenia
+                                                    select.deviceTypeOption.form-control
+                                                        option(value='Dowolna' selected) -
                                                         each deviceTypeIt in data.deviceTypes
-                                                            option(value!=deviceTypeIt._id selected=(failure.deviceType.name==deviceTypeIt.name)) #{deviceTypeIt.name}  
+                                                            if failure.deviceType
+                                                                option(value=deviceTypeIt._id selected=(failure.deviceType.name==deviceTypeIt.name)) #{deviceTypeIt.name}  
+                                                            else
+                                                                option(value=deviceTypeIt._id) #{deviceTypeIt.name}
+
                                                 div.form-group.col-4
-                                                    label(for="device") Urządzenie
-                                                    select#deviceOption.form-control
+                                                    label Urządzenie
+                                                    select.deviceOption.form-control
+                                                        option(value='Dowolna' selected) -
                                                         each deviceIt in data.devices
-                                                            option(value!=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
+                                                            if failure.device
+                                                                option(value=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
+                                                            else
+                                                                option(value=deviceIt._id) #{deviceIt.name}
                                             div.form-row
                                                 div.form-group.col-4
                                                     label(for="startDate") Godzina rozpoczęcia
@@ -154,20 +178,34 @@ block content
                                 form(data-rapId=data.raport._id)
                                     div.form-row
                                         div.form-group.col-4
-                                            label(for="inputState") Linia
-                                            select#inputState.form-control
-                                                each prodLine in data.prodLines 
-                                                    option(value!=prodLine._id) #{prodLine.name}
+                                            label Linia produkcyjna
+                                            select.prodLineOption.form-control(name="prodLine")
+                                                option(value='Dowolna' selected) -
+                                                each prodLineIterate in data.prodLines 
+                                                        option(value=prodLineIterate._id) #{prodLineIterate.name}
+                                                        
                                         div.form-group.col-4
-                                            label(for="inputState") Typ Urządzenia
-                                            select#inputState.form-control
-                                                each deviceType in data.deviceTypes
-                                                    option(value!=deviceType._id) #{deviceType.name}
+                                            label Operacja
+                                            select.operationOption.form-control
+                                                option(value='Dowolna' selected) -
+                                                each operation in data.operations
+                                                        option(value=operation._id) #{operation.name}
+
                                         div.form-group.col-4
-                                            label(for="inputState") Urządzenie
-                                            select#inputState.form-control
-                                                each device in data.devices
-                                                    option(value!=device._id) #{device.name}
+                                            label Typ urządzenia
+                                            select.deviceTypeOption.form-control
+                                                option(value='Dowolna' selected) -
+                                                each deviceTypeIt in data.deviceTypes
+                                                        option(value=deviceTypeIt._id) #{deviceTypeIt.name}
+
+                                        div.form-group.col-4
+                                            label Urządzenie
+                                            select.deviceOption.form-control
+                                                option(value='Dowolna' selected) -
+                                                each deviceIt in data.devices
+                                                    option(value=deviceIt._id) #{deviceIt.name}
+                                                
+
                                     div.form-row
                                         div.form-group.col-4
                                             label(for="startDate") Godzina rozpoczęcia
@@ -414,9 +452,16 @@ block content
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
             zmienna =form
-            prodLineId = form.childNodes[0].childNodes[0].childNodes[1].selectedOptions[0].value
-            deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
-            deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
+            //- prodLineId = form.childNodes[0].childNodes[0].childNodes[1].selectedOptions[0].value
+            //- deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
+            //- deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
+            // my lucky guess
+            prodLineId = form.querySelector('.prodLineOption').value
+            deviceTypeId = form.querySelector('.deviceTypeOption').value
+            deviceId = form.querySelector('.deviceOption').value
+            operationId = form.querySelector('.operationOption').value
+
+            
 
             startDate = form.childNodes[1].childNodes[0].childNodes[1].value
             startDate = timeToDate(startDate)
@@ -436,18 +481,9 @@ block content
 
             usedParts = form.childNodes[6].childNodes[0].childNodes[1].value
             missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
-            
-            fetch('/api/zapisz-awarie/'+form.dataset.rapid, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+
+            let formBody = {
                     failureId: form.dataset.failureid,
-                    prodLine: prodLineId,
-                    deviceType: deviceTypeId,
-                    device: deviceId,
                     startDate: startDate,
                     endDate: endDate,
                     orderNum: orderNum,
@@ -456,7 +492,25 @@ block content
                     effect: effect,
                     action: action,
                     usedParts: usedParts,
-                    missingParts: missingParts})
+                    missingParts: missingParts}
+
+            if (operationId !== 'Dowolna')
+                formBody.operation = operationId
+            if (prodLineId !== 'Dowolna')
+                formBody.prodLine = prodLineId
+            if (deviceTypeId !== 'Dowolna')
+                formBody.deviceType = deviceTypeId
+            if (deviceId !== 'Dowolna')
+                formBody.device = deviceId
+            console.log(formBody)
+            
+            fetch('/api/zapisz-awarie/'+form.dataset.rapid, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formBody)
             })
             .then(function(response) {
                 return response.json();
