@@ -16,9 +16,9 @@ const { DocumentProvider } = require('mongoose')
 //HOME PAGE
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
-  // this is bad
+  console.log(startDate)
+  // this is bad //too bad!
   startDate.setHours(startDate.getHours() + 2)
-  // just setHours(0,0,0,0) and use getDate - 3
   startDate.setDate(startDate.getDate() - 4)
   async.parallel(
     {
@@ -61,10 +61,15 @@ exports.raport_GET_list = function (req, res) {
       var shiftB = []
       var shiftC = []
       var dates = []
-      var pushDate = startDate
-      for (var i = 4; i > 0; i--) {
-        pushDate.setDate(pushDate.getDate() + 1)
-        dates.push(DateTime.fromJSDate(pushDate).toFormat('dd.LL.yyyy'))
+      var notPissingMeOffDate = new Date()
+      console.log(notPissingMeOffDate.getHours())
+      for (var i = 4; i > 0; i--) { // THIS I BAD I WILL FIX IT (NIE ZADZIAŁA NA PRZELOMIE MIESIĘCY!!!!!!!!!)
+        day = notPissingMeOffDate.getDate()-i
+        if(day<10) day='0'+day
+        month = notPissingMeOffDate.getMonth()+1
+        if(month<10) month = '0'+month
+        year = notPissingMeOffDate.getFullYear()
+        dates.push(day+'.'+month+'.'+year)
       }
       for (var i = 0; i < dates.length; i++) {
         var match = false
@@ -322,7 +327,6 @@ exports.raport_GET_failures = function (req, res, next) {
     )
   }
   if (req.verifiedShift == 0) {
-    console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
       res.render('redirect-access-denied', {
         title: 'Edytuj wybrany raport przez kalendarz',
@@ -528,7 +532,6 @@ exports.raport_GET_firstSection = function (req, res, next) {
       })
   }
   if (req.verifiedShift == 0) {
-    console.log(req.verifiedPerm)
     if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
       res.render('redirect-access-denied', {
         title: 'Edytuj wybrany raport przez kalendarz',

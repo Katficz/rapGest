@@ -116,7 +116,7 @@ block content
                                                                 each employee in coWorkers
                                                                     div(class='aa'+failure._id.toString() data-emplo=employee._id)
                                                                         li
-                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='nonCollabs' value=employee._id disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
+                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='nonCollabs' data-employeeId=employee._id.toString() disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                                             label(for='nonCollabs') #{employee.name} #{employee.surname}
                                             div.form-row
                                                 div.form-group.col-12
@@ -206,7 +206,7 @@ block content
                                                     each employee in coWorkers
                                                         div(style="width:100%")
                                                             li
-                                                                input.mr-1.collabsCheckBox(type='checkbox' name='techCoWorker' value=employee._id)
+                                                                input.mr-1.collabsCheckBox(type='checkbox' data-employeeId=employee._id.toString() name='techCoWorker' value=employee._id)
                                                                 label(for='techCoWorker') #{employee.name} #{employee.surname}          
 
 
@@ -215,6 +215,9 @@ block content
                                             button.btn.btn-outline-danger#deleteFailure(type="button" name="deleteDiv" onclick="deleteSomeFail(this)") Usuń
                                             button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)') Zapisz
 
+    div#snackbar 
+
+    
     script.
         raport = !{JSON.stringify(myRaport)}
         const activateLink = document.querySelector('#seconSectionActive')
@@ -237,17 +240,6 @@ block content
             }
         };
 
-
-
-
-        //- var nonCollabWorkers = document.querySelectorAll('.nonCollabWorkers')
-        //- var failure = JSON.parse(document.querySelector('#startUpOption').dataset.failure)
-        //- var savedCollaborators = failure.collaborators
-        //- for(let i = 0;i<nonCollabWorkers.length;i++) {
-        //-     if(!(savedCollaborators.includes(nonCollabWorkers[i].dataset.emplo))) {
-        //-         nonCollabWorkers[i].style.display = 'initial'
-        //-     }
-        //- }
         var failureNum = bigDiv.childElementCount -1
 
         function addFBtn() {
@@ -286,8 +278,10 @@ block content
                     }
                     else{
                     accordionDiv.removeChild(deleteMeDiv)
-                    alert('Success!')
-                    }
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = 'Pomyślnie usunięto awarię!'
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                     }
                 })
                 .catch((err) => {
                     alert(err.message)
@@ -300,8 +294,6 @@ block content
                 accordionDiv.removeChild(deleteMeDiv)
             }
         }
-        colabCheckBoxestest = document.querySelectorAll('.collabsCheckBox')
-        var zmienna
 
         // This function takes time string(eg. "12:30") and turns it into date obj
         function timeToDate(time){
@@ -312,7 +304,6 @@ block content
         }
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
-            zmienna =form
             //- prodLineId = form.childNodes[0].childNodes[0].childNodes[1].selectedOptions[0].value
             //- deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
             //- deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
@@ -342,23 +333,26 @@ block content
             missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
             
             collaborators = []
-            for(let i = 0;i<button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes.length;i++) {
-                if(button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes[i].firstChild.firstChild.checked) {
-                    collaborators.push(button.parentNode.parentNode.previousSibling.childNodes[0].childNodes[1].childNodes[i].firstChild.firstChild.value) // inputy
+            collabsCheck = form.querySelectorAll('.collabsCheckBox')
+            for(let i = 0;i<collabsCheck.length;i++) {
+                if(collabsCheck[i].checked) {
+                    collaborators.push(collabsCheck[i].dataset.employeeid) // inputy
                 }
-
             }
+
             let formBody = {
-                    failureId: form.dataset.failureid,
-                    startDate: startDate,
-                    endDate: endDate,
-                    orderNum: orderNum,
-                    cause: cause,
-                    diagnostics: diagnostics,
-                    effect: effect,
-                    action: action,
-                    usedParts: usedParts,
-                    missingParts: missingParts}
+                failureId: form.dataset.failureid,
+                startDate: startDate,
+                endDate: endDate,
+                orderNum: orderNum,
+                cause: cause,
+                diagnostics: diagnostics,
+                effect: effect,
+                action: action,
+                usedParts: usedParts,
+                missingParts: missingParts,
+                collaborators: collaborators
+            }
 
             if (operationId !== 'Dowolna')
                 formBody.operation = operationId
@@ -386,8 +380,10 @@ block content
                     alert(json.mesage)
                 }
                 else{
-                alert('Success!')
-                form.dataset.failureid = json._id
+                    var snackBar = document.getElementById("snackbar");
+                    snackBar.className = "show";
+                    snackBar.textContent = 'Pomyślnie zapisano awarię!'
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                 form.dataset.failureid = json._id
                 }
             })
             .catch((err) => {

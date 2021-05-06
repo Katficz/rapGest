@@ -135,7 +135,6 @@ exports.user_POST_update = [
         if (err) {
           return next(err)
         }
-        console.log(errors.array())
       res.render('user-list', { title: 'Użytkownik', user_list: result, errors: errors.array() })
       })
     } else {
@@ -252,7 +251,6 @@ exports.user_GET_login = function(req, res) {
 exports.user_POST_login = async function(req, res, next) {
     var dataTeraz = new Date()
     dataTeraz.setHours(dataTeraz.getHours()+2)
-    console.log(dataTeraz)
     User.findOne({login: req.body.login})
     .exec(async function(err, loggedInResult) {
         if(err) {
@@ -274,67 +272,13 @@ exports.user_POST_login = async function(req, res, next) {
           var nowDate = new Date()
           nowDate.setHours(nowDate.getHours()+2)
           saveDate = new Date()
-          saveDate.setHours(10)
+          saveDate.setHours(13)
 
           startDate = new Date()
           endDate = new Date()
-          if (
-            shiftLoggedIn != 3 ||
-            (nowDate.getHours() > 6 && nowDate.getHours() < 24)
-          ) {
-            startDate.setHours(8, 00)
-            endDate.setHours(24)
-            Raport.findOne({
-              shift: shiftLoggedIn,
-              date: {
-                // searching for the same day between 8 - 24
-                $gte: startDate,
-                $lte: endDate,
-              },
-            })
-            .exec(function (err, resultRap) {
-              if (err) {
-                return next(err)
-              }
-              if (resultRap == null) {
-                User.find({
-                  shift: shiftLoggedIn,
-                  isAvaible: true,
-                })
-                .exec(function (err, team) {
-                  if (err) {
-                    res.status(500).json(err)
-                    return next(err)
-                  }
-                  raport = new Raport({
-                    date: saveDate,
-                    shift: shiftLoggedIn,
-                    teamAbsent: team,
-                    teamPresent: [],
-                  })
-                  raport.save()
-                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id,}, process.env.TOKEN_SECRET)
-                  res.status(200)
-                  .cookie('token', token, {
-                    secure: true,
-                    httpOnly: true,
-                  })
-                  .redirect('/api/raporty')
-                })
-              } 
-              if(resultRap){
-                const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: resultRap._id}, process.env.TOKEN_SECRET)
-                res.status(200)
-                .cookie('token', token, {
-                  secure: true,
-                  httpOnly: true,
-                })
-                .redirect('/api/raporty')
-              }
-            })
-          }
-          // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
-          if (shiftLoggedIn == 3 && 6 > nowDate.getHours() && 0 < nowDate.getHours()) {
+                    // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
+
+          if (shiftLoggedIn == 3 && (10 > nowDate.getHours())) {
             startDate.setHours(8, 00)
             endDate.setHours(24)
 
@@ -394,6 +338,58 @@ exports.user_POST_login = async function(req, res, next) {
             })
           }
 
+          else {
+            startDate.setHours(8, 00)
+            endDate.setHours(24)
+            Raport.findOne({
+              shift: shiftLoggedIn,
+              date: {
+                // searching for the same day between 8 - 24
+                $gte: startDate,
+                $lte: endDate,
+              },
+            })
+            .exec(function (err, resultRap) {
+              if (err) {
+                return next(err)
+              }
+              if (resultRap == null) {
+                User.find({
+                  shift: shiftLoggedIn,
+                  isAvaible: true,
+                })
+                .exec(function (err, team) {
+                  if (err) {
+                    res.status(500).json(err)
+                    return next(err)
+                  }
+                  raport = new Raport({
+                    date: saveDate,
+                    shift: shiftLoggedIn,
+                    teamAbsent: team,
+                    teamPresent: [],
+                  })
+                  raport.save()
+                  const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id,}, process.env.TOKEN_SECRET)
+                  res.status(200)
+                  .cookie('token', token, {
+                    secure: true,
+                    httpOnly: true,
+                  })
+                  .redirect('/api/raporty')
+                })
+              } 
+              if(resultRap){
+                const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: resultRap._id}, process.env.TOKEN_SECRET)
+                res.status(200)
+                .cookie('token', token, {
+                  secure: true,
+                  httpOnly: true,
+                })
+                .redirect('/api/raporty')
+              }
+            })
+          }
         }
         if(loggedInResult.shift == 0) {
           const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, shift: 0}, process.env.TOKEN_SECRET)
