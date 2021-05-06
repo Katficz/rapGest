@@ -12,6 +12,7 @@ const operation_controller = require('../controllers/device/operationController'
 const masterplan_controller = require('../controllers/masterplanController')
 const plan_controller = require('../controllers/planController')
 const search_controller = require('../controllers/searchController')
+const failure_controller = require('../controllers/failureController')
 
 //to authenticate specific routes, add auth.authTech/authSpec/authAdmin to middleware
 const auth = require('./verifyToken')
@@ -400,6 +401,9 @@ router.get('/raporty/:id', auth.authTech, raportController.raport_GET_one)
 ██║░░░░░██║░░██║██║███████╗╚██████╔╝██║░░██║███████╗██████╔╝
 ╚═╝░░░░░╚═╝░░╚═╝╚═╝╚══════╝░╚═════╝░╚═╝░░╚═╝╚══════╝╚═════╝░
 */
+
+// View failure detail
+router.get('/failure/:id', failure_controller.failure_detail)
 //SAVE FAILURE -- FETCH URL // save failure for specific raport id
 router.post(
   '/zapisz-awarie/:id',

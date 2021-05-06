@@ -1,0 +1,75 @@
+extends layout
+block content
+block content  
+   div(class='col mx-md-5 mt-4')
+      div(class='row')
+         div(class='col')
+            h1 #{title}
+            h3.mt-4 Jest częścią Raportu: 
+               a(href=(raport==null? '#' :raport.url)) #{raport==null? '' : 'Raport '+ new Intl.DateTimeFormat('pl-PL').format(raport.date) + ' Zmiana '+raport.shift}
+
+      div.mt-4(class='row')
+         div.col
+            table(class='my-5 table table-bordered')
+               //caption.h5 Awaria #{(failure._id)}
+               thead.table-dark
+                  tr
+                     th(class='text-center' scope='col' colspan='2') Awaria #{failure._id}
+                     //tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
+                     //th(width="20%" class='text-center' scope='col') Status:
+                     //th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+                     //th(scope='col') Efekt #{failure.effect}
+               tbody
+                  tr.umfy-table-separator
+                     td(width="20%" ) Status:
+                     td Efekt: #{failure.effect}
+
+                  tr.umfy-table-separator
+                     td Czas trwania awarii: 
+                     td #{failure.duration}
+                  tr
+                     td Operacja 
+                     td #{failure.operation==null ? '' : failure.operation.name}
+                  tr
+                     td Linia 
+                     td #{failure.prodLine==null ? '' : failure.prodLine.name}
+                  tr
+                     td Typ
+                     td #{failure.deviceType==null ? '' : failure.deviceType.name}
+                  tr.umfy-table-separator
+                     td Urządzenie
+                     td #{failure.device==null ? '' :failure.device.name}
+                  tr
+                     td Przyczyna 
+                     td #{failure.cause}
+                  tr
+                     td Diagnostyka 
+                     td #{failure.diagnostics}
+                  tr.umfy-table-separator
+                     td Działanie 
+                     td #{failure.action}
+                  tr
+                     td Numer zlecenia 
+                     td #{failure.orderNum}
+                  tr
+                     td Użyte części
+                     td #{failure.usedParts}
+                  tr
+                     td Części do zamówienia 
+                     td #{failure.missingParts}
+                  tr.umfy-table-separator
+                     td Prace na postój 
+                     td #{failure.plannedActions}
+                  tr
+                     td Autor
+                     td #{failure.author==null ? '' : failure.author.name}
+                  tr.umfy-table-separator
+                     td Kolaboranci
+                     // Why does it print '<' and '>' ?????
+                     // I cannot treat it like an object because of that (coleague.name)
+                     if failure.collaborators==null
+                        td 
+                     else
+                        td
+                           each coleague in failure.collaborators
+                              div #{coleague.name}

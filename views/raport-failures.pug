@@ -44,11 +44,13 @@ block content
                                                             option(value!=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
                                             div.form-row
                                                 div.form-group.col-4
-                                                    label(for="sprawdzmy to") Godzina rozpoczęcia
-                                                    input.form-control#startTime(type='time', name='name' value=failure.startTime disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
+                                                    label(for="startDate") Godzina rozpoczęcia
+                                                    - var nSD = new Date(failure.startDate)
+                                                    input.form-control#startDate(type='time', name='startDate' value=(("0" + nSD.getHours()).slice(-2)+':'+("0" + nSD.getMinutes()).slice(-2)) disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                 div.form-group.col-4
-                                                    label(for="sprawdzmy to") Czas trwania [hh:mm]
-                                                    input.form-control#duration(type='time', name='name' value=failure.duration disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
+                                                    label(for="endDate") Godzina zakończenia
+                                                    - var nED = new Date(failure.endDate)
+                                                    input.form-control#endDate(type='time', name='endDate' value=(("0" + nED.getHours()).slice(-2)+':'+("0" + nED.getMinutes()).slice(-2)) disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
                                                 div.form-group.col-4
                                                     p Efekt
                                                     input.mx-1(type="radio" name="efect" value="OK" checked=(failure.effect===true) disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
@@ -123,11 +125,11 @@ block content
                                                     option(value!=device._id) #{device.name}
                                     div.form-row
                                         div.form-group.col-4
-                                            label(for="sprawdzmy to") Godzina rozpoczęcia
-                                            input.form-control#startTime(type='time', name='name' required)
+                                            label(for="startDate") Godzina rozpoczęcia
+                                            input.form-control#startDate(type='time', name='startDate' required)
                                         div.form-group.col-4
-                                            label(for="sprawdzmy to") Czas trwania [hh:mm]
-                                            input.form-control#duration(type='time', name='name' required)
+                                            label(for="endDate") Godzina zakończenia
+                                            input.form-control#endDate(type='time', name='endDate' required)
                                         div.form-group.col-4
                                             p Efekt
                                             input.mx-1(type="radio" name="efect" value="OK")
@@ -179,6 +181,7 @@ block content
                                             button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)') Zapisz
 
     script.
+        raport = !{JSON.stringify(myRaport)}
         const activateLink = document.querySelector('#seconSectionActive')
         activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#myRaportSubMenu')
@@ -264,6 +267,14 @@ block content
         }
         colabCheckBoxestest = document.querySelectorAll('.collabsCheckBox')
         var zmienna
+
+        // This function takes time string(eg. "12:30") and turns it into date obj
+        function timeToDate(time){
+            time = time.split(':')
+            today = new Date(raport.date)
+            today.setHours(time[0],time[1],0,0)
+            return today
+        }
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
             zmienna =form
@@ -271,8 +282,10 @@ block content
             deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
             deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
 
-            startTime = form.childNodes[1].childNodes[0].childNodes[1].value
-            duration = form.childNodes[1].childNodes[1].childNodes[1].value
+            startDate = form.childNodes[1].childNodes[0].childNodes[1].value
+            startDate = timeToDate(startDate)
+            endDate = form.childNodes[1].childNodes[1].childNodes[1].value
+            endDate = timeToDate(endDate)
 
             var effect
             if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
@@ -308,8 +321,8 @@ block content
                     prodLine: prodLineId,
                     deviceType: deviceTypeId,
                     device: deviceId,
-                    startTime: startTime,
-                    duration: duration,
+                    startDate: startDate,
+                    endDate: endDate,
                     orderNum: orderNum,
                     cause: cause,
                     diagnostics: diagnostics,

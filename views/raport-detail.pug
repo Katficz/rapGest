@@ -1,8 +1,8 @@
 extends layout
 block content  
-   div(class='col')
+   div(class='col mx-md-5 mt-4')
       div(class='row')
-         div(class='col mx-md-5 mt-4')
+         div(class='col')
             h1.mt-5.text-center #{raport.virtual_date} 
             h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
             p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
@@ -12,6 +12,8 @@ block content
             //a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
 
             a.btn.btn-primary.my-5.mr-2(href='/api/raporty/'+raport._id+'/edytuj' hidden=(permission==='technik'?true:false)) Zmodyfikuj    
+      div(class='row')
+         div(class='col')
             table(class='table table-bordered')
                caption Skład zmiany
                   thead
@@ -40,6 +42,8 @@ block content
                               td
                                  button.btn.btn-danger.umfy-btn(disabled) NIE
 
+      div(class='row')
+         div(class='col')
             table(class="table table-bordered") 
                caption Obchód
                thead 
@@ -75,6 +79,8 @@ block content
                         button.btn.umfy-btn(class=(raport.roundAround.isWorkshop === true ? 'btn-success' : 'btn-danger') disabled) #{(raport.roundAround.isWorkshop === true ? 'OK ' : 'NOK')}
 
 
+      div(class='row')
+         div(class='col')
             table(class='table table-bordered') 
                caption Prace Planowane
                thead 
@@ -91,12 +97,16 @@ block content
                   //-          button.btn.umfy-btn(class=(item.isDone === true ? 'btn-success' : 'btn-danger') disabled) #{(item.isDone=== true ? 'OK ' : 'NOK')}
 
 
+      div(class='row')
+         div(class='col')
             table(class='table table-bordered')
                caption Dodatkowe informacje
                tbody
                   td.p-1.pb-5 #{raport.additionalInfo}
 
 
+      div(class='row')
+         div(class='col')
             each failure in raport.failure
                table(class='my-5 table table-bordered')
                   caption.h5 Awaria #{(failure._id)}
@@ -107,9 +117,12 @@ block content
                         //th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
                         th(scope='col') Efekt #{failure.effect}
                   tbody
+                     tr
+                        td Czas rozpoczęcia Awarii
+                        td #{failure.startDate.toLocaleString()}
                      tr.umfy-table-separator
-                        td Czas trwania awarii: 
-                        td #{failure.duration}
+                        td Czas zakończenia Awarii
+                        td #{failure.endDate.toLocaleString()}
                      tr
                         td Operacja 
                         td #{failure.operation==null ? '' : failure.operation.name}

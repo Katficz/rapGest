@@ -99,11 +99,13 @@ block content
                                                             option(value!=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
                                             div.form-row
                                                 div.form-group.col-4
-                                                    label(for="sprawdzmy to") Godzina rozpoczęcia
-                                                    input.form-control#startTime(type='time', name='name' value=failure.startTime)
+                                                    label(for="startDate") Godzina rozpoczęcia
+                                                    - var nSD = new Date(failure.startDate)
+                                                    input.form-control#startDate(type='time', name='startDate' value=(("0" + nSD.getHours()).slice(-2)+':'+("0" + nSD.getMinutes()).slice(-2)))
                                                 div.form-group.col-4
-                                                    label(for="sprawdzmy to") Czas trwania [hh:mm]
-                                                    input.form-control#duration(type='time', name='name' value=failure.duration)
+                                                    label(for="endDate") Godzina zakończenia
+                                                    - var nED = new Date(failure.endDate)
+                                                    input.form-control#endDate(type='time', name='endDate' value=(("0" + nED.getHours()).slice(-2)+':'+("0" + nED.getMinutes()).slice(-2)))
                                                 div.form-group.col-4
                                                     p Efekt
                                                     input.mx-1(type="radio" name="efect" value="OK" checked=(failure.effect===true))
@@ -168,17 +170,18 @@ block content
                                                     option(value!=device._id) #{device.name}
                                     div.form-row
                                         div.form-group.col-4
-                                            label(for="sprawdzmy to") Godzina rozpoczęcia
-                                            input.form-control#startTime(type='time', name='name' required)
+                                            label(for="startDate") Godzina rozpoczęcia
+                                            input.form-control#startDate(type='time', name='startDate' required)
                                         div.form-group.col-4
-                                            label(for="sprawdzmy to") Czas trwania [hh:mm]
-                                            input.form-control#duration(type='time', name='name' required)
+                                            label(for="endDate") Godzina zakończenia
+                                            input.form-control#endDate(type='time', name='endDate' required)
                                         div.form-group.col-4
                                             p Efekt
                                             input.mx-1(type="radio" name="efect" value="OK")
                                             label.mr-2(for="efect") OK
                                             input.mx-1(type="radio" name="efect" value="NOK")
                                             label(for="efect") NOK
+
 
                                     div.form-row
                                         div.form-group.col-12
@@ -219,6 +222,7 @@ block content
 
 
     script.
+        let raport = !{JSON.stringify(data.raport)}
         //its kinda fucked up, but adding new one is cloning form make visible:none which is last child of #failureAccordion
         //when new failure is added filled in and saved id of this failure is stored in form div
         //raport id of this raport is stored also in form 
@@ -399,6 +403,14 @@ block content
                 accordionDiv.removeChild(deleteMeDiv)
             }
         }
+
+        function timeToDate(time){
+            time = time.split(':')
+            today = new Date(raport.date)
+            today.setHours(time[0],time[1],0,0)
+            return today
+        }
+
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
             zmienna =form
@@ -406,9 +418,10 @@ block content
             deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
             deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
 
-            startTime = form.childNodes[1].childNodes[0].childNodes[1].value
-            duration = form.childNodes[1].childNodes[1].childNodes[1].value
-
+            startDate = form.childNodes[1].childNodes[0].childNodes[1].value
+            startDate = timeToDate(startDate)
+            endDate = form.childNodes[1].childNodes[1].childNodes[1].value
+            endDate = timeToDate(endDate)
             var effect
             if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
             if(form.childNodes[1].childNodes[2].childNodes[3].checked) {effect = false}
@@ -435,8 +448,8 @@ block content
                     prodLine: prodLineId,
                     deviceType: deviceTypeId,
                     device: deviceId,
-                    startTime: startTime,
-                    duration: duration,
+                    startDate: startDate,
+                    endDate: endDate,
                     orderNum: orderNum,
                     cause: cause,
                     diagnostics: diagnostics,

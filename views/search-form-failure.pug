@@ -3,48 +3,56 @@ block content
    div(class='col mx-md-5')
       div(class='row')
          div(class="col my-5")
-            h1.text-center.mb-3 Wyszukiwanie Raportów
+            h1.text-center.mb-3 Wyszukiwanie Awarii
       div(class='row')
          div(class="col my-2")
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center(colspan='4') Data Utworzenia raportu
+                     th.text-center(colspan='4') Czas wystąpienia awarii
                tbody
                   td 
                      label(for='dateStart') Od
-                     input.form-control#dateStart(type='date' name='date_execution')
+                     input.form-control#dateStart(type='date' name='dateStart')
+                     p
+                     label(for='hourStart') Godzina
+                     input.form-control#hourStart(type='time' name='hourStart')
+
                   td 
 
                      label(for='dateEnd') Do
-                     input.form-control#dateEnd(type='date' name='date_execution')
-                  td 
-                     label(for='shiftnum') Zmiana
-                     select.form-control#shiftnum
-                        option(value='Dowolna' selected='selected') Dowolna
-                        option(value='1') Poranna
-                        option(value='2') Popołudniowa
-                        option(value='3') Nocna
+                     input.form-control#dateEnd(type='date' name='dateEnd')
+                     p
+                     label(for='hourEnd') Godzina
+                     input.form-control#hourEnd(type='time' name='hourEnd')
+
+
       div(class='row')   
          div.col.my-2            
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center Obecni na zmianie
+                     th.text-center Autor
                tbody(id='teamPresent')
                   tr
                      td
-                        button(class="btn btn-danger" type='button' id="addUserButtonPresent" onclick='addUserPresent()') Dodaj
+                        select#user.form-control(type='select' name='user' )
+                           for user in users
+                              if plan
+                                 option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+                              else
+                                 option(value=user._id) #{user.fullname}            
+                        
       div(class='row')   
          div.col.my-2            
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center Nieobecni na zmianie
-               tbody(id='teamAbsent')
+                     th.text-center Współautorzy 
+               tbody(id='usersCollab')
                   tr
                      td
-                        button(class="btn btn-danger" type='button' id="addUserButtonAbsent" onclick='addUserAbsent()') Dodaj
+                        button(class="btn btn-danger" type='button' id="addCollaboratorsButton" onclick='addCollaborators()') Dodaj
       div(class='row')
          div.col.my-2
             table.table.table-bordered.mb-5
@@ -72,23 +80,23 @@ block content
 
 
    script.
-      let usersList = !{JSON.stringify(users_list)}
+      let usersList = !{JSON.stringify(users)}
       let users = ''
       for(let i=0; i<usersList.length; i++) {
          users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
       }
-      function addUserPresent(){
+      function addCollaborators(){
          pasteHTML = (`
             <tr>
                <td>
-                  <select class='form-control userPresent'>
+                  <select class='form-control userCollaborator'>
                      <option value='Dowolne'> Nie wybrano </option>
                      `+users+`
                   </select>
                </td>
             </tr>
                `)
-         whereToPaste = document.querySelector('#teamPresent')
+         whereToPaste = document.querySelector('#usersCollab')
          whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
       }
 
