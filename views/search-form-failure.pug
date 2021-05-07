@@ -18,7 +18,7 @@ block content
                      td
                         label(for='shiftnum') Numer zmiany
                         select.form-control#shiftnum
-                           option(value='Dowolna' selected='selected') Dowolna
+                           option(value='defaultvalue' selected='selected') Dowolna
                            option(value='1') Poranna
                            option(value='2') Popołudniowa
                            option(value='3') Nocna
@@ -28,11 +28,10 @@ block content
                         label(for='dateEnd') Do
                         input.form-control#dateEnd(type='date' name='dateEnd')
                      td
-                        label(for='timespanGt') Dłuższa niż
-                           input.form-control#timespanGt(type='time' name='timespanGt')
-                     
-                        label(for='timespanLt') Krótsza niż
-                           input.form-control#timespanLt(type='time' name='timespanLt')
+                           label(for='timespanGt') Dłuższa niż
+                              input.form-control#timespanGt(type='time' name='timespanGt')
+                           label(for='timespanLt') Krótsza niż
+                              input.form-control#timespanLt(type='time' name='timespanLt')
 
 
       div(class='row')   
@@ -45,39 +44,55 @@ block content
                   tr
                      td
                         select#user.form-control(type='select' name='user' )
-                           option(value='Dowolne' selected=true) Dowolne
+                           option(value='defaultvalue' selected=true) Dowolne
                            for user in users
                               if plan
                                  option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
                               else
                                  option(value=user._id) #{user.fullname}            
 
-      div(class='row')   
-         div.col.my-2            
+      //- div(class='row')   
+      //-    div.col.my-2            
+      //-       table.table.table-bordered
+      //-          thead.table-dark
+      //-             tr
+      //-                th.text-center Współautorzy 
+      //-          tbody(id='usersCollab')
+      //-             tr
+      //-                td
+      //-                   button(class="btn btn-danger" type='button' id="addCollaboratorsButton" onclick='addCollaborators()') Dodaj
+      div(class='row')
+         div.col.my-2
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center Współautorzy 
-               tbody(id='usersCollab')
-                  tr
-                     td
-                        button(class="btn btn-danger" type='button' id="addCollaboratorsButton" onclick='addCollaborators()') Dodaj
-      div(class='row')
-         div.col.my-2
-            table.table.table-bordered.mb-5
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='2') Obchód - wadliwy element
+                     th.text-center(colspan='4') Urządzenie
                tbody
-                  tr
-                     td
-                        select.form-control#roundAround
-                           option(value='Dowolne' selected=true) Dowolne
-                           option(value='isKettle') Kotłownia
-                           option(value='isCompressor') Kompresownia
-                           option(value='isIce') Wieża Chłodu
-                           option(value='isElectric') Rozdzielnia
-                           option(value='isWorkshop') Warsztat
+                  td 
+                     label Linia
+                     select.form-control#line
+                        option(value='defaultvalue' selected=true) Dowolna Linia
+                        each item in lines
+                           option( value=item._id) #{item.name}
+                  td 
+                     label Operacja
+                     select.form-control#operation
+                        option(value='defaultvalue' selected=true) Dowolna Operacja
+                        each item in operations
+                           option( value=item._id) #{item.name}
+               tr
+                  td
+                     label Typ urządzenia
+                     select.form-control#devicetype
+                        option(value='defaultvalue' selected=true) Dowolny Typ
+                        each item in devicetypes
+                           option( value=item._id)  #{item.name}
+                  td
+                     label Urządzenie
+                     select.form-control#device
+                        option(value='defaultvalue' selected=true) Dowolne Urządzenie
+                        each item in devices
+                           option( value=item._id ) #{item.name}
 
       div(class='row')
          div.col.my-2
@@ -89,25 +104,25 @@ block content
 
 
    script.
-      let usersList = !{JSON.stringify(users)}
-      let users = ''
-      for(let i=0; i<usersList.length; i++) {
-         users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
-      }
-      function addCollaborators(){
-         pasteHTML = (`
-            <tr>
-               <td>
-                  <select class='form-control userCollaborator'>
-                     <option value='Dowolne'> Nie wybrano </option>
-                     `+users+`
-                  </select>
-               </td>
-            </tr>
-               `)
-         whereToPaste = document.querySelector('#usersCollab')
-         whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
-      }
+      //- let usersList = !{JSON.stringify(users)}
+      //- let users = ''
+      //- for(let i=0; i<usersList.length; i++) {
+      //-    users = users + '<option value='+ usersList[i]._id +'>' + usersList[i].name + ' ' + usersList[i].surname + '</option>';
+      //- }
+      //- function addCollaborators(){
+      //-    pasteHTML = (`
+      //-       <tr>
+      //-          <td>
+      //-             <select class='form-control userCollaborator'>
+      //-                <option value='defaultvalue'> Nie wybrano </option>
+      //-                `+users+`
+      //-             </select>
+      //-          </td>
+      //-       </tr>
+      //-          `)
+      //-    whereToPaste = document.querySelector('#usersCollab')
+      //-    whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
+      //- }
 
 
       //- function timeToDate(date, time){
@@ -141,18 +156,22 @@ block content
          let timespanLt = document.getElementById('timespanLt').value
          let timespanGt = document.getElementById('timespanGt').value
 
+         let line = document.querySelector('#line').value
+         let operation = document.querySelector('#operation').value
+         let devicetype = document.querySelector('#devicetype').value
+         let device = document.querySelector('#device').value
 
 
          let author = document.getElementById('user').value
-         let collaborators = document.querySelectorAll('.userCollaborator')
-         let collabs_list = []
-         for(usr of collaborators){
-            if(usr.value !== 'Dowolne')
-               collabs_list.push(usr.value)
-         }
+         //- let collaborators = document.querySelectorAll('.userCollaborator')
+         //- let collabs_list = []
+         //- for(usr of collaborators){
+         //-    if(usr.value !== 'defaultvalue')
+         //-       collabs_list.push(usr.value)
+         //- }
         
          let searchForm = {}
-         if (shiftnum !== 'Dowolna'){
+         if (shiftnum !== 'defaultvalue'){
             searchForm['shift'] = Number(shiftnum)
          }
          if (dateStart != ''){
@@ -169,7 +188,6 @@ block content
             searchForm['dateEnd'] = dE
          }
          //- if (hourEnd != ''){
-            
          //-    searchForm['hourEnd'] =  handleHours(hourEnd)
          //- }
          
@@ -179,12 +197,23 @@ block content
          if (timespanGt != ''){
             searchForm['timespanGt'] = calculateTimespan(timespanGt)
          }
-         
-         if (author !== 'Dowolne'){
+         if (author !== 'defaultvalue'){
             searchForm['author'] = author
          }
-         if (collabs_list.length !== 0){
-            searchForm['collaborators'] = collabs_list
+         //- if (collabs_list.length !== 0){
+         //-    searchForm['collaborators'] = collabs_list
+         //- }
+         if (line != 'defaultvalue'){
+            searchForm['line'] = line
+         }
+         if (operation != 'defaultvalue'){
+            searchForm['operation'] = operation
+         }
+         if (devicetype != 'defaultvalue'){
+            searchForm['devicetype'] = devicetype
+         }
+         if (device != 'defaultvalue'){
+            searchForm['device'] = device
          }
 
          console.log('FORM', searchForm)

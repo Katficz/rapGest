@@ -53,6 +53,7 @@ const failureSchema = new Schema({
   effect: {
     type: Boolean,
   },
+  status: { type: Number },
   plannedActions: {
     //ESZCZE NIE IMPLEMENTUJE
     type: String,

@@ -130,40 +130,45 @@ block content
                                                     label(for="endDate") Godzina zakończenia
                                                     - var nED = new Date(failure.endDate)
                                                     input.form-control#endDate(type='time', name='endDate' value=(("0" + nED.getHours()).slice(-2)+':'+("0" + nED.getMinutes()).slice(-2)))
-                                                div.form-group.col-4
-                                                    p Efekt
-                                                    input.mx-1(type="radio" name="efect" value="OK" checked=(failure.effect===true))
-                                                    label.mr-2(for="efect") OK
-                                                    input.mx-1(type="radio" name="efect" value="NOK" checked=(failure.effect===false))
-                                                    label(for="efect") NOK
+                                            .row.mt-2
+                                                .col.d-flex.justify-content-between
+                                                    .form-check.form-check-inline
+                                                        input.form-check-input.statusRepaired(type='radio'  name='status' value='1' checked=(failure.status===1 ? true : false) )
+                                                        label.form-check-label Naprawiono 
+                                                    .form-check.form-check-inline
+                                                        input.form-check-input.statusNotRepaired(type='radio' name='status' value='2' checked=(failure.status===1 ? true : false))
+                                                        label.form-check-label Nie naprawiono 
+                                                    .form-check.form-check-inline
+                                                        input.form-check-input.statusTemporary(type='radio' name='status' value='3' checked=(failure.status===1 ? true : false))
+                                                        label.form-check-label Rozwiązanie tymczasowe 
 
                                             div.form-row
                                                 div.form-group.col-12
-                                                    label(for="orderNum") Numer zlecenia
-                                                    textarea.form-control#orderNum(type='text' name='orderNum') #{failure.orderNum}
+                                                    label Numer zlecenia
+                                                    textarea.form-control.orderNum(type='text' name='orderNum') #{failure.orderNum}
 
                                             div.form-row
                                                 div.form-group.col-12
-                                                    label(for="cause") Przyczyna
-                                                    textarea.text-break.form-control#cause(type='text', name='cause') #{failure.cause}
+                                                    label
+                                                    textarea.text-break.form-control.cause(type='text', name='cause') #{failure.cause}
 
                                             div.form-row
                                                 div.form-group.col-12
-                                                    label(for="diagnostics") Diagnostyka
-                                                    textarea.form-control#diagnostics(type='text', name='diagnostics') #{failure.diagnostics}
+                                                    label Diagnostyka
+                                                    textarea.form-control.diagnostics(type='text', name='diagnostics') #{failure.diagnostics}
 
                                             div.form-row
                                                 div.form-group.col-12
-                                                    label(for="actions") Wykonane akcje
-                                                    textarea.form-control#actions(type='text', name='actions') #{failure.action}
+                                                    label Wykonane akcje
+                                                    textarea.form-control.action(type='text', name='action') #{failure.action}
 
                                             div.form-row
                                                 div.form-group.col-6
-                                                    label(for="usedParts") Wykorzystane części
-                                                    textarea.form-control#usedParts(type='text', name='usedParts') #{failure.usedParts}
+                                                    label Wykorzystane części
+                                                    textarea.form-control.usedParts(type='text', name='usedParts') #{failure.usedParts}
                                                 div.form-group.col-6
-                                                    label(for="missingParts") Brakujące części
-                                                    textarea.form-control#missingParts(type='text', name='missingParts') #{failure.missingParts}
+                                                    label Brakujące części
+                                                    textarea.form-control.missingParts(type='text', name='missingParts') #{failure.missingParts}
 
                                             div.form-row
                                                 div.form-group.col-12
@@ -213,41 +218,47 @@ block content
                                         div.form-group.col-4
                                             label(for="endDate") Godzina zakończenia
                                             input.form-control#endDate(type='time', name='endDate' required)
-                                        div.form-group.col-4
-                                            p Efekt
-                                            input.mx-1(type="radio" name="efect" value="OK")
-                                            label.mr-2(for="efect") OK
-                                            input.mx-1(type="radio" name="efect" value="NOK")
-                                            label(for="efect") NOK
+                                    .row.mt-2
+                                        .col.d-flex.justify-content-between
+                                            .form-check.form-check-inline
+                                                input.form-check-input.statusRepaired(type='radio'  name='status' value='1' checked=(failure.status===1 ? true : false) )
+                                                label.form-check-label Naprawiono 
+                                            .form-check.form-check-inline
+                                                input.form-check-input.statusNotRepaired(type='radio' name='status' value='2' checked=(failure.status===1 ? true : false))
+                                                label.form-check-label Nie naprawiono 
+                                            .form-check.form-check-inline
+                                                input.form-check-input.statusTemporary(type='radio' name='status' value='3' checked=(failure.status===1 ? true : false))
+                                                label.form-check-label Rozwiązanie tymczasowe 
 
 
                                     div.form-row
                                         div.form-group.col-12
-                                            label(for="orderNum") Numer zlecenia
-                                            input.form-control#orderNum(type='text', name='orderNum')
+                                            label Numer zlecenia
+                                            input.form-control.orderNum(type='text', name='orderNum')
 
                                     div.form-row
                                         div.form-group.col-12
-                                            label(for="cause") Przyczyna
-                                            textarea.form-control#cause(type='text', name='cause')
+                                            label Przyczyna
+                                            textarea.form-control.cause(type='text', name='cause')
 
                                     div.form-row
                                         div.form-group.col-12
-                                            label(for="diagnostics") Diagnostyka
-                                            textarea.form-control#diagnostics(type='text', name='diagnostics')
+                                            label Diagnostyka
+                                            textarea.form-control.diagnostics(type='text', name='diagnostics')
 
                                     div.form-row
                                         div.form-group.col-12
-                                            label(for="actions") Wykonane akcje
-                                            textarea.form-control#actions(type='text', name='actions')
+                                            label Wykonane akcje
+                                            textarea.form-control.action(type='text', name='action')
 
                                     div.form-row
                                         div.form-group.col-6
-                                            label(for="usedParts") Wykorzystane części
-                                            textarea.form-control#usedParts(type='text', name='usedParts')
+                                            label Wykorzystane części
+                                            textarea.form-control.usedParts(type='text', name='usedParts')
                                         div.form-group.col-6
-                                            label(for="missingParts") Brakujące części
-                                            textarea.form-control#missingParts(type='text', name='missingParts')
+                                            label Brakujące części
+                                            textarea.form-control.missingParts(type='text', name='missingParts')
+                                    
 
                                     div.form-row
                                         div.form-group.col-12
@@ -461,8 +472,17 @@ block content
             deviceId = form.querySelector('.deviceOption').value
             operationId = form.querySelector('.operationOption').value
 
+            let status
+            if (form.querySelector(".statusRepaired").checked){
+                status = 1
+                }
+            else if (form.querySelector(".statusNotRepaired").checked){
+                status = 2
+                }
+            else if (form.querySelector(".statusTemporary").checked){
+                status = 3
+                }
             
-
             startDate = form.childNodes[1].childNodes[0].childNodes[1].value
             startDate = timeToDate(startDate)
             endDate = form.childNodes[1].childNodes[1].childNodes[1].value
@@ -472,27 +492,32 @@ block content
             }
             
             if(startDate == ''){
-                startDate = newDate()
+                startDate = new Date(raport.date)
             }
             if(endDate == ''){
                 endDate = startDate
             }
             
 
-            var effect
-            if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
-            if(form.childNodes[1].childNodes[2].childNodes[3].checked) {effect = false}
+            //- var effect
+            //- if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
+            //- if(form.childNodes[1].childNodes[2].childNodes[3].checked) {effect = false}
+            orderNum = form.querySelector('.orderNum').value
+            cause = form.querySelector('.cause').value
+            diagnostics = form.querySelector('.diagnostics').value
+            action = form.querySelector('.action').value
+            usedParts = form.querySelector('.usedParts').value
+            missingParts = form.querySelector('.missingParts').value
+            //- orderNum = form.childNodes[2].childNodes[0].childNodes[1].value
 
-            orderNum = form.childNodes[2].childNodes[0].childNodes[1].value
-
-            cause = form.childNodes[3].childNodes[0].childNodes[1].value
+            //- cause = form.childNodes[3].childNodes[0].childNodes[1].value
   
-            diagnostics = form.childNodes[4].childNodes[0].childNodes[1].value
+            //- diagnostics = form.childNodes[4].childNodes[0].childNodes[1].value
 
-            action = form.childNodes[5].childNodes[0].childNodes[1].value
+            //- action = form.childNodes[5].childNodes[0].childNodes[1].value
 
-            usedParts = form.childNodes[6].childNodes[0].childNodes[1].value
-            missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
+            //- usedParts = form.childNodes[6].childNodes[0].childNodes[1].value
+            //- missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
 
             let formBody = {
                     failureId: form.dataset.failureid,
@@ -501,7 +526,7 @@ block content
                     orderNum: orderNum,
                     cause: cause,
                     diagnostics: diagnostics,
-                    effect: effect,
+                    status: status,
                     action: action,
                     usedParts: usedParts,
                     missingParts: missingParts,

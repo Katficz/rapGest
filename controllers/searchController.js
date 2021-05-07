@@ -7,6 +7,7 @@ const Operation = require('../models/operation')
 const DeviceType = require('../models/device-type')
 const Raport = require('../models/raport')
 const Failure = require('../models/failure')
+const mongoose = require('mongoose')
 
 const async = require('async')
 const { body, validationResult } = require('express-validator')
@@ -129,6 +130,11 @@ exports.search_failure_post = function (req, res, next) {
       startDate: 1,
       endDate: 1,
       shift: 1,
+      author: 1,
+      prodLine: 1,
+      operation: 1,
+      deviceType: 1,
+      device: 1,
       timespan: { $subtract: ['$endDate', '$startDate'] },
     },
   }
@@ -137,6 +143,26 @@ exports.search_failure_post = function (req, res, next) {
 
   if (searchForm.shift) {
     $match['shift'] = Number(searchForm.shift)
+  }
+  if (searchForm.author) {
+    //{ $match : { author : "dave" } }
+    $match['author'] = mongoose.Types.ObjectId(searchForm.author)
+  }
+  // if (searchForm.collaborators) {
+  //   //{ $match : { author : "dave" } }
+  //   $match['collaborators'] = ''
+  // }
+  if (searchForm.line) {
+    $match['prodLine'] = mongoose.Types.ObjectId(searchForm.line)
+  }
+  if (searchForm.operation) {
+    $match['operation'] = mongoose.Types.ObjectId(searchForm.operation)
+  }
+  if (searchForm.devicetype) {
+    $match['deviceType'] = mongoose.Types.ObjectId(searchForm.devicetype)
+  }
+  if (searchForm.device) {
+    $match['device'] = mongoose.Types.ObjectId(searchForm.device)
   }
   if (searchForm.timespanLt && searchForm.timespanGt) {
     $match['timespan'] = {
@@ -166,7 +192,6 @@ exports.search_failure_post = function (req, res, next) {
     █░█ █▀█ █░█ █▀█ █▀
     █▀█ █▄█ █▄█ █▀▄ ▄█
   */
-  // if no date is passed it means only hour is passed
   // if (searchForm.hourStart) {
   //   $match['hourStart'] = { $gte: searchForm.hourStart }
   // }

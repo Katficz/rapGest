@@ -113,9 +113,13 @@ block content
                   thead
                      tr
                         //tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
-                        th(width="20%" class='text-center' scope='col') Status:
+                        //th(width="20%" class='text-center' scope='col') Status:
                         //th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
-                        th(scope='col') Efekt #{failure.effect}
+                        //th(scope='col') Status #{failure.status}
+                     tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
+                        th(width="20%" class='text-center' scope='col') Status:
+                        th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+            
                   tbody
                      tr
                         td Czas rozpoczęcia Awarii
