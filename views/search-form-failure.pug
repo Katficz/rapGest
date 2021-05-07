@@ -9,13 +9,13 @@ block content
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center(colspan='2') Czas wystąpienia awarii
+                     th.text-center(colspan='3') Czas wystąpienia awarii
                tbody
                   tr
                      td(width='40%')
                         label(for='dateStart') Od
                         input.form-control#dateStart(type='date' name='dateStart')
-                     td
+                     td(colspan='2')
                         label(for='shiftnum') Numer zmiany
                         select.form-control#shiftnum
                            option(value='defaultvalue' selected='selected') Dowolna
@@ -28,10 +28,11 @@ block content
                         label(for='dateEnd') Do
                         input.form-control#dateEnd(type='date' name='dateEnd')
                      td
-                           label(for='timespanGt') Dłuższa niż
-                              input.form-control#timespanGt(type='time' name='timespanGt')
-                           label(for='timespanLt') Krótsza niż
-                              input.form-control#timespanLt(type='time' name='timespanLt')
+                        label(for='timespanGt') Dłuższa niż
+                           input.form-control#timespanGt(type='time' name='timespanGt')
+                     td
+                        label(for='timespanLt') Krótsza niż
+                           input.form-control#timespanLt(type='time' name='timespanLt')
 
 
       div(class='row')   
@@ -93,6 +94,21 @@ block content
                         option(value='defaultvalue' selected=true) Dowolne Urządzenie
                         each item in devices
                            option( value=item._id ) #{item.name}
+      div(class='row')
+         div(class="col my-2")
+            table.table.table-bordered
+               thead.table-dark
+                  tr
+                     th.text-center(colspan='2') Efekt Awarii
+               tbody
+                  tr
+                     td
+                        label(for='status') 
+                        select.form-control#status
+                           option(value='defaultvalue' selected='selected') Dowolny
+                           option(value='1') Naprawiono
+                           option(value='2') Nie naprawiono
+                           option(value='3') Rozwiązanie tymczasowe
 
       div(class='row')
          div.col.my-2
@@ -156,11 +172,12 @@ block content
          let timespanLt = document.getElementById('timespanLt').value
          let timespanGt = document.getElementById('timespanGt').value
 
-         let line = document.querySelector('#line').value
-         let operation = document.querySelector('#operation').value
-         let devicetype = document.querySelector('#devicetype').value
-         let device = document.querySelector('#device').value
+         let line = document.getElementById('line').value
+         let operation = document.getElementById('operation').value
+         let devicetype = document.getElementById('devicetype').value
+         let device = document.getElementById('device').value
 
+         let status = document.getElementById('status').value
 
          let author = document.getElementById('user').value
          //- let collaborators = document.querySelectorAll('.userCollaborator')
@@ -214,6 +231,9 @@ block content
          }
          if (device != 'defaultvalue'){
             searchForm['device'] = device
+         }
+         if (status != 'defaultvalue'){
+            searchForm['status'] = status
          }
 
          console.log('FORM', searchForm)
@@ -273,7 +293,7 @@ block content
                </td> 
                <td class='padding0'> 
                   <a class='black-link' href=`+url+'>'+new Date(failure.endDate).toLocaleString()+`</a> 
-               </td> 
+               </td>
             </tr>`
          }
          let raport_count = data.length
@@ -287,7 +307,7 @@ block content
          pasteHTML = (`
          <div class='row' id='searchResults'>
             <div class='col my-2'>
-               <h2> Znaleziono `+raport_count +`Awarii.</h2>
+               <h2> Znaleziono `+raport_count +` Awarii.</h2>
                   <table class='table table-bordered table-hover dark-header-hover'>
                      <thead class='table-dark'>
                         <tr>

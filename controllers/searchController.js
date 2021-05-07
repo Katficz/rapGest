@@ -135,12 +135,16 @@ exports.search_failure_post = function (req, res, next) {
       operation: 1,
       deviceType: 1,
       device: 1,
+      status: 1,
       timespan: { $subtract: ['$endDate', '$startDate'] },
     },
   }
   // query statements
   let $match = {}
 
+  if (searchForm.status) {
+    $match['status'] = Number(searchForm.status)
+  }
   if (searchForm.shift) {
     $match['shift'] = Number(searchForm.shift)
   }

@@ -221,13 +221,13 @@ block content
                                     .row.mt-2
                                         .col.d-flex.justify-content-between
                                             .form-check.form-check-inline
-                                                input.form-check-input.statusRepaired(type='radio'  name='status' value='1' checked=(failure.status===1 ? true : false) )
+                                                input.form-check-input.statusRepaired(type='radio'  name='status' value='1' )
                                                 label.form-check-label Naprawiono 
                                             .form-check.form-check-inline
-                                                input.form-check-input.statusNotRepaired(type='radio' name='status' value='2' checked=(failure.status===1 ? true : false))
+                                                input.form-check-input.statusNotRepaired(type='radio' name='status' value='2')
                                                 label.form-check-label Nie naprawiono 
                                             .form-check.form-check-inline
-                                                input.form-check-input.statusTemporary(type='radio' name='status' value='3' checked=(failure.status===1 ? true : false))
+                                                input.form-check-input.statusTemporary(type='radio' name='status' value='3')
                                                 label.form-check-label Rozwiązanie tymczasowe 
 
 
