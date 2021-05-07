@@ -444,7 +444,7 @@ block content
 
         function timeToDate(time){
             time = time.split(':')
-            today = new Date(raport.date)
+            let today = new Date(raport.date)
             today.setHours(time[0],time[1],0,0)
             return today
         }
@@ -467,6 +467,18 @@ block content
             startDate = timeToDate(startDate)
             endDate = form.childNodes[1].childNodes[1].childNodes[1].value
             endDate = timeToDate(endDate)
+            if (endDate < startDate){
+                endDate.setDate(endDate.getDate()+1)
+            }
+            
+            if(startDate == ''){
+                startDate = newDate()
+            }
+            if(endDate == ''){
+                endDate = startDate
+            }
+            
+
             var effect
             if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
             if(form.childNodes[1].childNodes[2].childNodes[3].checked) {effect = false}
@@ -492,7 +504,8 @@ block content
                     effect: effect,
                     action: action,
                     usedParts: usedParts,
-                    missingParts: missingParts}
+                    missingParts: missingParts,
+                    shift: raport.shift}
 
             if (operationId !== 'Dowolna')
                 formBody.operation = operationId

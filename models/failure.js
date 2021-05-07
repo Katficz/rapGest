@@ -20,6 +20,7 @@ const failureSchema = new Schema({
   startDate: {
     type: Date,
   },
+  shift: { type: Number, required: true },
   orderNum: {
     type: String,
     maxlength: 50,

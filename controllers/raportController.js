@@ -63,13 +63,14 @@ exports.raport_GET_list = function (req, res) {
       var dates = []
       var notPissingMeOffDate = new Date()
       console.log(notPissingMeOffDate.getHours())
-      for (var i = 4; i > 0; i--) { // THIS I BAD I WILL FIX IT (NIE ZADZIAŁA NA PRZELOMIE MIESIĘCY!!!!!!!!!)
-        day = notPissingMeOffDate.getDate()-i
-        if(day<10) day='0'+day
-        month = notPissingMeOffDate.getMonth()+1
-        if(month<10) month = '0'+month
+      for (var i = 4; i > 0; i--) {
+        // THIS I BAD I WILL FIX IT (NIE ZADZIAŁA NA PRZELOMIE MIESIĘCY!!!!!!!!!)
+        day = notPissingMeOffDate.getDate() - i
+        if (day < 10) day = '0' + day
+        month = notPissingMeOffDate.getMonth() + 1
+        if (month < 10) month = '0' + month
         year = notPissingMeOffDate.getFullYear()
-        dates.push(day+'.'+month+'.'+year)
+        dates.push(day + '.' + month + '.' + year)
       }
       for (var i = 0; i < dates.length; i++) {
         var match = false

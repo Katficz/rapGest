@@ -128,15 +128,17 @@ block content
          }
          let roundAround = document.querySelector('#roundAround').value
 
-         searchForm = {}
+         let searchForm = {}
          if (shiftnum !== 'Dowolna'){
             searchForm['shift'] = shiftnum
          }
          if (dateStart != ''){
-            searchForm['dateStart'] = dateStart
+            searchForm['dateStart'] = new Date(dateStart)
          }
          if (dateEnd != ''){
-            searchForm['dateEnd'] = dateEnd
+            let dE = new Date(dateEnd)
+            dE.setHours(24, 0, 0, 0)
+            searchForm['dateEnd'] = dE
          }
          if (roundAround !== 'Dowolne'){
             searchForm['roundAround'] = roundAround

@@ -298,7 +298,7 @@ block content
         // This function takes time string(eg. "12:30") and turns it into date obj
         function timeToDate(time){
             time = time.split(':')
-            today = new Date(raport.date)
+            let today = new Date(raport.date)
             today.setHours(time[0],time[1],0,0)
             return today
         }
@@ -316,6 +316,16 @@ block content
             startDate = timeToDate(startDate)
             endDate = form.childNodes[1].childNodes[1].childNodes[1].value
             endDate = timeToDate(endDate)
+            // if endDate is lower than start date it means it ended past midnight
+            if (endDate < startDate){
+                endDate.setDate(endDate.getDate()+1)
+            }
+            if(startDate == ''){
+                startDate = newDate()
+            }
+            if(endDate == ''){
+                endDate = startDate
+            }
 
             var effect
             if(form.childNodes[1].childNodes[2].childNodes[1].checked) {effect = true}
@@ -351,8 +361,10 @@ block content
                 action: action,
                 usedParts: usedParts,
                 missingParts: missingParts,
-                collaborators: collaborators
+                collaborators: collaborators,
+                shift: raport.shift
             }
+            console.log(formBody)
 
             if (operationId !== 'Dowolna')
                 formBody.operation = operationId

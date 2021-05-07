@@ -9,22 +9,30 @@ block content
             table.table.table-bordered
                thead.table-dark
                   tr
-                     th.text-center(colspan='4') Czas wystąpienia awarii
+                     th.text-center(colspan='2') Czas wystąpienia awarii
                tbody
-                  td 
-                     label(for='dateStart') Od
-                     input.form-control#dateStart(type='date' name='dateStart')
-                     p
-                     label(for='hourStart') Godzina
-                     input.form-control#hourStart(type='time' name='hourStart')
+                  tr
+                     td(width='40%')
+                        label(for='dateStart') Od
+                        input.form-control#dateStart(type='date' name='dateStart')
+                     td
+                        label(for='shiftnum') Numer zmiany
+                        select.form-control#shiftnum
+                           option(value='Dowolna' selected='selected') Dowolna
+                           option(value='1') Poranna
+                           option(value='2') Popołudniowa
+                           option(value='3') Nocna
 
-                  td 
-
-                     label(for='dateEnd') Do
-                     input.form-control#dateEnd(type='date' name='dateEnd')
-                     p
-                     label(for='hourEnd') Godzina
-                     input.form-control#hourEnd(type='time' name='hourEnd')
+                  tr
+                     td 
+                        label(for='dateEnd') Do
+                        input.form-control#dateEnd(type='date' name='dateEnd')
+                     td
+                        label(for='timespanGt') Dłuższa niż
+                           input.form-control#timespanGt(type='time' name='timespanGt')
+                     
+                        label(for='timespanLt') Krótsza niż
+                           input.form-control#timespanLt(type='time' name='timespanLt')
 
 
       div(class='row')   
@@ -33,16 +41,17 @@ block content
                thead.table-dark
                   tr
                      th.text-center Autor
-               tbody(id='teamPresent')
+               tbody(id='author')
                   tr
                      td
                         select#user.form-control(type='select' name='user' )
+                           option(value='Dowolne' selected=true) Dowolne
                            for user in users
                               if plan
                                  option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
                               else
                                  option(value=user._id) #{user.fullname}            
-                        
+
       div(class='row')   
          div.col.my-2            
             table.table.table-bordered
@@ -101,60 +110,83 @@ block content
       }
 
 
-      function addUserAbsent(){
-         pasteHTML = (`
-            <tr>
-               <td>
-                  <select class='form-control userAbsent'>
-                     <option value='Dowolne'> Nie wybrano </option>
-                     `+users+`
-                  </select>
-               </td>
-            </tr>
-               `)
-         whereToPaste = document.querySelector('#teamAbsent')
-         whereToPaste.insertAdjacentHTML('afterbegin', pasteHTML)
-      }
+      //- function timeToDate(date, time){
+      //-    time = time.split(':')
+      //-    let today = new Date(date)
+      //-    today.setHours(time[0],time[1],0,0)
+      //-    return today
+      //- }
 
+      //- function handleHours(time){
+      //-    // TIME -2hr due to time shifts
+      //-    let hr = Number(time.split(':')[0]) -2
+      //-       if (hr < 0){
+      //-          hr = 24 + hr
+      //-       }
+      //-    return hr
+      //- }
+      function calculateTimespan(time){
+         time = time.split(':')
+         let hours = Number(time[0])
+         let minutes = Number(time[1])
+         return hours*3600000 + minutes*60000
+      }
 
       function postSearchButton(){
          let dateStart = document.getElementById('dateStart').value
          let dateEnd = document.getElementById('dateEnd').value
+         //let hourStart = document.getElementById('hourStart').value
+         //let hourEnd = document.getElementById('hourEnd').value
          let shiftnum = document.getElementById('shiftnum').value
+         let timespanLt = document.getElementById('timespanLt').value
+         let timespanGt = document.getElementById('timespanGt').value
 
-         let usersPresent = document.querySelectorAll('.userPresent')
-         let usersAbsent = document.querySelectorAll('.userAbsent')
-         let usersPresent_list = []
-         let usersAbsent_list = []
-         for(usr of usersPresent){
-            if(usr.value !== 'Dowolne')
-               usersPresent_list.push(usr.value)
-         }
-         for(usr of usersAbsent){
-            if(usr.value !== 'Dowolne')
-               usersAbsent_list.push(usr.value)
-         }
-         let roundAround = document.querySelector('#roundAround').value
 
-         searchForm = {}
+
+         let author = document.getElementById('user').value
+         let collaborators = document.querySelectorAll('.userCollaborator')
+         let collabs_list = []
+         for(usr of collaborators){
+            if(usr.value !== 'Dowolne')
+               collabs_list.push(usr.value)
+         }
+        
+         let searchForm = {}
          if (shiftnum !== 'Dowolna'){
-            searchForm['shift'] = shiftnum
+            searchForm['shift'] = Number(shiftnum)
          }
          if (dateStart != ''){
-            searchForm['dateStart'] = dateStart
-         }
+            let dS = new Date(dateStart)
+            dS.setHours(-2, 0, 0, 0)
+            searchForm['dateStart'] = dS
+         } 
+         //- if (hourStart != ''){
+         //-    searchForm['hourStart'] = handleHours(hourStart)
+         //- }
          if (dateEnd != ''){
-            searchForm['dateEnd'] = dateEnd
+            let dE = new Date(dateEnd)
+            dE.setHours(22, 0, 0, 0)
+            searchForm['dateEnd'] = dE
          }
-         if (roundAround !== 'Dowolne'){
-            searchForm['roundAround'] = roundAround
+         //- if (hourEnd != ''){
+            
+         //-    searchForm['hourEnd'] =  handleHours(hourEnd)
+         //- }
+         
+         if (timespanLt != ''){
+            searchForm['timespanLt'] = calculateTimespan(timespanLt)
          }
-         if (usersPresent_list.length !== 0){
-            searchForm['teamPresent'] = usersPresent_list
+         if (timespanGt != ''){
+            searchForm['timespanGt'] = calculateTimespan(timespanGt)
          }
-         if (usersAbsent_list.length !== 0){
-            searchForm['teamAbsent'] = usersAbsent_list
+         
+         if (author !== 'Dowolne'){
+            searchForm['author'] = author
          }
+         if (collabs_list.length !== 0){
+            searchForm['collaborators'] = collabs_list
+         }
+
          console.log('FORM', searchForm)
          // send data to the server
          postSearchRaport(searchForm)
@@ -198,48 +230,40 @@ block content
       }
 
       function handleResData(data){
-         let container = ''
-         for (raport of data){
-            let url = '/api/raporty/'+raport._id
-            if (raport.shift===1)
-               shift = 'Poranna'
-            else if (raport.shift===2)
-               shift = 'Popołudniowa'
-            else if (raport.shift===3)
-               shift = 'Nocna'
-            else shift = ''
+         console.log(data)
+         data.sort(function(a, b) {let dateA = a.startDate; let dateB = b.startDate; return (dateA < dateB) ? -1 : (dateA > dateB) ? 1 : 0;});
+          let container = ''
+         for (failure of data){
+            let url = '/api/failure/'+failure._id
+            
 
             container = container +`
             <tr> 
                <td class='padding0'> 
-                  <a class='black-link' href=`+url+'>'+new Date(raport.date).toLocaleString() +`</a> 
+                  <a class='black-link' href=`+url+'>'+new Date(failure.startDate).toLocaleString() +`</a> 
                </td> 
                <td class='padding0'> 
-                  <a class='black-link' href=`+url+'>'+shift+`</a> 
-               </td> 
-               <td class='padding0'> 
-                  <a class='black-link' href=`+url+'>'+ raport.failure.length +`</a> 
+                  <a class='black-link' href=`+url+'>'+new Date(failure.endDate).toLocaleString()+`</a> 
                </td> 
             </tr>`
          }
          let raport_count = data.length
-         let deklinacja_raportu
-         if (raport_count===0 || raport_count>=5)
-            deklinacja_raportu = 'Raportów'
-         else if (raport_count===1)
-            deklinacja_raportu = 'Raport'
-         else
-            deklinacja_raportu = 'Raporty'
+         //- let deklinacja_raportu
+         //- if (raport_count===0 || raport_count>=5)
+         //-    deklinacja_raportu = 'Raportów'
+         //- else if (raport_count===1)
+         //-    deklinacja_raportu = 'Raport'
+         //- else
+         //-    deklinacja_raportu = 'Raporty'
          pasteHTML = (`
          <div class='row' id='searchResults'>
             <div class='col my-2'>
-               <h2> Znaleziono `+raport_count +' '+ deklinacja_raportu+`.</h2>
+               <h2> Znaleziono `+raport_count +`Awarii.</h2>
                   <table class='table table-bordered table-hover dark-header-hover'>
                      <thead class='table-dark'>
                         <tr>
-                           <th> Data </th>
-                           <th> Zmiana </th>
-                           <th> Liczba Awarii </th>
+                           <th> Data Rozpoczęcia</th>
+                           <th> Data Zakończenia </th>
                         </tr>
                      </thead>
                      <tbody>
@@ -252,6 +276,7 @@ block content
             `)
       whereToPaste = document.querySelector('#postSearchButton')
       whereToPaste.insertAdjacentHTML('afterend', pasteHTML)
+
       }
 
 

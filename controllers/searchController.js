@@ -6,6 +6,7 @@ const ProdLine = require('../models/prod-line')
 const Operation = require('../models/operation')
 const DeviceType = require('../models/device-type')
 const Raport = require('../models/raport')
+const Failure = require('../models/failure')
 
 const async = require('async')
 const { body, validationResult } = require('express-validator')
@@ -27,8 +28,6 @@ exports.search_raport_get = function (req, res, next) {
 // Send the search form for finding raports
 exports.search_raport_post = function (req, res, next) {
   let searchForm = req.body
-  let dE = new Date(searchForm.dateEnd)
-  dE.setHours(24, 0, 0, 0)
   let query = {}
   if (searchForm.shift) {
     query.shift = searchForm.shift
@@ -36,14 +35,14 @@ exports.search_raport_post = function (req, res, next) {
   if (searchForm.dateStart && searchForm.dateEnd) {
     query.date = {
       $gte: searchForm.dateStart,
-      $lte: dE,
+      $lte: searchForm.dateEnd,
     }
   } else {
     if (searchForm.dateStart && !searchForm.dateEnd) {
       query.date = { $gte: searchForm.dateStart }
     }
     if (searchForm.dateEnd && !searchForm.dateStart) {
-      query.date = { $lte: dE }
+      query.date = { $lte: searchForm.dateEnd }
     }
   }
   if (searchForm.teamPresent) {
@@ -123,40 +122,64 @@ exports.search_failure_get = function (req, res, next) {
 // Send the search form for finding failures
 exports.search_failure_post = function (req, res, next) {
   let searchForm = req.body
-  let dE = new Date(searchForm.dateEnd)
-  dE.setHours(24, 0, 0, 0)
-  let query = {}
-  if (searchForm.shift) {
-    query.shift = searchForm.shift
+  // Those fields are returned just like with the find() metehod
+  let projectFields = {
+    $project: {
+      _id: 1,
+      startDate: 1,
+      endDate: 1,
+      shift: 1,
+      timespan: { $subtract: ['$endDate', '$startDate'] },
+    },
   }
-  if (searchForm.dateStart && searchForm.dateEnd) {
-    query.date = {
-      $gte: searchForm.dateStart,
-      $lte: dE,
-    }
-  } else {
-    if (searchForm.dateStart && !searchForm.dateEnd) {
-      query.date = { $gte: searchForm.dateStart }
-    }
-    if (searchForm.dateEnd && !searchForm.dateStart) {
-      query.date = { $lte: dE }
-    }
-  }
-  if (searchForm.teamPresent) {
-    query.teamPresent = { $all: searchForm.teamPresent }
-  }
-  if (searchForm.teamAbsent) {
-    query.teamAbsent = { $all: searchForm.teamAbsent }
-  }
-  if (searchForm.roundAround) {
-    query['roundAround.' + searchForm.roundAround] = false
-  }
-  //console.log('Query:', query)
+  // query statements
+  let $match = {}
 
-  Raport.find(query, ['_id', 'shift', 'date', 'failure']).exec(function (
-    err,
-    result
-  ) {
+  if (searchForm.shift) {
+    $match['shift'] = Number(searchForm.shift)
+  }
+  if (searchForm.timespanLt && searchForm.timespanGt) {
+    $match['timespan'] = {
+      $lte: Number(searchForm.timespanLt),
+      $gte: Number(searchForm.timespanGt),
+    }
+  } else if (searchForm.timespanLt) {
+    $match['timespan'] = {
+      $lte: Number(searchForm.timespanLt),
+    }
+  } else if (searchForm.timespanGt) {
+    $match['timespan'] = {
+      $gte: Number(searchForm.timespanGt),
+    }
+  }
+  /*
+    █▀▄ ▄▀█ ▀█▀ █▀▀ █▀
+    █▄▀ █▀█ ░█░ ██▄ ▄█
+  */
+  if (searchForm.dateStart) {
+    $match['startDate'] = { $gte: new Date(searchForm.dateStart) }
+  }
+  if (searchForm.dateEnd) {
+    $match['endDate'] = { $lte: new Date(searchForm.dateEnd) }
+  }
+  /*
+    █░█ █▀█ █░█ █▀█ █▀
+    █▀█ █▄█ █▄█ █▀▄ ▄█
+  */
+  // if no date is passed it means only hour is passed
+  // if (searchForm.hourStart) {
+  //   $match['hourStart'] = { $gte: searchForm.hourStart }
+  // }
+  // if (searchForm.hourEnd) {
+  //   $match['hourEnd'] = { $lt: searchForm.hourEnd }
+  // }
+
+  let queryAgg = [projectFields, { $match }]
+
+  console.log('Query:', queryAgg)
+  console.log('Query:', $match)
+
+  Failure.aggregate(queryAgg).exec(function (err, result) {
     if (err) {
       res.status(500).json(err)
       return next(err)
