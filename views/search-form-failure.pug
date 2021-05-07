@@ -91,9 +91,9 @@ block content
                   td
                      label Urządzenie
                      select.form-control#device
-                        option(value='defaultvalue' selected=true) Dowolne Urządzenie
-                        each item in devices
-                           option( value=item._id ) #{item.name}
+                        //- option(value='defaultvalue' selected=true) Dowolne Urządzenie
+                        //- each item in devices
+                        //-    option( value=item._id ) #{item.name}
       div(class='row')
          div(class="col my-2")
             table.table.table-bordered
@@ -117,6 +117,62 @@ block content
          div.col.my-2
 
 
+
+   script.
+      const allDevices =  !{JSON.stringify(devices)}
+      //console.log(allDevices)
+      renderDevices(allDevices)
+
+      let linePicked = 'defaultvalue'
+      let operationPicked = 'defaultvalue'
+      let devicetypePicked = 'defaultvalue'
+
+      document.getElementById("line").onchange = function(e) {
+         linePicked = this.value
+         updateDevices()
+      }
+      document.getElementById("operation").onchange = function(e) {
+         operationPicked = this.value
+         updateDevices()
+      }
+      document.getElementById("devicetype").onchange = function(e) {
+         devicetypePicked = this.value
+         updateDevices()
+      }
+
+         /*
+         (device.prodLine.toString() === (linePicked==='defaultvalue'? device.prodLine.toString() : linePicked) &&
+               device.operation.toString() === (operationPicked==='defaultvalue'? device.operation.toString() : operationPicked) &&
+               device.deviceType.toString() === (devicetypePicked==='defaultvalue'? device.deviceType.toString() : devicetypePicked))
+               */
+
+      function updateDevices(){
+         let devices = []
+         for (device of allDevices){
+            if((linePicked==='defaultvalue' ? true : device.prodLine.toString() === linePicked) &&
+               (operationPicked==='defaultvalue' ? true : device.operation.toString() === operationPicked) &&
+               (devicetypePicked==='defaultvalue' ? true : device.deviceType.toString() === devicetypePicked)){
+               devices.push(device)
+            }
+         }
+         removeOptions(document.getElementById('device'))
+         renderDevices(devices)
+      }
+
+      function renderDevices(devices){
+         let devicesHTML = `<option value='defaultvalue' selected=true> Dowolne Urządzenie </option>`
+         for(device of devices) {
+            devicesHTML = devicesHTML + '<option value='+ device._id +'>' + device.name + '</option>';
+         }
+         let whereToPaste = document.querySelector('#device')
+         whereToPaste.insertAdjacentHTML('beforeend', devicesHTML)
+      }
+      function removeOptions(selectElement) {
+         var i, L = selectElement.options.length - 1;
+         for(i = L; i >= 0; i--) {
+            selectElement.remove(i);
+         }
+      }
 
 
    script.
@@ -284,8 +340,6 @@ block content
           let container = ''
          for (failure of data){
             let url = '/api/failure/'+failure._id
-            
-
             container = container +`
             <tr> 
                <td class='padding0'> 
@@ -297,17 +351,17 @@ block content
             </tr>`
          }
          let raport_count = data.length
-         //- let deklinacja_raportu
-         //- if (raport_count===0 || raport_count>=5)
-         //-    deklinacja_raportu = 'Raportów'
-         //- else if (raport_count===1)
-         //-    deklinacja_raportu = 'Raport'
-         //- else
-         //-    deklinacja_raportu = 'Raporty'
+         let deklinacja_awarii
+         if (raport_count===0 || raport_count>=5)
+            deklinacja_awarii = 'Awarii'
+         else if (raport_count===1)
+            deklinacja_awarii = 'Awarię'
+         else
+            deklinacja_awarii = 'Awarie'
          pasteHTML = (`
          <div class='row' id='searchResults'>
             <div class='col my-2'>
-               <h2> Znaleziono `+raport_count +` Awarii.</h2>
+               <h2> Znaleziono `+raport_count +' '+deklinacja_awarii+`.</h2>
                   <table class='table table-bordered table-hover dark-header-hover'>
                      <thead class='table-dark'>
                         <tr>
@@ -319,7 +373,6 @@ block content
                      `+container+` 
                      </tbody>
                   </table>
-                   
             </div>
          </div>
             `)
