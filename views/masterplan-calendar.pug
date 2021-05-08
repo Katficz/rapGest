@@ -37,27 +37,27 @@ block content
                           div.col
                             label Linia
                             select.planLine.form-control(type='select' name='line' )
-                              option(value='Dowolne' selected) Dowolne
+                              option(value='defaultvalue' selected) Dowolne
                               each line in lines
                                 if plan
                                   option(value=line._id) #{line.name}
                           div.col
                             label Operacja
                             select.planOperation.form-control(type='select' name='operation' )
-                              option(value='Dowolne' selected) Dowolne
+                              option(value='defaultvalue' selected) Dowolne
                               each operation in operations
                                   option(value=operation._id) #{operation.name}
                         div.mt-4(class='row')
                           div.col
                             label Typ Urządzenia
                             select.planDevicetype.form-control(type='select' name='devicetype' )
-                              option(value='Dowolne' selected) Dowolne
+                              option(value='defaultvalue' selected) Dowolne
                               each devicetype in devicetypes
                                   option(value=devicetype._id) #{devicetype.name}
                           div.col
                             label Urządzenie
                             select.planDevice.form-control(type='select' name='device' )
-                              option(value='Dowolne' selected) Dowolne
+                              option(value='defaultvalue' selected) Dowolne
                               each device in devices
                                   option(value=device._id) #{device.name}
                         div.mt-4(class='row')
@@ -79,6 +79,48 @@ block content
   link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.css')
   script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/main.min.js')
   script(src='https://cdn.jsdelivr.net/npm/fullcalendar@5.6.0/locales-all.min.js')
+  script.
+    const allDevices =  !{JSON.stringify(devices)}
+    const allMasterplans = !{JSON.stringify(masterplans)}
+
+    for (masterplan of allMasterplans){
+      masterplanID = 'ID' + masterplan._id
+      
+      masterplanForm = document.getElementById(masterplanID)
+      masterplanForm.querySelector('.planLine').addEventListener('change', updateDevices)
+      masterplanForm.querySelector('.planOperation').addEventListener('change', updateDevices)
+      masterplanForm.querySelector('.planDevicetype').addEventListener('change', updateDevices)
+    }
+    function updateDevices(){
+      let parent = this.parentNode.parentNode.parentNode
+          let line = parent.querySelector('.planLine').value
+          let operation = parent.querySelector('.planOperation').value
+          let devicetype = parent.querySelector('.planDevicetype').value
+          let devices = []
+          for (device of allDevices){
+            if((line==='defaultvalue' ? true : device.prodLine.toString() === line) &&
+               (operation==='defaultvalue' ? true : device.operation.toString() === operation) &&
+               (devicetype==='defaultvalue' ? true : device.deviceType.toString() === devicetype)){
+               devices.push(device)
+            }
+         }
+         removeOptions(parent.querySelector('.planDevice'))
+         renderDevices(devices, parent)
+    }
+    function renderDevices(devices, parent){
+         let devicesHTML = `<option value='defaultvalue' selected=true> Dowolne Urządzenie </option>`
+         for(device of devices) {
+            devicesHTML = devicesHTML + '<option value='+ device._id +'>' + device.name + '</option>';
+         }
+         let whereToPaste = parent.querySelector('.planDevice')
+         whereToPaste.insertAdjacentHTML('beforeend', devicesHTML)
+      }
+      function removeOptions(selectElement) {
+         var i, L = selectElement.options.length - 1;
+         for(i = L; i >= 0; i--) {
+            selectElement.remove(i);
+         }
+      }
   script.
     // PLAN: ['_id', 'name', 'dateStart', 'dateEnd', 'status']
     let events_list = !{JSON.stringify(events_list)}
@@ -156,13 +198,13 @@ block content
           status: planStatus }
 
         // If line name is not picked it's value is equal to "dowolne". Don't save such objects.
-        if (planLine !== 'Dowolne')
+        if (planLine !== 'defaultvalue')
           createdPlans['ID'+temporaryId].line = planLine
-        if (planOperation !== 'Dowolne')
+        if (planOperation !== 'defaultvalue')
           createdPlans['ID'+temporaryId].operation = planOperation
-        if (planDevicetype !== 'Dowolne')
+        if (planDevicetype !== 'defaultvalue')
           createdPlans['ID'+temporaryId].devicetype = planDevicetype
-        if (planDevice !== 'Dowolne')
+        if (planDevice !== 'defaultvalue')
           createdPlans['ID'+temporaryId].device = planDevice
 
 

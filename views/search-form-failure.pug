@@ -91,9 +91,9 @@ block content
                   td
                      label Urządzenie
                      select.form-control#device
-                        //- option(value='defaultvalue' selected=true) Dowolne Urządzenie
-                        //- each item in devices
-                        //-    option( value=item._id ) #{item.name}
+                        option(value='defaultvalue' selected=true) Dowolne Urządzenie
+                        each item in devices
+                           option( value=item._id ) #{item.name}
       div(class='row')
          div(class="col my-2")
             table.table.table-bordered
@@ -120,38 +120,23 @@ block content
 
    script.
       const allDevices =  !{JSON.stringify(devices)}
-      //console.log(allDevices)
-      renderDevices(allDevices)
-
       let linePicked = 'defaultvalue'
       let operationPicked = 'defaultvalue'
       let devicetypePicked = 'defaultvalue'
 
-      document.getElementById("line").onchange = function(e) {
-         linePicked = this.value
-         updateDevices()
-      }
-      document.getElementById("operation").onchange = function(e) {
-         operationPicked = this.value
-         updateDevices()
-      }
-      document.getElementById("devicetype").onchange = function(e) {
-         devicetypePicked = this.value
-         updateDevices()
-      }
-
-         /*
-         (device.prodLine.toString() === (linePicked==='defaultvalue'? device.prodLine.toString() : linePicked) &&
-               device.operation.toString() === (operationPicked==='defaultvalue'? device.operation.toString() : operationPicked) &&
-               device.deviceType.toString() === (devicetypePicked==='defaultvalue'? device.deviceType.toString() : devicetypePicked))
-               */
+      document.getElementById('line').addEventListener('change', updateDevices)
+      document.getElementById('operation').addEventListener('change', updateDevices)
+      document.getElementById('devicetype').addEventListener('change', updateDevices)
 
       function updateDevices(){
          let devices = []
+         let line = document.getElementById('line').value
+         let operation = document.getElementById('operation').value
+         let devicetype = document.getElementById('devicetype').value
          for (device of allDevices){
-            if((linePicked==='defaultvalue' ? true : device.prodLine.toString() === linePicked) &&
-               (operationPicked==='defaultvalue' ? true : device.operation.toString() === operationPicked) &&
-               (devicetypePicked==='defaultvalue' ? true : device.deviceType.toString() === devicetypePicked)){
+            if((line==='defaultvalue' ? true : device.prodLine.toString() === line) &&
+               (operation==='defaultvalue' ? true : device.operation.toString() === operation) &&
+               (devicetype==='defaultvalue' ? true : device.deviceType.toString() === devicetype)){
                devices.push(device)
             }
          }
@@ -173,8 +158,7 @@ block content
             selectElement.remove(i);
          }
       }
-
-
+      
    script.
       //- let usersList = !{JSON.stringify(users)}
       //- let users = ''
