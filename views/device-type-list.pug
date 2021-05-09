@@ -8,12 +8,15 @@ block content
         table.table.table-bordered.table-striped.table-hover.dark-header-hover
             thead.table-dark
                 tr
-                    th.text-center Lista
+                    th(width='30%') Nazwa
+                    th Opis
             tbody
                 each devicetype in list
                     tr
                         td.padding0
-                            a.black-link(href=devicetype.url) #{devicetype.name}
+                            a.black-link(href=devicetype.url) #{devicetype.name==null ? '' : devicetype.name}
+                        td.padding0
+                            a.black-link(href=devicetype.url) #{devicetype.description==null ? '' : devicetype.description}
                 else
                     li Nie znaleziono żadnych typów urządzeń.
 

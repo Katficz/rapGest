@@ -1,20 +1,20 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 const deviceTypeSchema = new Schema({
-    name: {
-        require: true,
-        type: String,
-        maxlength: 50
-    },
-    description: {
-        type: String,
-    }
+  name: {
+    require: true,
+    type: String,
+    maxlength: 400,
+  },
+  description: {
+    type: String,
+  },
 })
 
 deviceTypeSchema.virtual('url').get(function () {
-    return '/api/typy-urzadzen/' + this._id
- })
+  return '/api/typy-urzadzen/' + this._id
+})
 
 module.exports = mongoose.model('DeviceType', deviceTypeSchema)

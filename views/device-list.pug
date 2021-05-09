@@ -11,15 +11,22 @@ block content
                     tr
                         th.text-center(scope='col' colspan='3') #{line.name}
                 tbody
+                    tr 
+                        th.text-center Operacja
+                        th.text-center Typ
+                        th.text-center Nazwa
+                        //- th.text-center Opis
                     each device in device_list
                         if device.prodLine == line._id.toString()
                             tr
-                                td.padding0(width="33%") 
+                                td.padding0(width="25%") 
                                     a.black-link(href=device.url) #{device.operation==null ? '' : device.operation.name} 
-                                td.padding0(width="33%") 
+                                td.padding0(width="25%") 
                                     a.black-link(href=device.url) #{device.deviceType==null ? '' : device.deviceType.name} 
-                                td.padding0(width="33%") 
-                                    a.black-link(href=device.url) #{device.name}
+                                td.padding0(width="25%") 
+                                    a.black-link(href=device.url) #{device.deviceType==null ? '' : device.name}
+                                //- td.padding0(width="25%") 
+                                //-     a.black-link(href=device.url) #{device.description==null ? '' : device.description}
 
 
         if errors

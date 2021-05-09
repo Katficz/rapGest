@@ -6,19 +6,21 @@ block content
 
       a.btn.btn-primary.my-2(href="/api/operation/create") Utwórz Operację
 
-      table.table.table-bordererd.table-striped.table-hover.dark-header-hover
-         thead.table-dark
-            tr
-               th.text-center(scope='col' colspan='2') Lista
-
-
-         tbody
-            each operation in operation_list
-               tr
-                  td.padding0(width="50%") 
-                     a.black-link(href=operation.url) #{operation.line.name} 
-                  td.padding0
-                     a.black-link(href=operation.url) #{operation.name}
+      table.table.table-bordered.table-striped.table-hover.dark-header-hover
+            thead.table-dark
+                tr
+                    th(width='30%') Nazwa
+                    th Opis
+            tbody
+                each operation in operation_list
+                    tr
+                        td.padding0
+                            a.black-link(href=operation.url) #{operation.name==null ? '' : operation.name}
+                        td.padding0
+                            a.black-link(href=operation.url) #{operation.description==null ? '' : operation.description}
+                        
+                else
+                    li Nie znaleziono żadnych typów urządzeń.
 
 
    script.

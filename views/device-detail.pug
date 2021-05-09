@@ -2,17 +2,36 @@ extends layout
 
 block content
     div(class="col mx-md-5")
-        h1 #{title}
+        div(class='row')
+            div.col
+                h1 #{title}
+        div.mt-4(class='row')
+            div.col
+                table(class='table table-bordered')
+                    thead.table-dark
+                        tr
+                            th(scope="col" colspan='2').text-center #{device.name==null ? '' : device.name}
+                    tbody
+                        tr
+                            td(width='50%') IP
+                            td #{device.ip==null ? '' : device.ip}
+                        tr
+                            td Linia
+                            td #{device.line==null ? '' : device.line.name}
+                        tr
+                            td Operacja
+                            td #{device.operation==null ? '' : device.operation.name}
+                        tr
+                            td Typ urządzenia
+                            td #{device.deviceType==null ? '' : device.deviceType.name}
+                        tr
+                            td Opis
+                            td #{device.desctiption==null ? '' : device.desctiption}
 
-        p #[strong Nazwa:] #{device.name}
-        p #[strong Ip:] #{device.ip==null ? '' : device.ip}
-        p #[strong Linia:] #{device.line==null ? '' : device.prodLine.name}
-        p #[strong Operacja:] #{device.operation==null ? '' : device.operation.name}
-        p #[strong Typ urządzenia:] #{device.deviceType==null ? '' : device.deviceType.name}
-        p #[strong Opis:] #{device.desctiption==null ? '' : device.description}
-
-        a.btn.btn-danger.my-5.mr-2(href=device.url + '/usun') Usuń 
-        a.btn.btn-primary.my-5.mr-2(href=device.url + '/edytuj') Zmodyfikuj 
+        div(class='row')
+            div(class='col mx-md-5 mt-4')
+                a.btn.btn-danger.my-5.mr-2(href=device.url + '/usun') Usuń 
+                a.btn.btn-primary.my-5.mr-2(href=device.url + '/edytuj') Zmodyfikuj 
 
 
 

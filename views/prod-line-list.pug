@@ -8,12 +8,15 @@ block content
         table.table.table-bordered.table-striped.table-hover.dark-header-hover
             thead.table-dark
                 tr
-                    th.text-center Lista
+                    th(width='30%') Nazwa
+                    th Opis
             tbody
                 each line in list
                     tr
                         td.padding0
                             a.black-link(href=line.url) #{line.name}
+                        td.padding0
+                            a.black-link(href=line.url) #{line.description}
                 else
                     li.list-group-item Brak linii.
 
