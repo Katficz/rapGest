@@ -8,38 +8,38 @@ block content
                 button.btn.btn-outline-warning#newFailure(type="button" onclick='addFBtn()') Dodaj Awarię
 
                 div.accordion#failureAccordion.mt-2(data-raport=myRaport data-coworkers=coWorkers data-loggedInUser=loggedInUser.fullname)
-                    
+
                     if myRaport.failure.length!=0
-                        
+
                         each failure, index in myRaport.failure
 
                             div.card#card(value=failure._id)
-                                
+
                                 div.card-header.gestamp-bg-color
                                     h2.mb-0 
                                         button.btn.btn-link.btn-block.text-left.collapsed(type="button" data-toggle="collapse" data-target='#collapse'+index aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num #{index + 1} Dodana przez: #{failure.author.fullname}
-                                
+
                                 div.collapse(data-parent="#failureAccordion" id='collapse'+index)
-                                    
-                                    div.card-body
-                                        
+
+                                    div.card-body(id=('ID'+failure._id))
+
                                         form(data-rapId=myRaport._id data-failureId=failure._id)
-                                            
+
                                             div.form-row#startUpOption(data-failure=failure)
                                                 div.form-group.col-4
                                                     label Linia produkcyjna
                                                     select.prodLineOption.form-control(name="prodLine")
-                                                        option(value='Dowolna' selected) -
+                                                        option(value='defaultvalue' selected) -
                                                         each prodLineIterate in prodLines 
                                                             if failure.prodLine
                                                                 option(value=prodLineIterate._id selected=(failure.prodLine.name==prodLineIterate.name)) #{prodLineIterate.name}   
                                                             else
                                                                 option(value=prodLineIterate._id) #{prodLineIterate.name}
-                                                              
+
                                                 div.form-group.col-4
                                                     label Operacja
                                                     select.operationOption.form-control
-                                                        option(value='Dowolna' selected) -
+                                                        option(value='defaultvalue' selected) -
                                                         each operation in operations
                                                             if failure.operation
                                                                 option(value=operation._id selected=(failure.operation.name==operation.name)) #{operation.name}  
@@ -49,7 +49,7 @@ block content
                                                 div.form-group.col-4
                                                     label Typ urządzenia
                                                     select.deviceTypeOption.form-control
-                                                        option(value='Dowolna' selected) -
+                                                        option(value='defaultvalue' selected) -
                                                         each deviceTypeIt in deviceTypes
                                                             if failure.deviceType
                                                                 option(value=deviceTypeIt._id selected=(failure.deviceType.name==deviceTypeIt.name)) #{deviceTypeIt.name}  
@@ -59,7 +59,7 @@ block content
                                                 div.form-group.col-4
                                                     label Urządzenie
                                                     select.deviceOption.form-control
-                                                        option(value='Dowolna' selected) -
+                                                        option(value='defaultvalue' selected) -
                                                         each deviceIt in devices
                                                             if failure.device
                                                                 option(value=deviceIt._id selected=(failure.device.name==deviceIt.name)) #{deviceIt.name}
@@ -118,11 +118,11 @@ block content
                                                 div.form-group.col-12
                                                     p Pracujący przy awarii:
                                                         ul.nice-shifts-border.list-unstyled
-                                                                each employee in coWorkers
-                                                                    div(class='aa'+failure._id.toString() data-emplo=employee._id)
-                                                                        li
-                                                                            input.mr-1.collabsCheckBox(type='checkbox' name='nonCollabs' data-employeeId=employee._id.toString() disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
-                                                                            label(for='nonCollabs') #{employee.name} #{employee.surname}
+                                                            each employee in coWorkers
+                                                                div(class='aa'+failure._id.toString() data-emplo=employee._id)
+                                                                    li
+                                                                        input.mr-1.collabsCheckBox(type='checkbox' name='nonCollabs' data-employeeId=employee._id.toString() disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true))
+                                                                        label(for='nonCollabs') #{employee.name} #{employee.surname}
                                             div.form-row
                                                 div.form-group.col-12
                                                     button.btn.btn-outline-danger#deleteFailure(type="button" onclick='deleteSomeFail(this)' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) Usuń
@@ -139,28 +139,28 @@ block content
                                         div.form-group.col-4
                                             label Linia produkcyjna
                                             select.prodLineOption.form-control(name="prodLine")
-                                                option(value='Dowolna' selected) -
+                                                option(value='defaultvalue' selected) -
                                                 each prodLineIterate in prodLines 
-                                                        option(value=prodLineIterate._id) #{prodLineIterate.name}
-                                                        
+                                                    option(value=prodLineIterate._id) #{prodLineIterate.name}
+
                                         div.form-group.col-4
                                             label Operacja
                                             select.operationOption.form-control
-                                                option(value='Dowolna' selected) -
+                                                option(value='defaultvalue' selected) -
                                                 each operation in operations
-                                                        option(value=operation._id) #{operation.name}
+                                                    option(value=operation._id) #{operation.name}
 
                                         div.form-group.col-4
                                             label Typ urządzenia
                                             select.deviceTypeOption.form-control
-                                                option(value='Dowolna' selected) -
+                                                option(value='defaultvalue' selected) -
                                                 each deviceTypeIt in deviceTypes
-                                                        option(value=deviceTypeIt._id) #{deviceTypeIt.name}
+                                                    option(value=deviceTypeIt._id) #{deviceTypeIt.name}
 
                                         div.form-group.col-4
                                             label Urządzenie
                                             select.deviceOption.form-control
-                                                option(value='Dowolna' selected) -
+                                                option(value='defaultvalue' selected) -
                                                 each deviceIt in devices
                                                     option(value=deviceIt._id) #{deviceIt.name}
                                     div.form-row
@@ -227,7 +227,49 @@ block content
 
     div#snackbar 
 
-    
+    script.
+        const allDevices =  !{JSON.stringify(devices)}
+        const allFailures = !{JSON.stringify(myRaport.failure)}
+
+        for (failure of allFailures){
+            failureID = 'ID' + failure._id
+
+            failureForm = document.getElementById(failureID)
+            failureForm.querySelector('.prodLineOption').addEventListener('change', updateDevices)
+            failureForm.querySelector('.operationOption').addEventListener('change', updateDevices)
+            failureForm.querySelector('.deviceTypeOption').addEventListener('change', updateDevices)
+        }
+        function updateDevices(){
+            let parent = this.parentNode.parentNode
+            let line = parent.querySelector('.prodLineOption').value
+            let operation = parent.querySelector('.operationOption').value
+            let devicetype = parent.querySelector('.deviceTypeOption').value
+            let devices = []
+            for (device of allDevices){
+                if((line==='defaultvalue' ? true : device.prodLine.toString() === line) &&
+                    (operation==='defaultvalue' ? true : device.operation.toString() === operation) &&
+                    (devicetype==='defaultvalue' ? true : device.deviceType.toString() === devicetype)){
+                    devices.push(device)
+                }
+            }
+            removeOptions(parent.querySelector('.deviceOption'))
+            renderDevices(devices, parent)
+        }
+        function renderDevices(devices, parent){
+            let devicesHTML = `<option value='defaultvalue' selected=true> - </option>`
+            for(device of devices) {
+                devicesHTML = devicesHTML + '<option value='+ device._id +'>' + device.name + '</option>';
+            }
+            let whereToPaste = parent.querySelector('.deviceOption')
+            whereToPaste.insertAdjacentHTML('beforeend', devicesHTML)
+            }
+        function removeOptions(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
+
     script.
         raport = !{JSON.stringify(myRaport)}
         const activateLink = document.querySelector('#seconSectionActive')
@@ -261,6 +303,10 @@ block content
             newDiv.lastChild.id = 'collapse'+failureNum
             newDiv.style.display = 'flex'
             bigDiv.appendChild(newDiv)
+
+            newDiv.querySelector('.prodLineOption').addEventListener('change', updateDevices)
+            newDiv.querySelector('.operationOption').addEventListener('change', updateDevices)
+            newDiv.querySelector('.deviceTypeOption').addEventListener('change', updateDevices)
         }
 
         function deleteSomeFail(button) {
@@ -275,7 +321,7 @@ block content
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({failureId: form.dataset.failureid})
-                    
+
                 })
                 .then(function(response) {
                 console.log(response)
@@ -367,7 +413,7 @@ block content
 
             //usedParts = form.childNodes[6].childNodes[0].childNodes[1].value
             //missingParts = form.childNodes[6].childNodes[1].childNodes[1].value
-            
+
             collaborators = []
             collabsCheck = form.querySelectorAll('.collabsCheckBox')
             for(let i = 0;i<collabsCheck.length;i++) {
@@ -392,13 +438,13 @@ block content
             }
             console.log(formBody)
 
-            if (operationId !== 'Dowolna')
+            if (operationId !== 'defaultvalue')
                 formBody.operation = operationId
-            if (prodLineId !== 'Dowolna')
+            if (prodLineId !== 'defaultvalue')
                 formBody.prodLine = prodLineId
-            if (deviceTypeId !== 'Dowolna')
+            if (deviceTypeId !== 'defaultvalue')
                 formBody.deviceType = deviceTypeId
-            if (deviceId !== 'Dowolna')
+            if (deviceId !== 'defaultvalue')
                 formBody.device = deviceId
 
 
@@ -428,7 +474,7 @@ block content
                 alert(err.message)
             })
         }
-    
+
     if errors
         ul
             for error in errors

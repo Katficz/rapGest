@@ -319,8 +319,8 @@ block content
       }
 
       function handleResData(data){
-         console.log(data)
-         data.sort(function(a, b) {let dateA = a.startDate; let dateB = b.startDate; return (dateA < dateB) ? -1 : (dateA > dateB) ? 1 : 0;});
+         //console.log(data)
+         //data.sort(function(a, b) {let dateA = a.startDate; let dateB = b.startDate; return (dateA < dateB) ? -1 : (dateA > dateB) ? 1 : 0;});
           let container = ''
          for (failure of data){
             let url = '/api/failure/'+failure._id
