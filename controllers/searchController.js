@@ -139,6 +139,21 @@ exports.search_failure_post = function (req, res, next) {
       timespan: { $subtract: ['$endDate', '$startDate'] },
     },
   }
+  let sortFields = {
+    $sort: { startDate: 1 },
+  }
+  let limitOutputFields = {
+    $unset: [
+      'shift',
+      'author',
+      'prodLine',
+      'operation',
+      'deviceType',
+      'device',
+      'status',
+      'timespan',
+    ],
+  }
   // query statements
   let $match = {}
 
@@ -203,10 +218,10 @@ exports.search_failure_post = function (req, res, next) {
   //   $match['hourEnd'] = { $lt: searchForm.hourEnd }
   // }
 
-  let queryAgg = [projectFields, { $match }]
+  let queryAgg = [projectFields, { $match }, limitOutputFields, sortFields]
 
-  console.log('Query:', queryAgg)
-  console.log('Query:', $match)
+  // console.log('Query:', queryAgg)
+  // console.log('Query:', $match)
 
   Failure.aggregate(queryAgg).exec(function (err, result) {
     if (err) {

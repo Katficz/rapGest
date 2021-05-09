@@ -3,8 +3,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const OperationSchema = new Schema({
-  name: { type: String, required: true, maxlength: 100 },
-  line: { type: Schema.Types.ObjectId, ref: 'ProdLine' },
+  name: { type: String, required: true, maxlength: 400 },
+  description: {
+    type: String,
+  },
 })
 
 // Virtual for plan's URL

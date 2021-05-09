@@ -2,9 +2,12 @@ extends layout
 
 block content 
     div.container
+        div(class='row')
+            div(class='col h2 d-flex justify-content-center umfy-clock')
+                div(id="clock" class="clock") #{new Date()}
         div.row
-            div.col-10.offset-1.col-xs-12
-                h1.h1.m-3.text-center= title
+            div.col
+                //h1.h1.m-3.text-center= title
                 table.table.table-bordered
                     thead 
                         tr
@@ -109,7 +112,13 @@ block content
             }
         }
 
-
+    script.
+        function update() {
+            now = new Date()
+            document.querySelector('#clock').innerHTML = now.toLocaleString()
+        }
+        update()
+        setInterval(update, 1000);
     if errors
         ul
             for error in errors

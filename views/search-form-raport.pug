@@ -5,68 +5,71 @@ block content
          div(class="col my-5")
             h1.text-center.mb-3 Wyszukiwanie Raportów
       div(class='row')
-         div(class="col my-2")
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='4') Data Utworzenia raportu
-               tbody
-                  td 
-                     label(for='dateStart') Od
-                     input.form-control#dateStart(type='date' name='date_execution')
-                  td 
+         .col(style='min-width:540px')
+            div(class='row')
+               div(class="col my-2")
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center(colspan='4') Data Utworzenia raportu
+                     tbody
+                        td 
+                           label(for='dateStart') Od
+                           input.form-control#dateStart(type='date' name='date_execution')
+                        td 
 
-                     label(for='dateEnd') Do
-                     input.form-control#dateEnd(type='date' name='date_execution')
-                  td 
-                     label(for='shiftnum') Zmiana
-                     select.form-control#shiftnum
-                        option(value='Dowolna' selected='selected') Dowolna
-                        option(value='1') Poranna
-                        option(value='2') Popołudniowa
-                        option(value='3') Nocna
-      div(class='row')   
-         div.col.my-2            
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center Obecni na zmianie
-               tbody(id='teamPresent')
-                  tr
-                     td
-                        button(class="btn btn-danger" type='button' id="addUserButtonPresent" onclick='addUserPresent()') Dodaj
-      div(class='row')   
-         div.col.my-2            
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center Nieobecni na zmianie
-               tbody(id='teamAbsent')
-                  tr
-                     td
-                        button(class="btn btn-danger" type='button' id="addUserButtonAbsent" onclick='addUserAbsent()') Dodaj
-      div(class='row')
-         div.col.my-2
-            table.table.table-bordered.mb-5
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='2') Obchód - wadliwy element
-               tbody
-                  tr
-                     td
-                        select.form-control#roundAround
-                           option(value='Dowolne' selected=true) Dowolne
-                           option(value='isKettle') Kotłownia
-                           option(value='isCompressor') Kompresownia
-                           option(value='isIce') Wieża Chłodu
-                           option(value='isElectric') Rozdzielnia
-                           option(value='isWorkshop') Warsztat
+                           label(for='dateEnd') Do
+                           input.form-control#dateEnd(type='date' name='date_execution')
+                        td 
+                           label(for='shiftnum') Zmiana
+                           select.form-control#shiftnum
+                              option(value='Dowolna' selected='selected') Dowolna
+                              option(value='1') Poranna
+                              option(value='2') Popołudniowa
+                              option(value='3') Nocna
+            div(class='row')   
+               div.col.my-2            
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center Obecni na zmianie
+                     tbody(id='teamPresent')
+                        tr
+                           td
+                              button(class="btn btn-danger" type='button' id="addUserButtonPresent" onclick='addUserPresent()') Dodaj
+            div(class='row')   
+               div.col.my-2            
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center Nieobecni na zmianie
+                     tbody(id='teamAbsent')
+                        tr
+                           td
+                              button(class="btn btn-danger" type='button' id="addUserButtonAbsent" onclick='addUserAbsent()') Dodaj
+            div(class='row')
+               div.col.my-2
+                  table.table.table-bordered.mb-5
+                     thead.table-dark
+                        tr
+                           th.text-center(colspan='2') Obchód - wadliwy element
+                     tbody
+                        tr
+                           td
+                              select.form-control#roundAround
+                                 option(value='Dowolne' selected=true) Dowolne
+                                 option(value='isKettle') Kotłownia
+                                 option(value='isCompressor') Kompresownia
+                                 option(value='isIce') Wieża Chłodu
+                                 option(value='isElectric') Rozdzielnia
+                                 option(value='isWorkshop') Warsztat
 
-      div(class='row')
-         div.col.my-2
-            button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
-      div(class='row' id='searchResults')
-         div.col.my-2
+            div(class='row')
+               div.col.my-2
+                  button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
+         .col#here(style='min-width:540px')
+            div.h2(class='row' id='searchResults') Wyniki wyszukiwania:
+               div.col.my-2
 
 
 
@@ -244,8 +247,8 @@ block content
             </div>
          </div>
             `)
-      whereToPaste = document.querySelector('#postSearchButton')
-      whereToPaste.insertAdjacentHTML('afterend', pasteHTML)
+      whereToPaste = document.querySelector('#here')
+      whereToPaste.insertAdjacentHTML('beforeend', pasteHTML)
       }
 
 

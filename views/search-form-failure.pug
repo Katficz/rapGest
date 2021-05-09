@@ -5,116 +5,119 @@ block content
          div(class="col my-5")
             h1.text-center.mb-3 Wyszukiwanie Awarii
       div(class='row')
-         div(class="col my-2")
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='3') Czas wystąpienia awarii
-               tbody
-                  tr
-                     td(width='40%')
-                        label(for='dateStart') Od
-                        input.form-control#dateStart(type='date' name='dateStart')
-                     td(colspan='2')
-                        label(for='shiftnum') Numer zmiany
-                        select.form-control#shiftnum
-                           option(value='defaultvalue' selected='selected') Dowolna
-                           option(value='1') Poranna
-                           option(value='2') Popołudniowa
-                           option(value='3') Nocna
+         .col(style='min-width:540px')
+            div(class='row')
+               div(class="col my-2")
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center(colspan='3') Czas wystąpienia awarii
+                     tbody
+                        tr
+                           td(width='40%')
+                              label(for='dateStart') Od
+                              input.form-control#dateStart(type='date' name='dateStart')
+                           td(colspan='2')
+                              label(for='shiftnum') Numer zmiany
+                              select.form-control#shiftnum
+                                 option(value='defaultvalue' selected='selected') Dowolna
+                                 option(value='1') Poranna
+                                 option(value='2') Popołudniowa
+                                 option(value='3') Nocna
 
-                  tr
-                     td 
-                        label(for='dateEnd') Do
-                        input.form-control#dateEnd(type='date' name='dateEnd')
-                     td
-                        label(for='timespanGt') Dłuższa niż
-                           input.form-control#timespanGt(type='time' name='timespanGt')
-                     td
-                        label(for='timespanLt') Krótsza niż
-                           input.form-control#timespanLt(type='time' name='timespanLt')
+                        tr
+                           td 
+                              label(for='dateEnd') Do
+                              input.form-control#dateEnd(type='date' name='dateEnd')
+                           td
+                              label(for='timespanGt') Dłuższa niż
+                                 input.form-control#timespanGt(type='time' name='timespanGt')
+                           td
+                              label(for='timespanLt') Krótsza niż
+                                 input.form-control#timespanLt(type='time' name='timespanLt')
 
 
-      div(class='row')   
-         div.col.my-2            
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center Autor
-               tbody(id='author')
-                  tr
-                     td
-                        select#user.form-control(type='select' name='user' )
-                           option(value='defaultvalue' selected=true) Dowolne
-                           for user in users
-                              if plan
-                                 option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
-                              else
-                                 option(value=user._id) #{user.fullname}            
+            div(class='row')   
+               div.col.my-2            
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center Autor
+                     tbody(id='author')
+                        tr
+                           td
+                              select#user.form-control(type='select' name='user' )
+                                 option(value='defaultvalue' selected=true) Dowolne
+                                 for user in users
+                                    if plan
+                                       option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
+                                    else
+                                       option(value=user._id) #{user.fullname}            
 
-      //- div(class='row')   
-      //-    div.col.my-2            
-      //-       table.table.table-bordered
-      //-          thead.table-dark
-      //-             tr
-      //-                th.text-center Współautorzy 
-      //-          tbody(id='usersCollab')
-      //-             tr
-      //-                td
-      //-                   button(class="btn btn-danger" type='button' id="addCollaboratorsButton" onclick='addCollaborators()') Dodaj
-      div(class='row')
-         div.col.my-2
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='4') Urządzenie
-               tbody
-                  td 
-                     label Linia
-                     select.form-control#line
-                        option(value='defaultvalue' selected=true) Dowolna Linia
-                        each item in lines
-                           option( value=item._id) #{item.name}
-                  td 
-                     label Operacja
-                     select.form-control#operation
-                        option(value='defaultvalue' selected=true) Dowolna Operacja
-                        each item in operations
-                           option( value=item._id) #{item.name}
-               tr
-                  td
-                     label Typ urządzenia
-                     select.form-control#devicetype
-                        option(value='defaultvalue' selected=true) Dowolny Typ
-                        each item in devicetypes
-                           option( value=item._id)  #{item.name}
-                  td
-                     label Urządzenie
-                     select.form-control#device
-                        option(value='defaultvalue' selected=true) Dowolne Urządzenie
-                        each item in devices
-                           option( value=item._id ) #{item.name}
-      div(class='row')
-         div(class="col my-2")
-            table.table.table-bordered
-               thead.table-dark
-                  tr
-                     th.text-center(colspan='2') Efekt Awarii
-               tbody
-                  tr
-                     td
-                        label(for='status') 
-                        select.form-control#status
-                           option(value='defaultvalue' selected='selected') Dowolny
-                           option(value='1') Naprawiono
-                           option(value='2') Nie naprawiono
-                           option(value='3') Rozwiązanie tymczasowe
+            //- div(class='row')   
+            //-    div.col.my-2            
+            //-       table.table.table-bordered
+            //-          thead.table-dark
+            //-             tr
+            //-                th.text-center Współautorzy 
+            //-          tbody(id='usersCollab')
+            //-             tr
+            //-                td
+            //-                   button(class="btn btn-danger" type='button' id="addCollaboratorsButton" onclick='addCollaborators()') Dodaj
+            div(class='row')
+               div.col.my-2
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center(colspan='2') Urządzenie
+                     tbody
+                        td(width='50%')
+                           label Linia
+                           select.form-control#line
+                              option(value='defaultvalue' selected=true) Dowolna Linia
+                              each item in lines
+                                 option( value=item._id) #{item.name}
+                        td 
+                           label Operacja
+                           select.form-control#operation
+                              option(value='defaultvalue' selected=true) Dowolna Operacja
+                              each item in operations
+                                 option( value=item._id) #{item.name}
+                     tr
+                        td
+                           label Typ urządzenia
+                           select.form-control#devicetype
+                              option(value='defaultvalue' selected=true) Dowolny Typ
+                              each item in devicetypes
+                                 option( value=item._id)  #{item.name}
+                        td
+                           label Urządzenie
+                           select.form-control#device
+                              option(value='defaultvalue' selected=true) Dowolne Urządzenie
+                              each item in devices
+                                 option( value=item._id ) #{item.name}
+            div(class='row')
+               div(class="col my-2")
+                  table.table.table-bordered
+                     thead.table-dark
+                        tr
+                           th.text-center(colspan='2') Efekt Awarii
+                     tbody
+                        tr
+                           td
+                              label(for='status') 
+                              select.form-control#status
+                                 option(value='defaultvalue' selected='selected') Dowolny
+                                 option(value='1') Naprawiono
+                                 option(value='2') Nie naprawiono
+                                 option(value='3') Rozwiązanie tymczasowe
 
-      div(class='row')
-         div.col.my-2
-            button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
-      div(class='row' id='searchResults')
-         div.col.my-2
+            div(class='row')
+               div.col.my-2
+                  button(class="btn btn-primary mb-2" type='button' id="postSearchButton" onclick='postSearchButton()') Wyszukaj    
+         .col#here(style='min-width:540px')
+            div.h2(class='row' id='searchResults') Wyniki wyszukiwania:
+               div.col.my-2
 
 
 
@@ -319,8 +322,8 @@ block content
       }
 
       function handleResData(data){
-         console.log(data)
-         data.sort(function(a, b) {let dateA = a.startDate; let dateB = b.startDate; return (dateA < dateB) ? -1 : (dateA > dateB) ? 1 : 0;});
+         //console.log(data)
+         //data.sort(function(a, b) {let dateA = a.startDate; let dateB = b.startDate; return (dateA < dateB) ? -1 : (dateA > dateB) ? 1 : 0;});
           let container = ''
          for (failure of data){
             let url = '/api/failure/'+failure._id
@@ -360,8 +363,8 @@ block content
             </div>
          </div>
             `)
-      whereToPaste = document.querySelector('#postSearchButton')
-      whereToPaste.insertAdjacentHTML('afterend', pasteHTML)
+      whereToPaste = document.querySelector('#here')
+      whereToPaste.insertAdjacentHTML('beforeend', pasteHTML)
 
       }
 
