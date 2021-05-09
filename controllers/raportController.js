@@ -18,7 +18,7 @@ exports.raport_GET_list = function (req, res) {
   startDate = new Date()
   // this is bad //too bad!
   startDate.setHours(startDate.getHours() + 2)
-  startDate.setDate(startDate.getDate() - 4)
+  startDate.setUTCDate(startDate.getUTCDate() - 4)
   async.parallel(
     {
       shiftA: function (callback) {
@@ -56,13 +56,15 @@ exports.raport_GET_list = function (req, res) {
       if (err) {
         return next(err)
       }
+      console.log(startDate, 'puszuj mnie plosze')
       var shiftA = []
       var shiftB = []
       var shiftC = []
       var dates = []
-      for (var i = 4; i > 0; i--) {
-        var temp = new Date(startDate.setDate(startDate.getUTCDate()+1))
-        dates.push(DateTime.fromJSDate(temp).toFormat('dd.LL.yyyy'))
+
+      for (var i = 0; i < 4; i++) {
+        startDate.setUTCDate(startDate.getUTCDate()+1)
+        dates.push(DateTime.fromJSDate(startDate).toFormat('dd.LL.yyyy'))
       }
       for (var i = 0; i < dates.length; i++) {
         var match = false
