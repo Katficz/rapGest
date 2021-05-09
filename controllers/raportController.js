@@ -56,7 +56,6 @@ exports.raport_GET_list = function (req, res) {
       if (err) {
         return next(err)
       }
-      console.log(startDate, 'puszuj mnie plosze')
       var shiftA = []
       var shiftB = []
       var shiftC = []
