@@ -62,7 +62,7 @@ exports.raport_GET_list = function (req, res) {
       var dates = []
 
       for (var i = 0; i < 4; i++) {
-        startDate.setUTCDate(startDate.getUTCDate()+1)
+        startDate.setUTCDate(startDate.getUTCDate() + 1)
         dates.push(DateTime.fromJSDate(startDate).toFormat('dd.LL.yyyy'))
       }
       for (var i = 0; i < dates.length; i++) {
@@ -261,6 +261,10 @@ exports.raport_GET_failures = function (req, res, next) {
             .populate({
               path: 'failure',
               populate: 'deviceType',
+            })
+            .populate({
+              path: 'failure',
+              populate: 'operation',
             })
             .populate({
               path: 'failure',

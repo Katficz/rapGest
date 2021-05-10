@@ -43,6 +43,7 @@ block content
                                                         each operation in operations
                                                             if failure.operation
                                                                 option(value=operation._id selected=(failure.operation.name==operation.name)) #{operation.name}  
+                                                                option #{failure.operation}  
                                                             else
                                                                 option(value=operation._id) #{operation.name}
 

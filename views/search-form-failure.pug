@@ -49,10 +49,7 @@ block content
                               select#user.form-control(type='select' name='user' )
                                  option(value='defaultvalue' selected=true) Dowolne
                                  for user in users
-                                    if plan
-                                       option(value=user._id selected=(user._id.toString()===plan.user._id.toString() ? 'selected' : false )) #{user.fullname}
-                                    else
-                                       option(value=user._id) #{user.fullname}            
+                                    option(value=user._id) #{user.fullname}            
 
             //- div(class='row')   
             //-    div.col.my-2            
