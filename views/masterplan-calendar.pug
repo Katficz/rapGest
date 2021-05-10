@@ -71,6 +71,7 @@ block content
 
     div
       button.btn.btn-danger.mt-3(type="button" id='testSendButton' onclick="")  Zapisz 
+      button.btn.btn-info.mt-3.ml-4(type="button" id='printList' onclick="")  Wydrukuj Plan Dnia
   div.col#calendar-wrap
     #calendar
 
@@ -159,6 +160,51 @@ block content
         arg.draggedEl.parentNode.removeChild(arg.draggedEl);
       },
       events: events_list,
+      eventDidMount: function(info) {
+      var dotEl = info.el.getElementsByClassName('fc-list-event-graphic')[0];
+      if (dotEl) {
+        // if event is longer than 16 hours
+      if (info.event.allDay || (info.event.end - info.event.start) > 57600000) {
+         dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> I, II, III</span>`)
+      }
+        // starts in I
+      else if (6 <= info.event.start.getHours() && info.event.start.getHours() < 14) {
+        if (14 <= info.event.end?.getHours() && info.event.end?.getHours() < 22){
+        dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> I, II</span>`)
+        }
+        else if (22 <= info.event.end?.getHours() || info.event.end?.getHours() < 6 ){
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> I, II, III</span>`)
+        }
+        else {
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> I</span>`)
+        }
+        }
+        // starts in II
+      else if (14 <= info.event.start.getHours() && info.event.start.getHours() < 22) {
+        if (6 <= info.event.end?.getHours() && info.event.end?.getHours() < 14){
+        dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> II, III, I</span>`)
+        }
+        else if (22 <= info.event.end?.getHours() || info.event.end?.getHours() < 6 ){
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> II, III</span>`)
+        }
+        else {
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> II</span>`)
+        }
+        }
+        // starts in III
+      else if (22 <= info.event.start.getHours() || info.event.start.getHours() < 6 ) {
+        if (14 <= info.event.end?.getHours() && info.event.end?.getHours() < 22){
+        dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> III, II</span>`)
+        }
+        else if (6 <= info.event.end?.getHours() && info.event.end?.getHours() < 14){
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> III, II, I</span>`)
+        }
+        else {
+          dotEl.insertAdjacentHTML('beforeend', `<span class='mr-3'> III</span>`)
+        }
+        }
+      }
+    },
       eventClick: function(info) {
         info.jsEvent.preventDefault(); // don't let the browser navigate
 
@@ -230,7 +276,7 @@ block content
 
 
     function saveModifiedPlans(){
-      console.log('modifiedEvents: ',modifiedEvents)
+      //console.log('modifiedEvents: ',modifiedEvents)
       //console.log('createdPlans', createdPlans)
       for (let planId of modifiedEvents){
         event = calendar.getEventById(planId)
@@ -300,9 +346,16 @@ block content
       })
     }
     
-
+    function printList(){
+      // click
+      document.querySelector('.fc-listWeek-button.fc-button.fc-button-primary').click()
+      window.print()
+    }
+   
 
     /* LISTENERS */
     let el2 = document.getElementById("testSendButton");
     el2.addEventListener("click", saveModifiedPlans, false);
 
+    let el3 = document.getElementById("printList");
+    el3.addEventListener("click", printList, false);

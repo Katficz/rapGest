@@ -270,3 +270,15 @@ a.green-link {
     opacity: 0;
   }
 }
+
+@media print {
+  #external-events {
+    display: none;
+  }
+  button {
+    display: none !important;
+  }
+  .fc-scroller.fc-scroller-liquid {
+    overflow: visible !important;
+  }
+}
