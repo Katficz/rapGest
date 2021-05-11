@@ -13,7 +13,10 @@ const { body, validationResult } = require('express-validator')
 // Display list of all plans.
 exports.masterplan_list = function (req, res, next) {
   Masterplan.find()
-    .sort([['date', 'descending']])
+    .sort([
+      ['status', 'ascending'],
+      ['date', 'descending'],
+    ])
     .exec(function (err, result) {
       if (err) {
         return next(err)
@@ -200,6 +203,7 @@ exports.masterplan_create_post = [
           res.render('masterplan-form', {
             users: result,
             masterplan: masterplan,
+            errors: errors.array(),
           })
         })
       return
@@ -364,12 +368,14 @@ exports.masterplan_update_post = [
 
   (req, res, next) => {
     const errors = validationResult(req)
+    // if I didn't send parsed plans, they would be overwritten with an empty array. Why?
     let masterplan = new Masterplan({
       name: req.body.name,
       desc: req.body.desc,
       date: new Date(),
       status: req.body.status,
       user: req.body.user,
+      plans: JSON.parse(req.body.plans),
       _id: req.params.id,
     })
 
@@ -383,9 +389,11 @@ exports.masterplan_update_post = [
           res.render('masterplan-form', {
             users: result,
             masterplan: masterplan,
+            errors: errors.array(),
           })
         })
     } else {
+      console.log('forma', masterplan)
       Masterplan.findByIdAndUpdate(
         req.params.id,
         masterplan,

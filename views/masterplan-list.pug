@@ -13,6 +13,7 @@ block content
                th(scope='col') Tytuł
                th(scope='col') Data utworzenia
                th(scope='col') Wielkość
+               th(scope='col') Status
          tbody
             each masterplan in masterplan_list
                tr
@@ -22,3 +23,10 @@ block content
                      a.black-link(href=masterplan.url) #{masterplan.date.toLocaleString()}
                   td.padding0 
                      a.black-link(href=masterplan.url) #{masterplan.plans.length}
+                  td.padding0 
+                     if masterplan.status===1
+                        a.blue-link(href=masterplan.url) Nierozpoczęte
+                     if masterplan.status===2
+                        a.yellow-link(href=masterplan.url) W Trakcie Realizacji
+                     if masterplan.status===3
+                        a.green-link(href=masterplan.url) Zakończone

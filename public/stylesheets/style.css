@@ -124,6 +124,14 @@ a.green-link {
   color: #28a745;
   text-decoration: none;
 }
+a.blue-link {
+  color: #007bff;
+  text-decoration: none;
+}
+a.yellow-link {
+  color: #ffc107;
+  text-decoration: none;
+}
 
 .clock {
   height: 6rem;
