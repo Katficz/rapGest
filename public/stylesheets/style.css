@@ -124,6 +124,14 @@ a.green-link {
   color: #28a745;
   text-decoration: none;
 }
+a.blue-link {
+  color: #007bff;
+  text-decoration: none;
+}
+a.yellow-link {
+  color: #ffc107;
+  text-decoration: none;
+}
 
 .clock {
   height: 6rem;
@@ -270,12 +278,32 @@ a.green-link {
     opacity: 0;
   }
 }
+.gestamp-logo {
+  width: 250px;
+  display: none;
+}
+.title-print {
+  display: none;
+}
 
 @media print {
   #external-events {
     display: none;
   }
-  button {
+  .title-print {
+    display: block;
+  }
+  .print-margin-top-lg {
+    margin-top: -130px;
+  }
+  .print-margin-top {
+    margin-top: -80px;
+  }
+  .gestamp-logo {
+    width: 250px;
+    display: block;
+  }
+  button.fc-button {
     display: none !important;
   }
   .fc-scroller.fc-scroller-liquid {

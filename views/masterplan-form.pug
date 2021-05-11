@@ -19,6 +19,8 @@ block content
                         else
                            option(value=user._id) #{user.fullname}
 
+                  input(type='hidden' name='plans' value=masterplan.plans)
+
                   .row.mt-2
                       .col.d-flex.justify-content-between.mt-4(style='max-width: 600px;')
                         .form-check.form-check-inline
@@ -30,6 +32,8 @@ block content
                         .form-check.form-check-inline
                           input.form-check-input(type='radio' id=('inlineRadio3') name='status' value='3' checked=(masterplan===undefined? '' : masterplan.status===3? true : false))
                           label.form-check-label(for='inlineRadio3')  Zakończone
+                  
+                     
                     
                button.btn.btn-primary(type='submit') Zapisz
 

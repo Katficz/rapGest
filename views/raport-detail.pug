@@ -2,19 +2,22 @@ extends layout
 block content  
    div(class='col mx-md-5 mt-4')
       div(class='row')
-         div(class='col')
+         div.page.print-margin-top-lg(class='col')
+            img.gestamp-logo.float-left.logo-print(src="/images/Gestamp_Logo.png" alt="")
             h1.mt-5.text-center #{raport.virtual_date} 
             h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
             p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
 
-            a.btn.btn-primary.my-5.mr-2(href='/api/raport/'+ raport._id +'/download' target="_blank") Pobierz PDF
+            //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/download' target="_blank") Pobierz PDF
+            //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/pdf' target="_blank") Pobierz PDF
+            a.btn.btn-primary.my-5.mr-2#printRaport Wydrukuj Raport
 
             //a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
 
             a.btn.btn-primary.my-5.mr-2(href='/api/raporty/'+raport._id+'/edytuj' hidden=(permission==='technik'?true:false)) Zmodyfikuj    
       div(class='row')
-         div(class='col')
-            table(class='table table-bordered')
+         div.page(class='col')
+            table.print-table(class='table table-bordered')
                caption Skład zmiany
                   thead
                      tr
@@ -43,7 +46,7 @@ block content
                                  button.btn.btn-danger.umfy-btn(disabled) NIE
 
       div(class='row')
-         div(class='col')
+         div.page(class='col')
             table(class="table table-bordered") 
                caption Obchód
                thead 
@@ -80,7 +83,7 @@ block content
 
 
       div(class='row')
-         div(class='col')
+         div.page(class='col')
             table(class='table table-bordered') 
                caption Prace Planowane
                thead 
@@ -98,7 +101,7 @@ block content
 
 
       div(class='row')
-         div(class='col')
+         div.page(class='col')
             table(class='table table-bordered')
                caption Dodatkowe informacje
                tbody
@@ -108,73 +111,75 @@ block content
       div(class='row')
          div(class='col')
             each failure in raport.failure
-               table(class='my-5 table table-bordered')
-                  caption.h5 Awaria #{(failure._id)}
-                  thead
-                     tr
-                        //tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
-                        //th(width="20%" class='text-center' scope='col') Status:
-                        //th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
-                        //th(scope='col') Status #{failure.status}
-                     tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
-                        th(width="20%" class='text-center' scope='col') Status:
-                        th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
-            
-                  tbody
-                     tr
-                        td Czas rozpoczęcia Awarii
-                        td #{(failure.startDate==null ? '' : failure.startDate.toLocaleString())}
-                     tr.umfy-table-separator
-                        td Czas zakończenia Awarii
-                        td #{(failure.endDate==null ? '' : failure.endDate.toLocaleString())}
-                     tr
-                        td Operacja 
-                        td #{failure.operation==null ? '' : failure.operation.name}
-                     tr
-                        td Linia 
-                        td #{failure.prodLine==null ? '' : failure.prodLine.name}
-                     tr
-                        td Typ
-                        td #{failure.deviceType==null ? '' : failure.deviceType.name}
-                     tr.umfy-table-separator
-                        td Urządzenie
-                        td #{failure.device==null ? '' :failure.device.name}
-                     tr
-                        td Przyczyna 
-                        td #{failure.cause}
-                     tr
-                        td Diagnostyka 
-                        td #{failure.diagnostics}
-                     tr.umfy-table-separator
-                        td Działanie 
-                        td #{failure.action}
-                     tr
-                        td Numer zlecenia 
-                        td #{failure.orderNum}
-                     tr
-                        td Użyte części
-                        td #{failure.usedParts}
-                     tr
-                        td Części do zamówienia 
-                        td #{failure.missingParts}
-                     tr.umfy-table-separator
-                        td Prace na postój 
-                        td #{failure.plannedActions}
-                     tr
-                        td Autor
-                        td #{failure.author==null ? '' : failure.author.name}
-                     tr.umfy-table-separator
-                        td Kolaboranci
-                        // Why does it print '<' and '>' ?????
-                        // I cannot treat it like an object because of that (coleague.name)
-                        if failure.collaborators==null
-                           td 
-                        else
-                           td
-                              each coleague in failure.collaborators
-                                 div #{coleague.name}
-                                 
+               .page
+                  table(class='my-5 table table-bordered')
+                     caption.h5 Awaria #{(failure._id)}
+                     thead
+                        tr(class=(failure.status === 1 ? 'table-success' : (failure.status === 2 ? 'table-danger' : 'table-warning')))
+                           th(width="20%" class='text-center' scope='col') Status:
+                           th.text-center(scope='col') #{(failure.status === 1 ? 'Naprawiono' : (failure.status === 2 ? 'Nie naprawiono' : 'Działanie Tymczasowe'))}
+
+                     tbody
+                        tr
+                           td Czas rozpoczęcia Awarii
+                           td #{(failure.startDate==null ? '' : failure.startDate.toLocaleString())}
+                        tr.umfy-table-separator
+                           td Czas zakończenia Awarii
+                           td #{(failure.endDate==null ? '' : failure.endDate.toLocaleString())}
+                        tr
+                           td Operacja 
+                           td #{failure.operation==null ? '' : failure.operation.name}
+                        tr
+                           td Linia 
+                           td #{failure.prodLine==null ? '' : failure.prodLine.name}
+                        tr
+                           td Typ
+                           td #{failure.deviceType==null ? '' : failure.deviceType.name}
+                        tr.umfy-table-separator
+                           td Urządzenie
+                           td #{failure.device==null ? '' :failure.device.name}
+                        tr
+                           td Przyczyna 
+                           td #{failure.cause}
+                        tr
+                           td Diagnostyka 
+                           td #{failure.diagnostics}
+                        tr.umfy-table-separator
+                           td Działanie 
+                           td #{failure.action}
+                        tr
+                           td Numer zlecenia 
+                           td #{failure.orderNum}
+                        tr
+                           td Użyte części
+                           td #{failure.usedParts}
+                        tr
+                           td Części do zamówienia 
+                           td #{failure.missingParts}
+                        tr.umfy-table-separator
+                           td Prace na postój 
+                           td #{failure.plannedActions}
+                        tr
+                           td Autor
+                           td #{failure.author==null ? '' : failure.author.name}
+                        tr.umfy-table-separator
+                           td Kolaboranci
+                           // Why does it print '<' and '>' ?????
+                           // I cannot treat it like an object because of that (coleague.name)
+                           if failure.collaborators==null
+                              td 
+                           else
+                              td
+                                 each coleague in failure.collaborators
+                                    div #{coleague.name}
 
 
+   script.
+      function printRaport(){
+         window.print()
+       }
+   
 
-
+    /* LISTENERS */
+    let el1 = document.getElementById("printRaport");
+    el1.addEventListener("click", printRaport, false);
