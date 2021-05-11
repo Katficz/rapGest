@@ -273,20 +273,19 @@ exports.user_POST_login = async function(req, res, next) {
           nowDate.setHours(nowDate.getHours()+2)
           saveDate = new Date()
           saveDate.setHours(13)
-
+          
           startDate = new Date()
+          startDate.setHours(startDate.getHours()+2)
           endDate = new Date()
+          endDate.setHours(endDate.getHours()+2)
                     // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
 
-          if (shiftLoggedIn == 3 && (10 > nowDate.getHours())) {
-            startDate.setHours(8, 00)
-            endDate.setHours(24)
-
-            startDate.setHours(startDate.getHours() + 2)
-            endDate.setHours(startDate.getHours() + 2)
-            startDate.setDate(startDate.getDate() - 1)
-            endDate.setDate(startDate.getDate() - 1)
-
+          if ((shiftLoggedIn == 3) && (10 > nowDate.getUTCHours())) {
+            startDate.setUTCHours(8, 00)
+            endDate.setUTCHours(23, 00)
+            
+            startDate.setUTCDate(startDate.getUTCDate() - 1)
+            endDate.setUTCDate(endDate.getUTCDate() - 1)
             Raport.findOne({
               shift: shiftLoggedIn,
               date: {
@@ -339,8 +338,8 @@ exports.user_POST_login = async function(req, res, next) {
           }
 
           else {
-            startDate.setHours(8, 00)
-            endDate.setHours(24)
+            startDate.setUTCHours(8, 00)
+            endDate.setUTCHours(23, 59)
             Raport.findOne({
               shift: shiftLoggedIn,
               date: {
@@ -380,6 +379,7 @@ exports.user_POST_login = async function(req, res, next) {
                 })
               } 
               if(resultRap){
+
                 const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: resultRap._id}, process.env.TOKEN_SECRET)
                 res.status(200)
                 .cookie('token', token, {
