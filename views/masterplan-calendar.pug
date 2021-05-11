@@ -72,7 +72,9 @@ block content
     div
       button.btn.btn-danger.mt-3(type="button" id='testSendButton' onclick="")  Zapisz 
       button.btn.btn-info.mt-3.ml-4(type="button" id='printList' onclick="")  Wydrukuj Plan Dnia
-  div.col#calendar-wrap
+  div.col.print-margin-top#calendar-wrap
+    img.gestamp-logo.float-left.logo-print(src="/images/Gestamp_Logo.png" alt="")
+    div.h1.title-print.text-center(style='margin-top: 100px') Prace Planowane Utrzymania Ruchu
     #calendar
 
 
