@@ -63,7 +63,16 @@ exports.raport_GET_list = function (req, res) {
 
       for (var i = 0; i < 4; i++) {
         startDate.setUTCDate(startDate.getUTCDate() + 1)
-        dates.push(DateTime.fromJSDate(startDate).toFormat('dd.LL.yyyy'))
+        day = startDate.getUTCDate()
+        month = startDate.getUTCMonth()+1
+        year = startDate.getUTCFullYear()
+        if(day<10) day = '0'+day
+        if(month<10) month = '0'+month
+        dates.push(day+'.'+month+'.'+year)
+        //dates.push(DateTime.fromJSDate(startDate).toFormat('dd.LL.yyyy'))
+        day = 0
+        month = 0
+        year = 0
       }
       for (var i = 0; i < dates.length; i++) {
         var match = false
