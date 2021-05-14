@@ -16,7 +16,6 @@ const { DocumentProvider } = require('mongoose')
 //HOME PAGE
 exports.raport_GET_list = function (req, res) {
   startDate = new Date()
-  // this is bad //too bad!
   startDate.setHours(startDate.getHours() + 2)
   startDate.setUTCDate(startDate.getUTCDate() - 4)
   async.parallel(
@@ -110,7 +109,6 @@ exports.raport_GET_list = function (req, res) {
           shiftA.push(0)
         }
       }
-
       res.render('raport-list-home', {
         title: 'Witaj! Wybierz raport',
         shiftA: shiftA,
@@ -553,4 +551,31 @@ exports.raport_GET_firstSection = function (req, res, next) {
       })
     }
   }
+}
+
+exports.raport_POST_saveFirstSection = function(req, res, next) {
+  savedById = req.verifiedId
+  Raport.findByIdAndUpdate(req.params.id, req.body)
+  .exec(function(err, result) {
+    if(err) {
+      res.status(500).json({erro: err})
+      return
+    }
+    req.body.failure = result.failure
+    req.body.date = result.date,
+    req.body.shift = result.shift,
+    req.body.isCurrent = false,
+    req.body.savedBy = req.verifiedId,
+    req.body.editedDate = new Date()
+
+    var outDatedRaport = new Raport(req.body)
+    outDatedRaport.save(function(err) {
+      if(err) {
+        console.log(err)
+        res.status(500).json({err:err})
+        return
+      }
+      res.status(200).json('success!')
+    })
+  })
 }

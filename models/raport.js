@@ -48,6 +48,17 @@ const raportSchema = new Schema({
   additionalInfo: {
     type: String,
   },
+  //things for history of changes 
+  isCurrent: {
+    type: Boolean,
+  },
+  savedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  editedDate: {
+    type: Date,
+  }
 })
 
 raportSchema.virtual('url').get(function () {

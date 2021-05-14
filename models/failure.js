@@ -64,5 +64,9 @@ const failureSchema = new Schema({
   missingParts: {
     type: String,
   },
+  isCurrent: {
+    type: Boolean,
+  },
+  //
 })
 module.exports = mongoose.model('Failure', failureSchema)

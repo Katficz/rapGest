@@ -12,7 +12,7 @@ block content
                     div.card-body
                         if present||absent
                             div.form-group
-                                form#team(data-raportId=raportId)
+                                form#team
                                     table.table.table-sm.mb-0
                                         thead 
                                             tr
@@ -25,15 +25,14 @@ block content
                                                     td!= employee.name 
                                                     td!= employee.surname
                                                     td.text-center
-                                                        input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id checked)
+                                                        input.m-1.presentEmployee(type="checkbox" name="presence" data-userId=employee._id checked)
 
                                             each employee in absent
                                                 tr
                                                     td!= employee.name 
                                                     td!= employee.surname
                                                     td.text-center
-                                                        input.m-1#presentEmployee(type="checkbox" name="presence" data-userId=employee._id)
-                                    buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveTeam()') Zapisz skład osobowy
+                                                        input.m-1.presentEmployee(type="checkbox" name="presence" data-userId=employee._id)
 
             div.card
                 div.card-header.gestamp-bg-color#roundAroundkHeading
@@ -57,10 +56,6 @@ block content
                                                 textarea.form-control.roundAroundText(rows="1" id=place[0]) #{roundAround[place[0]]}
                                             td(align="center")
                                                 input.m-1.roundAroundCheckBox(type="checkbox" id=place[1] name=place[1] checked=roundAround[place[1]])
-                            buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-1(type="button" onclick='saveRoundAround()') Zapisz obchód
-    
-
-
 
             div.card
                 div.card-header.gestamp-bg-color#additionalInfoCheckHeading
@@ -71,7 +66,7 @@ block content
                         div.raportTableTitle.text-center Dodatkowe informacje
                         div.form-group
                             textarea#freeText.form-control(rows="5") #{additionalInfo}
-                        buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-5(type="button" onclick='saveAdditionalInfo()') Zapisz dodatkowy opis
+        buttonbtn.align-right.btn.btn-outline-success.btn-block.mb-5(type="button" onclick='saveAll()') Zapisz
 
 
     div#snackbar 
@@ -81,52 +76,24 @@ block content
         activateLink.className+=" active"
         const activateSubMenu = document.querySelector('#myRaportSubMenu')
         activateSubMenu.className+=" active"
-        const teamForm = document.querySelector('#team')
-        //teamform contains raports ID in it
 
-        function saveTeam() {
+        const raportId =  !{JSON.stringify(raportId)}
+
+
+        function saveAll() {
+            //prepraring team:
             var teamPresent = []
             var teamAbsent = []
-            // Access users' chcekboxes in some ugly way that only smart boys can understand
-            for(var i = 1; i<teamForm.childNodes[0].childNodes[1].childNodes.length;i++) {
-                if(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].checked == true) {
-                    teamPresent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+            checkBoxes = document.querySelectorAll('.presentEmployee')
+            for(let i = 0; i<checkBoxes.length;i++) {
+                if(checkBoxes[i].checked) {
+                    teamPresent.push(checkBoxes[i].dataset.userid)
                 }
-                else {
-                    teamAbsent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+                if(!checkBoxes[i].checked) {
+                    teamAbsent.push(checkBoxes[i].dataset.userid)
                 }
             }
-            fetch('/api/zapisz-sklad/'+teamForm.dataset.raportid,{
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        teamPresent: teamPresent,
-                        teamAbsent: teamAbsent,
-                    })
-            })
-            .then(function(res) {
-                return res.json()
-            })
-            .then(function(response) {
-                if(response.message) {
-                    alert(response.message)
-                }
-                else{
-                    var snackBar = document.getElementById("snackbar");
-                    snackBar.className = "show";
-                    snackBar.textContent = 'Pomyślnie zapisano skład osobowy!'
-                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
-                }
-            })
-            .catch((err) => {
-                alert(err.message)
-            })
-        }
-    
-        function saveRoundAround() {
+            //prepare roundAround
             const roundAroundText = document.querySelectorAll('.roundAroundText')
             const roundAroundCheckBox = document.querySelectorAll('.roundAroundCheckBox')
             var roundAroundPlaces =[
@@ -136,66 +103,160 @@ block content
                 ['electric', 'isElectric', 'Rozdzielnia'],
                 ['workshop', 'isWorkshop', 'Warsztat'],
             ]
-            var sendMe = {}
+            var roundAround = {}
             for(let i = 0;i<roundAroundPlaces.length;i++) {
-                sendMe[roundAroundPlaces[i][0]] = roundAroundText[i].value
-                sendMe[roundAroundPlaces[i][1]] = roundAroundCheckBox[i].checked
+                roundAround[roundAroundPlaces[i][0]] = roundAroundText[i].value
+                roundAround[roundAroundPlaces[i][1]] = roundAroundCheckBox[i].checked
             }
 
-            fetch('/api/zapisz-obchod/'+teamForm.dataset.raportid, {
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(sendMe)
-            })
-            .then(function(res) {
-                return res.json()
-            })
-            .then(function(response) {
-                if(response.message) {
-                    alert(response.message)
-                }
-                else{
-                    var snackBar = document.getElementById("snackbar");
-                    snackBar.className = "show";
-                    snackBar.textContent = 'Pomyślnie zapisano obchód!'
-                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
-            })
-            .catch((err) => {
-                alert(err.message)
-            })
-        }
-    
-        function saveAdditionalInfo() {
+            //prepare additionalInfo
             const freeText = document.querySelector('#freeText')
-            fetch('/api/zapisz-dodatkowe-info/'+teamForm.dataset.raportid, {
+
+            fetch('/api/zapisz-zestawienie/'+raportId, {
                 method: 'POST',
-                    headers: {
+                headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({additionalInfo: freeText.value})
+                body: JSON.stringify({
+                    teamPresent: teamPresent,
+                    teamAbsent: teamAbsent,
+                    roundAround: roundAround,
+                    additionalInfo: freeText.value
+                })
             })
             .then(function(res, err) {
                 return res.json()
             })
             .then(function(response) {
-                console.log(response)
-                if(response.message) {
+                if(response.err) {
                     alert(response.message)
                 }
                 else{
+                    console.log(response)
                     var snackBar = document.getElementById("snackbar");
                     snackBar.className = "show";
-                    snackBar.textContent = 'Pomyślnie zapisano dodatkowe informacje!'
+                    snackBar.textContent = 'Zapisano pomyślnie!'
                     setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
             })
             .catch((err) => {
                 alert(err.message)
             })
         }
+
+
+        //- function saveTeam() {
+        //-     var teamPresent = []
+        //-     var teamAbsent = []
+        //-     // Access users' chcekboxes in some ugly way that only smart boys can understand
+        //-     for(var i = 1; i<teamForm.childNodes[0].childNodes[1].childNodes.length;i++) {
+        //-         if(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].checked == true) {
+        //-             teamPresent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+        //-         }
+        //-         else {
+        //-             teamAbsent.push(teamForm.childNodes[0].childNodes[1].childNodes[i].childNodes[2].childNodes[0].dataset.userid)
+        //-         }
+        //-     }
+        //-     fetch('/api/zapisz-sklad/'+teamForm.dataset.raportid,{
+        //-         method: 'POST',
+        //-             headers: {
+        //-                 'Accept': 'application/json',
+        //-                 'Content-Type': 'application/json'
+        //-             },
+        //-             body: JSON.stringify({
+        //-                 teamPresent: teamPresent,
+        //-                 teamAbsent: teamAbsent,
+        //-             })
+        //-     })
+        //-     .then(function(res) {
+        //-         return res.json()
+        //-     })
+        //-     .then(function(response) {
+        //-         if(response.message) {
+        //-             alert(response.message)
+        //-         }
+        //-         else{
+        //-             var snackBar = document.getElementById("snackbar");
+        //-             snackBar.className = "show";
+        //-             snackBar.textContent = 'Pomyślnie zapisano skład osobowy!'
+        //-             setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
+        //-         }
+        //-     })
+        //-     .catch((err) => {
+        //-         alert(err.message)
+        //-     })
+        //- }
+    
+        //- function saveRoundAround() {
+        //-     const roundAroundText = document.querySelectorAll('.roundAroundText')
+        //-     const roundAroundCheckBox = document.querySelectorAll('.roundAroundCheckBox')
+        //-     var roundAroundPlaces =[
+        //-         ['kettle', 'isKettle', 'Kotłownia'],
+        //-         ['compressor', 'isCompressor', 'Kompresownia'],
+        //-         ['ice', 'isIce', 'Wieża Chłodu'],
+        //-         ['electric', 'isElectric', 'Rozdzielnia'],
+        //-         ['workshop', 'isWorkshop', 'Warsztat'],
+        //-     ]
+        //-     var sendMe = {}
+        //-     for(let i = 0;i<roundAroundPlaces.length;i++) {
+        //-         sendMe[roundAroundPlaces[i][0]] = roundAroundText[i].value
+        //-         sendMe[roundAroundPlaces[i][1]] = roundAroundCheckBox[i].checked
+        //-     }
+
+        //-     fetch('/api/zapisz-obchod/'+teamForm.dataset.raportid, {
+        //-         method: 'POST',
+        //-             headers: {
+        //-                 'Accept': 'application/json',
+        //-                 'Content-Type': 'application/json'
+        //-             },
+        //-             body: JSON.stringify(sendMe)
+        //-     })
+        //-     .then(function(res) {
+        //-         return res.json()
+        //-     })
+        //-     .then(function(response) {
+        //-         if(response.message) {
+        //-             alert(response.message)
+        //-         }
+        //-         else{
+        //-             var snackBar = document.getElementById("snackbar");
+        //-             snackBar.className = "show";
+        //-             snackBar.textContent = 'Pomyślnie zapisano obchód!'
+        //-             setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
+        //-     })
+        //-     .catch((err) => {
+        //-         alert(err.message)
+        //-     })
+        //- }
+    
+        //- function saveAdditionalInfo() {
+        //-     const freeText = document.querySelector('#freeText')
+        //-     fetch('/api/zapisz-dodatkowe-info/'+teamForm.dataset.raportid, {
+        //-         method: 'POST',
+        //-             headers: {
+        //-                 'Accept': 'application/json',
+        //-                 'Content-Type': 'application/json'
+        //-             },
+        //-             body: JSON.stringify({additionalInfo: freeText.value})
+        //-     })
+        //-     .then(function(res, err) {
+        //-         return res.json()
+        //-     })
+        //-     .then(function(response) {
+        //-         console.log(response)
+        //-         if(response.message) {
+        //-             alert(response.message)
+        //-         }
+        //-         else{
+        //-             var snackBar = document.getElementById("snackbar");
+        //-             snackBar.className = "show";
+        //-             snackBar.textContent = 'Pomyślnie zapisano dodatkowe informacje!'
+        //-             setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                }
+        //-     })
+        //-     .catch((err) => {
+        //-         alert(err.message)
+        //-     })
+        //- }
     if errors
         ul
             for error in errors

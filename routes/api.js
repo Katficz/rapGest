@@ -447,6 +447,9 @@ router.post(
   raportController.raport_POST_saveAdditionalInfo
 )
 
+//RAPORT SAVE 1ST SECTION -- FETCH URL
+router.post('/zapisz-zestawienie/:id', auth.authTech, raportController.raport_POST_saveFirstSection)
+
 /*
 ██╗░░░██╗░██████╗███████╗██████╗░░██████╗
 ██║░░░██║██╔════╝██╔════╝██╔══██╗██╔════╝

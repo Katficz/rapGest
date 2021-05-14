@@ -248,9 +248,8 @@ exports.user_GET_login = function(req, res) {
   res.clearCookie('token')
   res.render('login', {title: 'System Raportowania UR Spawalnia'});
 }
+
 exports.user_POST_login = async function(req, res, next) {
-    var dataTeraz = new Date()
-    dataTeraz.setHours(dataTeraz.getHours()+2)
     User.findOne({login: req.body.login})
     .exec(async function(err, loggedInResult) {
         if(err) {
@@ -278,7 +277,7 @@ exports.user_POST_login = async function(req, res, next) {
           startDate.setHours(startDate.getHours()+2)
           endDate = new Date()
           endDate.setHours(endDate.getHours()+2)
-                    // raport for the 3rd shift, created between 0-6 will be created with previous days date and hours 24
+          // raport for the 3rd shift, created between b4 10am will be created with previous days date and hours 24
 
           if ((shiftLoggedIn == 3) && (10 > nowDate.getUTCHours())) {
             startDate.setUTCHours(8, 00)
@@ -289,7 +288,7 @@ exports.user_POST_login = async function(req, res, next) {
             Raport.findOne({
               shift: shiftLoggedIn,
               date: {
-                // searching for the previous date 8 - 24
+                // searching for the previous date 8 - 23
                 $gte: startDate,
                 $lte: endDate,
               },
@@ -314,6 +313,7 @@ exports.user_POST_login = async function(req, res, next) {
                     shift: shiftLoggedIn,
                     teamAbsent: team,
                     teamPresent: [],
+                    isCurrent: true,
                   })
                   raport.save()
                   const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id}, process.env.TOKEN_SECRET)
@@ -338,6 +338,7 @@ exports.user_POST_login = async function(req, res, next) {
           }
 
           else {
+            console.log('jestem w elsie')
             startDate.setUTCHours(8, 00)
             endDate.setUTCHours(23, 59)
             Raport.findOne({
@@ -367,6 +368,7 @@ exports.user_POST_login = async function(req, res, next) {
                     shift: shiftLoggedIn,
                     teamAbsent: team,
                     teamPresent: [],
+                    isCurrent: true,
                   })
                   raport.save()
                   const token = jwt.sign({_id: loggedInResult._id, permission: loggedInResult.permission, myRaportId: raport._id,}, process.env.TOKEN_SECRET)
