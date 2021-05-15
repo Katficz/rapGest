@@ -13,7 +13,7 @@ block content
 
                         each failure, index in myRaport.failure
 
-                            div.card#card(value=failure._id)
+                            div.card(value=failure._id)
 
                                 div.card-header.gestamp-bg-color
                                     h2.mb-0 
@@ -129,7 +129,7 @@ block content
                                                     button.btn.btn-outline-danger#deleteFailure(type="button" onclick='deleteSomeFail(this)' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) Usuń
                                                     button.btn.btn-outline-success.float-right#saveFailure.float-right(type="button" onclick='saveSomeFailure(this)' disabled=(failure.author._id.toString()==loggedInUser._id.toString()?false:true)) Zapisz
 
-                    div.card#card(style="display: none")
+                    div.card(style="display: none")
                         div.card-header.gestamp-bg-color
                             h2.mb-0 
                                 button.btn.btn-link.btn-block.text-left(type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapseOne" style="color: white") Awaria num 1 #{loggedInUser.fullname}
@@ -359,8 +359,10 @@ block content
             today.setHours(time[0],time[1],0,0)
             return today
         }
+        var zmienna
         function saveSomeFailure(button) {
             var form = button.parentNode.parentNode.parentNode
+            zmienna = form
             //- prodLineId = form.childNodes[0].childNodes[0].childNodes[1].selectedOptions[0].value
             //- deviceTypeId = form.childNodes[0].childNodes[1].childNodes[1].selectedOptions[0].value
             //- deviceId = form.childNodes[0].childNodes[2].childNodes[1].selectedOptions[0].value
@@ -424,7 +426,7 @@ block content
             }
 
             let formBody = {
-                failureId: form.dataset.failureid,
+                failureId: form.dataset.failureId,
                 startDate: startDate,
                 endDate: endDate,
                 orderNum: orderNum,
@@ -461,14 +463,15 @@ block content
                 return response.json();
             })
             .then(function(json) {
-                if(json.message) {
-                    alert(json.mesage)
+                if(json.err) {
+                    alert(json.message)
                 }
                 else{
                     var snackBar = document.getElementById("snackbar");
                     snackBar.className = "show";
                     snackBar.textContent = 'Pomyślnie zapisano awarię!'
-                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);                 form.dataset.failureid = json._id
+                    setTimeout(function(){ snackBar.className = snackBar.className.replace("show", ""); }, 3000);
+                    form.dataset.failureId = json._id
                 }
             })
             .catch((err) => {

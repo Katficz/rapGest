@@ -7,3 +7,8 @@ block content
         if(url)
             h2.h2.text-center Zostaniesz przekierowany do strony głównej za 3 sekundy...
             meta(http-equiv="refresh" content="3;"+url)
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg

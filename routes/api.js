@@ -355,6 +355,9 @@ router.get('/linie-produkcyjne/:id', prodLineController.prodLine_GET_one)
 //GET raports list /// HOME PAGE AFTER LOGIN///
 router.get('/raporty', auth.authTech, raportController.raport_GET_list)
 
+//GET for creating NEW raport in past as spec/admin on specific date and shift
+router.get('/raporty/dodaj/:date/:shift', auth.authSpec, raportController.raport_GET_addNew)
+
 //GET for this shifts raport summary /// only technicians will use this --
 router.get(
   '/raporty/moj-raport',
@@ -362,12 +365,18 @@ router.get(
   raportController.raport_GET_myRaport
 )
 
+//GET for specific raports first section 
+router.get('/raporty/zestawienie/:id', auth.authSpec, raportController.raport_GET_firstSection)
+
 //GET for this shifts raports first section // kurwa nie wiem jak nazwać to gówno po and i po polsku
 router.get(
   '/raporty/moj-raport/zestawienie',
   auth.authTech,
   raportController.raport_GET_firstSection
 )
+
+//GET for specific raports first section 
+router.get('/raporty/awarie/:id', auth.authSpec, raportController.raport_GET_firstSection)
 
 //GET for this users + shifts failures
 router.get(
@@ -384,11 +393,11 @@ router.get(
 )
 
 //POST for updating raport
-router.post(
-  '/raporty/:id/edytuj',
-  auth.authTech,
-  raportController.raport_POST_update
-)
+// router.post(
+//   '/raporty/:id/edytuj',
+//   auth.authTech,
+//   raportController.raport_POST_update
+// )
 
 //GET specific raport
 router.get('/raporty/:id', auth.authTech, raportController.raport_GET_one)
@@ -427,25 +436,25 @@ router.post(
 ╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░    ╚═╝░░░░░╚═╝╚═╝╚═╝░░╚══╝░╚════╝░╚═╝░░╚═╝╚═════╝░
 */
 /// RAPORT TEAM SAVE -- FETCH URL // save/override team members for the raport
-router.post(
-  '/zapisz-sklad/:id',
-  auth.authTech,
-  raportController.raport_POST_saveTeam
-)
+// router.post(
+//   '/zapisz-sklad/:id',
+//   auth.authTech,
+//   raportController.raport_POST_saveTeam
+// )
 
 //RAPORT SAVE ROUNDAROUND -- FETCH URL // save/override for raport
-router.post(
-  '/zapisz-obchod/:id',
-  auth.authTech,
-  raportController.raport_POST_saveRoundAround
-)
+// router.post(
+//   '/zapisz-obchod/:id',
+//   auth.authTech,
+//   raportController.raport_POST_saveRoundAround
+// )
 
 //RAPORT SAVE ADDITIONAL INFO -- FETCH URL
-router.post(
-  '/zapisz-dodatkowe-info/:id',
-  auth.authTech,
-  raportController.raport_POST_saveAdditionalInfo
-)
+// router.post(
+//   '/zapisz-dodatkowe-info/:id',
+//   auth.authTech,
+//   raportController.raport_POST_saveAdditionalInfo
+// )
 
 //RAPORT SAVE 1ST SECTION -- FETCH URL
 router.post('/zapisz-zestawienie/:id', auth.authTech, raportController.raport_POST_saveFirstSection)

@@ -50,9 +50,7 @@ const failureSchema = new Schema({
   action: {
     type: String,
   },
-  // effect: {
-  //   type: Boolean,
-  // },
+
   status: { type: Number },
   plannedActions: {
     //ESZCZE NIE IMPLEMENTUJE

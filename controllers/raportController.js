@@ -26,6 +26,7 @@ exports.raport_GET_list = function (req, res) {
           date: {
             $gte: startDate,
           },
+          isCurrent: true,
         })
           .sort('+date')
           .exec(callback)
@@ -36,6 +37,7 @@ exports.raport_GET_list = function (req, res) {
           date: {
             $gte: startDate,
           },
+          isCurrent: true,
         })
           .sort('+date')
           .exec(callback)
@@ -46,6 +48,7 @@ exports.raport_GET_list = function (req, res) {
           date: {
             $gte: startDate,
           },
+          isCurrent: true,
         })
           .sort('+date')
           .exec(callback)
@@ -115,11 +118,12 @@ exports.raport_GET_list = function (req, res) {
         shiftB: shiftB,
         shiftC: shiftC,
         dates: dates,
+        permission: req.verifiedPerm
       })
     }
   )
 }
-
+//will get rid of this
 exports.raport_GET_update = function (req, res, next) {
   async.parallel(
     {
@@ -201,48 +205,6 @@ exports.raport_GET_update = function (req, res, next) {
     }
   )
 }
-///FETCH ENDPOINTS FOR RAPORTS FIRST SECTION
-exports.raport_POST_saveAdditionalInfo = function (req, res, next) {
-  Raport.findByIdAndUpdate(req.params.id, {
-    additionalInfo: req.body.additionalInfo,
-  }).exec(function (err) {
-    if (err) {
-      res.status(500).json(err)
-      return next(err)
-    } else {
-      res.status(200).json('Succes!')
-    }
-  })
-}
-
-exports.raport_POST_saveRoundAround = function (req, res) {
-  Raport.findByIdAndUpdate(req.params.id, {
-    roundAround: req.body,
-  }).exec(function (err) {
-    if (err) {
-      res.status(500).json(err)
-      return next(err)
-    } else {
-      res.status(200).json('Succes!')
-    }
-  })
-}
-
-exports.raport_POST_saveTeam = function (req, res, next) {
-  Raport.findByIdAndUpdate(req.params.id, {
-    teamPresent: req.body.teamPresent,
-    teamAbsent: req.body.teamAbsent,
-  }).exec(function (err) {
-    if (err) {
-      res.status(500).json(err)
-      return next(err)
-    } else {
-      res.status(200).json('Succes!')
-    }
-  })
-  //Raport.findByIdAndUpdate(req.params._id)
-}
-//FETCH FIRST SECTIO ENDS HERE
 
 // get ONLY failures for .../awarie endpoint
 exports.raport_GET_failures = function (req, res, next) {
@@ -347,6 +309,78 @@ exports.raport_GET_failures = function (req, res, next) {
     }
   }
 }
+// get only for first section
+exports.raport_GET_firstSection = function (req, res, next) {
+  if (req.verifiedShift != 0) {
+    Raport.findById(req.verifiedMyRaportId)
+      .populate('teamPresent')
+      .populate('teamAbsent')
+      .exec(function (err, result) {
+        var roundAroundPlaces = [
+          ['kettle', 'isKettle', 'Kotłownia'],
+          ['compressor', 'isCompressor', 'Kompresownia'],
+          ['ice', 'isIce', 'Wieża Chłodu'],
+          ['electric', 'isElectric', 'Rozdzielnia'],
+          ['workshop', 'isWorkshop', 'Warsztat'],
+        ]
+        if (err) {
+          return next(err)
+        }
+        res.render('raport-first-section', {
+          title: 'Podstawowe informacje',
+          raportId: req.verifiedMyRaportId,
+          absent: result.teamAbsent,
+          present: result.teamPresent,
+          roundAroundPlaces: roundAroundPlaces,
+          roundAround: result.roundAround,
+          additionalInfo: result.additionalInfo,
+        })
+      })
+  }
+  if (req.verifiedShift == 0) {
+    if(!req.params.id){
+      if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
+        res.render('redirect-access-denied', {
+          title: 'Edytuj wybrany raport przez kalendarz',
+          url: '/api/raporty',
+        })
+      }
+      if (req.verifiedPerm == 'technik') {
+        res.render('redirect-access-denied', {
+          title:
+            'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
+          url: '/api/raporty',
+        })
+      }
+    }
+    if(req.params.id) {
+      Raport.findById(req.params.id)
+      .populate('teamPresent')
+      .populate('teamAbsent')
+      .exec(function (err, result) {
+        var roundAroundPlaces = [
+          ['kettle', 'isKettle', 'Kotłownia'],
+          ['compressor', 'isCompressor', 'Kompresownia'],
+          ['ice', 'isIce', 'Wieża Chłodu'],
+          ['electric', 'isElectric', 'Rozdzielnia'],
+          ['workshop', 'isWorkshop', 'Warsztat'],
+        ]
+        if (err) {
+          return next(err)
+        }
+        res.render('raport-first-section', {
+          title: 'Podstawowe informacje',
+          raportId: req.verifiedMyRaportId,
+          absent: result.teamAbsent,
+          present: result.teamPresent,
+          roundAroundPlaces: roundAroundPlaces,
+          roundAround: result.roundAround,
+          additionalInfo: result.additionalInfo,
+        })
+      })
+    }
+  }
+}
 
 //FETCH ENDPOINTS FOR RAPORT MANAGMENT
 exports.raport_POST_deleteFailure = function (req, res) {
@@ -370,13 +404,61 @@ exports.raport_POST_deleteFailure = function (req, res) {
 exports.raport_POST_saveFailure = function (req, res, next) {
   if (req.body.failureId) {
     var id = req.body.failureId
+    console.log(req.body.failureId)
     delete req.body.failureId
-    req.body.author = req.verifiedId
-    failure.findByIdAndUpdate(id, req.body).exec(function (err, result) {
+    rapId = req.params.id
+
+    failure.findByIdAndUpdate(id, req.body)
+    .exec(function (err, result) {
       if (err) {
-        return next(err)
+        console.log(err)
+        res.status(500).json({err:err})
+        return
       }
-      res.status(200).json(result)
+      req.body.isCurrent = false
+      req.body.author = result.author
+      outDatedFailure = new Failure(req.body)
+      outDatedFailure.save(function(err) {
+        if(err) {
+          console.log(err)
+          res.status(500).json({err:err})
+          return
+        }
+        Raport.findById(rapId)
+        .exec(function(err, foundRaport) {
+          if(err) {
+            console.log(err)
+            res.status(500).json({err:err})
+            return
+          }
+          oldFailures = foundRaport.failure
+
+          var index = oldFailures.indexOf(id)
+          oldFailures[index] = outDatedFailure._id
+
+          outDatedRaport = new Raport({
+            date: foundRaport.date,
+            teamPresent: foundRaport.teamPresent,
+            teamAbsent: foundRaport.teamAbsent,
+            shift: foundRaport.shift,
+            roundAround: foundRaport.roundAround,
+            failure: oldFailures,
+            additionalInfo: foundRaport.additionalInfo,
+            isCurrent: false,
+            savedBy: req.verifiedId,
+            editedDate: new Date()
+          })
+
+          outDatedRaport.save(function(err) {
+            if(err) {
+              console.log(err)
+              res.status(500).json({err:err})
+              return
+            }
+            res.status(200).json(result)
+          })
+        })
+      })
     })
     return
   }
@@ -384,28 +466,128 @@ exports.raport_POST_saveFailure = function (req, res, next) {
   if (!req.body.failureId) {
     delete req.body.failureId
     req.body.author = req.verifiedId
+    req.body.isCurrent = true
     const failure = new Failure(req.body)
     failure.save(function (err) {
-      if (err) {
-        //return next(err)
-        res.status(500).json({ error: err })
+      if(err) {
+        console.log(err)
+        res.status(500).json({err:err})
+        return
       }
-      if (!err) {
         Raport.findByIdAndUpdate(req.params.id, {
           $push: { failure: failure._id, ref: 'Failure' },
         }).exec(function (err) {
           if (err) {
             return next(err)
           }
-          res.status(200).json(failure)
+          Raport.findById(req.params.id)
+          .exec(function(err, result) {
+            if(err) {
+              console.log(err)
+              res.status(500).json({err:err})
+              return
+            }
+            outDatedRaport = new Raport({
+              date: result.date,
+              teamPresent: result.teamPresent,
+              teamAbsent: result.teamAbsent,
+              shift: result.shift,
+              roundAround: result.roundAround,
+              failure: result.failure,
+              additionalInfo: result.additionalInfo,
+              isCurrent: false,
+              savedBy: req.verifiedId,
+              editedDate: new Date()
+            })
+
+            outDatedRaport.save(function(err) {
+              if(err) {
+                console.log(err)
+                res.status(500).json({err:err})
+                return
+              }
+              res.status(200).json(failure)
+            })
+          })
         })
-      }
     })
   }
 }
+
+exports.raport_POST_saveFirstSection = function(req, res, next) {
+  savedById = req.verifiedId
+  Raport.findByIdAndUpdate(req.params.id, req.body)
+  .exec(function(err, result) {
+    if(err) {
+      res.status(500).json({erro: err})
+      return
+    }
+    req.body.failure = result.failure
+    req.body.date = result.date,
+    req.body.shift = result.shift,
+    req.body.isCurrent = false,
+    req.body.savedBy = req.verifiedId,
+    req.body.editedDate = new Date()
+
+    var outDatedRaport = new Raport(req.body)
+    outDatedRaport.save(function(err) {
+      if(err) {
+        res.status(500).json({err:err})
+        return
+      }
+      res.status(200).json('success!')
+    })
+  })
+}
+
 //FETCH RAPORT ENDS HERE
-exports.raport_POST_update = function (req, res) {
-  res.send('update raport POST NI')
+
+
+exports.raport_GET_addNew = function (req, res) {
+
+  var from = req.params.date.split("-")
+  var creationDate = new Date(from[2], from[1] - 1, from[0],13,0,0)
+  var startSearchingDate = new Date(from[2], from[1] - 1, from[0],8,0,0)
+  var endSearchingDate = new Date(from[2], from[1] - 1, from[0],23,0,0)
+  shift = req.params.shift
+
+  Raport.findOne({
+    date: {
+      // searching for the same day between 8 - 24
+      $gte: startSearchingDate,
+      $lte: endSearchingDate,
+    },
+    shift: shift
+  })
+  .exec(function(err, result) {
+    if(err) {
+      res.status(500).json({err:err})
+      return
+    }
+    if(result) {
+      res.status(200).render('redirect-access-denied', {title: 'Raport dla danego dnia już istnieje!'})
+      return
+    }
+    User.find({
+      shift: shift,
+      isAvaible: true,
+    })
+    .exec(function (err, team) {
+      if (err) {
+        res.status(500).json(err)
+        return next(err)
+      }
+      raport = new Raport({
+        date: creationDate,
+        shift: shift,
+        teamAbsent: team,
+        teamPresent: [],
+        isCurrent: true,
+      })
+      raport.save()
+      res.status(200).redirect(raport.url)
+    })
+  })
 }
 
 exports.raport_GET_myRaport = function (req, res, next) {
@@ -509,73 +691,5 @@ exports.raport_GET_one = function (req, res) {
     })
 }
 
-exports.raport_GET_firstSection = function (req, res, next) {
-  if (req.verifiedShift != 0) {
-    Raport.findById(req.verifiedMyRaportId)
-      .populate('teamPresent')
-      .populate('teamAbsent')
-      .exec(function (err, result) {
-        var roundAroundPlaces = [
-          ['kettle', 'isKettle', 'Kotłownia'],
-          ['compressor', 'isCompressor', 'Kompresownia'],
-          ['ice', 'isIce', 'Wieża Chłodu'],
-          ['electric', 'isElectric', 'Rozdzielnia'],
-          ['workshop', 'isWorkshop', 'Warsztat'],
-        ]
-        if (err) {
-          return next(err)
-        }
-        res.render('raport-first-section', {
-          title: 'Podstawowe informacje',
-          raportId: req.verifiedMyRaportId,
-          absent: result.teamAbsent,
-          present: result.teamPresent,
-          roundAroundPlaces: roundAroundPlaces,
-          roundAround: result.roundAround,
-          additionalInfo: result.additionalInfo,
-        })
-      })
-  }
-  if (req.verifiedShift == 0) {
-    if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.render('redirect-access-denied', {
-        title: 'Edytuj wybrany raport przez kalendarz',
-        url: '/api/raporty',
-      })
-    }
-    if (req.verifiedPerm == 'technik') {
-      res.render('redirect-access-denied', {
-        title:
-          'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
-        url: '/api/raporty',
-      })
-    }
-  }
-}
 
-exports.raport_POST_saveFirstSection = function(req, res, next) {
-  savedById = req.verifiedId
-  Raport.findByIdAndUpdate(req.params.id, req.body)
-  .exec(function(err, result) {
-    if(err) {
-      res.status(500).json({erro: err})
-      return
-    }
-    req.body.failure = result.failure
-    req.body.date = result.date,
-    req.body.shift = result.shift,
-    req.body.isCurrent = false,
-    req.body.savedBy = req.verifiedId,
-    req.body.editedDate = new Date()
 
-    var outDatedRaport = new Raport(req.body)
-    outDatedRaport.save(function(err) {
-      if(err) {
-        console.log(err)
-        res.status(500).json({err:err})
-        return
-      }
-      res.status(200).json('success!')
-    })
-  })
-}
