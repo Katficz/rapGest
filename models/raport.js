@@ -69,4 +69,8 @@ raportSchema.virtual('virtual_date').get(function () {
   return DateTime.fromJSDate(this.date).toFormat('dd.LL.yyyy')
 })
 
+raportSchema.virtual('virtual_edited_date').get(function () {
+  return this.editedDate.toLocaleString()
+})
+
 module.exports = mongoose.model('Raport', raportSchema)

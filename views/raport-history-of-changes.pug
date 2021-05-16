@@ -1,0 +1,29 @@
+extends layout
+block content 
+    div.col-xl-10.offset-xl-1.col-l-12
+        h3.h3.text-center.my-5 Historia zmian raportu z dnia : #{currentRaport.virtual_date}, zmiany #{currentRaport.shift}
+        table.table 
+            thead.thead-dark 
+                tr 
+                    th(scope="col") Data zmiany
+                    th(scope="col") Zapisane przez
+                    th(scope="col") Podgląd
+            tbody
+                tr
+                    td Wersja aktualna - możliwość edycji
+                    td ---
+                    td 
+                        a.btn.btn-primary(href='/api/raporty/'+currentRaport._id) Podgląd  
+                each value in raports
+                    tr
+                        td #{value[0]}
+                        td #{value[1]}
+                        td 
+                            a.btn.btn-primary(href='/api/raporty/'+value[2]) Podgląd   
+
+
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg

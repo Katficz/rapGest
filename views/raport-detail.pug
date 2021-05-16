@@ -7,15 +7,17 @@ block content
             h1.mt-5.text-center #{raport.virtual_date} 
             h2.text-center Zmiana #{(raport.shift === 1 ? '1 – Poranna' : (raport.shift === 2? '2 – Popołudniowa' : '3 – Nocna'))}
             p.h4.my-4.text-center Dziennik zdarzeń oraz działania podjęte przez dział Utrzymania Ruchu
-
+            
+            if(raport.isCurrent == false)
+               p.h5.mt-4.text-center Wersja zapisana #{editedDate} przez #{raport.savedBy.fullname}
             //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/download' target="_blank") Pobierz PDF
             //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/pdf' target="_blank") Pobierz PDF
-            a.btn.btn-primary.my-5.mr-2#printRaport Wydrukuj Raport
+            
+            a.btn.btn-primary.my-5.mr-2#printRaport(hidden=!raport.isCurrent) Wydrukuj Raport
+            a.btn.btn-primary.my-5.mr-2.edit-button(href='/api/raporty/zestawienie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj zestawienie    
+            a.btn.btn-primary.my-5.mr-2.edit-button(href='/api/raporty/awarie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj awarię
+            a.btn.btn-primary.my-5.mr-2(href='/api/raporty/historia-zmian/'+raport._id hidden=!raport.isCurrent) Historia zmian
 
-            //a.btn.btn-primary.my-5.mr-2(href=raport.url+'/delete') Usuń 
-
-            a.btn.btn-primary.my-5.mr-2(href='/api/raporty/zestawienie/'+raport._id hidden=(permission==='technik'?true:false)) Edytuj zestawienie    
-            a.btn.btn-primary.my-5.mr-2(href='/api/raporty/awarie/'+raport._id hidden=(permission==='technik'?true:false)) Edytuj awarię
       div(class='row')
          div.page(class='col')
             table.print-table(class='table table-bordered')
@@ -180,7 +182,12 @@ block content
          window.print()
        }
    
-
+      var permission = !{JSON.stringify(permission)}
+      if(permission=='technik') {
+         var buttons = document.querySelectorAll(".edit-button")
+         buttons[0].hidden = true
+         buttons[1].hidden = true
+      }
     /* LISTENERS */
     let el1 = document.getElementById("printRaport");
     el1.addEventListener("click", printRaport, false);

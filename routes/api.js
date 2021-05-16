@@ -16,6 +16,7 @@ const failure_controller = require('../controllers/failureController')
 
 //to authenticate specific routes, add auth.authTech/authSpec/authAdmin to middleware
 const auth = require('./verifyToken')
+const raport = require('../models/raport')
 // adds verifiedId with logged in user ID and verifiedPerm with logged users permision in req
 // LOGING // 1st Page layout
 /*
@@ -385,12 +386,15 @@ router.get(
   raportController.raport_GET_failures
 )
 
+//history of change for specific raport
+router.get('/raporty/historia-zmian/:id', auth.authTech, raportController.raport_GET_historyOfChanges)
+
 //GET for updating raport
-router.get(
-  '/raporty/:id/edytuj',
-  auth.authSpec,
-  raportController.raport_GET_update
-)
+// router.get(
+//   '/raporty/:id/edytuj',
+//   auth.authSpec,
+//   raportController.raport_GET_update
+// )
 
 //POST for updating raport
 // router.post(
