@@ -95,7 +95,7 @@ block content
             }
             else {
                 firstTr.childNodes[i].firstChild.classList.add('btn-warning')
-                if(permission!='technik') secondTr.childNodes[i].firstChild.firstChild.href = '/api/raporty/dodaj/'+newDates[i-1]+'/2'
+                if(permission!='technik') firstTr.childNodes[i].firstChild.firstChild.href = '/api/raporty/dodaj/'+newDates[i-1]+'/1'
                 firstTr.childNodes[i].firstChild.firstChild.text = 'Brak raportu'
             }
         }
