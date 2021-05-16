@@ -389,19 +389,6 @@ router.get(
 //history of change for specific raport
 router.get('/raporty/historia-zmian/:id', auth.authTech, raportController.raport_GET_historyOfChanges)
 
-//GET for updating raport
-// router.get(
-//   '/raporty/:id/edytuj',
-//   auth.authSpec,
-//   raportController.raport_GET_update
-// )
-
-//POST for updating raport
-// router.post(
-//   '/raporty/:id/edytuj',
-//   auth.authTech,
-//   raportController.raport_POST_update
-// )
 
 //GET specific raport
 router.get('/raporty/:id', auth.authTech, raportController.raport_GET_one)

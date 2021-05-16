@@ -123,88 +123,6 @@ exports.raport_GET_list = function (req, res) {
     }
   )
 }
-//will get rid of this
-// exports.raport_GET_update = function (req, res, next) {
-//   async.parallel(
-//     {
-//       raport: function (callback) {
-//         Raport.findById(req.params.id)
-//           .populate('teamPresent')
-//           .populate('teamAbsent')
-//           .populate({
-//             path: 'failure',
-//             populate: {
-//               path: 'prodLine',
-//               model: 'ProdLine',
-//             },
-//           })
-//           .populate({
-//             path: 'failure',
-//             populate: 'deviceType',
-//           })
-//           .populate({
-//             path: 'failure',
-//             populate: 'device',
-//           })
-//           .populate({
-//             path: 'failure',
-//             populate: 'author',
-//           })
-//           .populate({
-//             path: 'failure',
-//             populate: 'operation',
-//           })
-//           .exec(callback)
-//       },
-//       deviceTypes: function (callback) {
-//         DeviceType.find()
-//           .sort([['name', 'ascending']])
-//           .exec(callback)
-//       },
-//       prodLines: function (callback) {
-//         ProdLine.find()
-//           .sort([['name', 'ascending']])
-//           .exec(callback)
-//       },
-//       operations: function (callback) {
-//         Operation.find()
-//           .sort([['name', 'ascending']])
-//           .exec(callback)
-//       },
-//       devices: function (callback) {
-//         Device.find()
-//           .sort([['name', 'ascending']])
-//           .exec(callback)
-//       },
-//     },
-//     function (err, result) {
-//       if (err) {
-//         return next(err)
-//       }
-
-//       var roundAroundPlaces = [
-//         ['kettle', 'isKettle', 'Kotłownia'],
-//         ['compressor', 'isCompressor', 'Kompresownia'],
-//         ['ice', 'isIce', 'Wieża Chłodu'],
-//         ['electric', 'isElectric', 'Rozdzielnia'],
-//         ['workshop', 'isWorkshop', 'Warsztat'],
-//       ]
-//       var canUpdate = true
-//       if (req.verifiedPerm == 'technik') canUpdate = false
-//       res.render('raport-update', {
-//         title:
-//           'Edytuj Raport zmiany ' +
-//           result.raport.shift +
-//           ' z dnia ' +
-//           result.raport.virtual_date,
-//         data: result,
-//         absent: result.raport.teamAbsent,
-//         present: result.raport.teamPresent,
-//         roundAroundPlaces: roundAroundPlaces,
-//       })
-//     }
-//   )
-// }
 
 // get ONLY failures for .../awarie endpoint
 exports.raport_GET_failures = function (req, res, next) {
@@ -422,6 +340,9 @@ exports.raport_GET_firstSection = function (req, res, next) {
           roundAroundPlaces: roundAroundPlaces,
           roundAround: result.roundAround,
           additionalInfo: result.additionalInfo,
+          shift: result.shift,
+          date: result.virtual_date,
+
         })
       })
   }
@@ -677,8 +598,13 @@ exports.raport_GET_addNew = function (req, res) {
         teamPresent: [],
         isCurrent: true,
       })
-      raport.save()
-      res.status(200).redirect(raport.url)
+      raport.save(function(err) {
+        if (err) {
+          res.status(500).json(err)
+          return next(err)
+        }
+        res.status(200).redirect(raport.url)
+      })
     })
   })
 }

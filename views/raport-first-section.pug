@@ -55,7 +55,9 @@ block content
                                             td
                                                 textarea.form-control.roundAroundText(rows="1" id=place[0]) #{roundAround[place[0]]}
                                             td(align="center")
-                                                input.m-1.roundAroundCheckBox(type="checkbox" id=place[1] name=place[1] checked=roundAround[place[1]])
+                                                input.m-1.roundAroundCheckBox(type="checkbox" onclick="okNok(this)" id=place[1] name=place[1] checked=roundAround[place[1]])
+                                                button.btn.umfy-btn(class=(roundAround[place[1]] === true ? 'btn-success' : 'btn-danger') disabled onclick="okNok(this)") #{(roundAround[place[1]] === true ? 'OK ' : 'NOK')}
+
 
             div.card
                 div.card-header.gestamp-bg-color#additionalInfoCheckHeading
@@ -78,6 +80,21 @@ block content
         activateSubMenu.className+=" active"
 
         const raportId =  !{JSON.stringify(raportId)}
+
+        var zmienna = 0
+        function okNok(button) {
+            zmienna = button
+            if(button.checked) {
+                button.nextSibling.textContent = "OK"
+                button.nextSibling.classList.remove('btn-danger')            
+                button.nextSibling.classList += ' btn-success'            
+            }
+            if(!button.checked) {
+                button.nextSibling.textContent = "NOK"
+                button.nextSibling.classList.remove('btn-success')            
+                button.nextSibling.classList += ' btn-danger'            
+            }
+        }
 
 
         function saveAll() {
