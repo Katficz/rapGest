@@ -4,7 +4,7 @@ block content
     div.container
         div.row
             div.col-xl-10.offset-xl-1.col-l-12
-                h3.h3.text-center Lista awarii
+                h3.h3.text-center Lista awarii z dnia: #{myRaport.virtual_date}, zmiany #{myRaport.shift}
                 button.btn.btn-outline-warning#newFailure(type="button" onclick='addFBtn()') Dodaj Awarię
 
                 div.accordion#failureAccordion.mt-2(data-raport=myRaport data-coworkers=coWorkers data-loggedInUser=loggedInUser.fullname)

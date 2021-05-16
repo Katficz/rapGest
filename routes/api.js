@@ -375,8 +375,8 @@ router.get(
   raportController.raport_GET_firstSection
 )
 
-//GET for specific raports first section 
-router.get('/raporty/awarie/:id', auth.authSpec, raportController.raport_GET_firstSection)
+//GET for specific raports failures
+router.get('/raporty/awarie/:id', auth.authSpec, raportController.raport_GET_failures)
 
 //GET for this users + shifts failures
 router.get(

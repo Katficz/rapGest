@@ -294,18 +294,106 @@ exports.raport_GET_failures = function (req, res, next) {
     )
   }
   if (req.verifiedShift == 0) {
-    if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
-      res.render('redirect-access-denied', {
-        title: 'Edytuj wybrany raport przez kalendarz',
-        url: '/api/raporty',
-      })
+    if(!req.params.id) {
+      if (req.verifiedPerm == 'admin' || req.verifiedPerm == 'specjalista') {
+        res.render('redirect-access-denied', {
+          title: 'Edytuj wybrany raport przez kalendarz',
+          url: '/api/raporty',
+        })
+      }
+      if (req.verifiedPerm == 'technik') {
+        res.render('redirect-access-denied', {
+          title:
+            'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
+          url: '/api/raporty',
+        })
+      }
+      return
     }
-    if (req.verifiedPerm == 'technik') {
-      res.render('redirect-access-denied', {
-        title:
-          'Brak możliwości edycji - Nie zostałeś dodany do żadnej dzisiejszej zmiany',
-        url: '/api/raporty',
-      })
+    if(req.params.id) {
+      async.parallel(
+        {
+          specialists: function (callback) {
+            User.find({
+              permission: 'specjalista',
+              isAvaible: true,
+            }).exec(callback)
+          },
+          raport: function (callback) {
+            Raport.findById(req.params.id)
+              .populate('teamPresent')
+              .populate({
+                path: 'failure',
+                populate: {
+                  path: 'prodLine',
+                  model: 'ProdLine',
+                },
+              })
+              .populate({
+                path: 'failure',
+                populate: 'deviceType',
+              })
+              .populate({
+                path: 'failure',
+                populate: 'operation',
+              })
+              .populate({
+                path: 'failure',
+                populate: 'device',
+              })
+              .populate({
+                path: 'failure',
+                populate: 'collaborators',
+              })
+              .populate({
+                path: 'failure',
+                populate: 'author',
+              })
+              .exec(callback)
+          },
+          deviceTypes: function (callback) {
+            DeviceType.find()
+              .sort([['name', 'ascending']])
+              .exec(callback)
+          },
+          prodLines: function (callback) {
+            ProdLine.find()
+              .sort([['name', 'ascending']])
+              .exec(callback)
+          },
+          operations: function (callback) {
+            Operation.find()
+              .sort([['name', 'ascending']])
+              .exec(callback)
+          },
+          devices: function (callback) {
+            Device.find()
+              .sort([['name', 'ascending']])
+              .exec(callback)
+          },
+        },
+        function (err, result) {
+          if (err) {
+            return next(err)
+          }
+          User.findById(req.verifiedId).exec(function (err, loggedInUser) {
+            if (err) {
+              return next(err)
+            }
+            coWorkers = result.raport.teamPresent.concat(result.specialists)
+            res.render('raport-failures', {
+              title: 'Edytuj awarie',
+              myRaport: result.raport,
+              deviceTypes: result.deviceTypes,
+              prodLines: result.prodLines,
+              operations: result.operations,
+              devices: result.devices,
+              coWorkers: coWorkers,
+              loggedInUser: loggedInUser,
+            })
+          })
+        }
+      )
     }
   }
 }
@@ -352,6 +440,7 @@ exports.raport_GET_firstSection = function (req, res, next) {
           url: '/api/raporty',
         })
       }
+      return
     }
     if(req.params.id) {
       Raport.findById(req.params.id)
@@ -366,16 +455,20 @@ exports.raport_GET_firstSection = function (req, res, next) {
           ['workshop', 'isWorkshop', 'Warsztat'],
         ]
         if (err) {
-          return next(err)
+          console.log(err)
+          res.status(500).json({err:err})
+          return
         }
         res.render('raport-first-section', {
           title: 'Podstawowe informacje',
-          raportId: req.verifiedMyRaportId,
+          raportId: result._id,
           absent: result.teamAbsent,
           present: result.teamPresent,
           roundAroundPlaces: roundAroundPlaces,
           roundAround: result.roundAround,
           additionalInfo: result.additionalInfo,
+          date: result.virtual_date,
+          shift: result.shift
         })
       })
     }
@@ -682,7 +775,9 @@ exports.raport_GET_one = function (req, res) {
     })
     .exec(function (err, result) {
       if (err) {
-        return next(err)
+        console.log(err)
+        res.status(500).json({err:err})
+        return
       }
       res.render('raport-detail', {
         raport: result,
