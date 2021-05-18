@@ -13,10 +13,10 @@ block content
             //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/download' target="_blank") Pobierz PDF
             //a.btn.btn-primary.my-5.mr-2#downloadPDF(href='/api/raporty/'+ raport._id +'/pdf' target="_blank") Pobierz PDF
             
-            a.btn.btn-primary.my-5.mr-2#printRaport(hidden=!raport.isCurrent) Wydrukuj Raport
-            a.btn.btn-primary.my-5.mr-2.edit-button(href='/api/raporty/zestawienie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj zestawienie    
-            a.btn.btn-primary.my-5.mr-2.edit-button(href='/api/raporty/awarie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj awarię
-            a.btn.btn-primary.my-5.mr-2(href='/api/raporty/historia-zmian/'+raport._id hidden=!raport.isCurrent) Historia zmian
+            a.btn.btn-primary.my-5.mr-2.hideInPrint#printRaport(hidden=!raport.isCurrent) Wydrukuj Raport
+            a.btn.btn-primary.my-5.mr-2.hideInPrint.edit-button(href='/api/raporty/zestawienie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj zestawienie    
+            a.btn.btn-primary.my-5.mr-2.hideInPrint.edit-button(href='/api/raporty/awarie/'+raport._id hidden=!raport.isCurrent disabled=(permission==='technik'?true:false)) Edytuj awarię
+            a.btn.btn-primary.my-5.mr-2.hideInPrint(href='/api/raporty/historia-zmian/'+raport._id hidden=!raport.isCurrent) Historia zmian
 
       div(class='row')
          div.page(class='col')

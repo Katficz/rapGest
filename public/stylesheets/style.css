@@ -309,4 +309,7 @@ a.yellow-link {
   .fc-scroller.fc-scroller-liquid {
     overflow: visible !important;
   }
+  .btn.hideInPrint {
+    display: none !important;
+  }
 }
