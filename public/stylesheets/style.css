@@ -1,12 +1,16 @@
 /* CSS FOR BOOTSTRAP STARTS HERE */
+/* main theme color */
+:root {
+  --my-color: #7f1212;
+}
 .logInBox {
   border: 3px solid black;
   border-radius: 10px;
-  background-color: #01426a;
+  background-color: var(--my-color);
   margin-top: 150px;
 }
 .raportTableTitle {
-  background-color: #01426a;
+  background-color: var(--my-color);
   color: white;
   border-radius: 5px;
   width: 100%;
@@ -14,15 +18,15 @@
 }
 
 .gestamp-bg-color {
-  background-color: #01426a;
+  background-color: var(--my-color);
 }
 .nice-border {
-  border: 3px solid #01426a;
+  border: 3px solid var(--my-color);
   border-radius: 15px;
   padding: 10px;
 }
 .nice-shifts-border {
-  border: 2px solid #01426a;
+  border: 2px solid var(--my-color);
   border-radius: 15px;
   padding: 15px;
   height: 200px;
@@ -43,7 +47,7 @@ body {
 }
 
 .bg-gestampblue {
-  background-color: #01426a;
+  background-color: #c72c2c;
 }
 
 .table caption {
